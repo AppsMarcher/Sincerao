@@ -66,7 +66,13 @@ async function salvarEdicaoCompetencia(id) {
   const tipo = linha.querySelector('.edit-tipo').value;
   const definicao = linha.querySelector('.edit-definicao').value.trim();
   if (!nome) { showToast('Informe o nome da competência.'); return; }
-  await sbFetch('/competencias?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ nome, tipo, definicao: definicao || null }) });
+  if (nomeJaExiste(G.competencias, nome, id)) { showToast('Já existe uma competência com esse nome.'); return; }
+  try {
+    await sbFetch('/competencias?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ nome, tipo, definicao: definicao || null }) });
+  } catch (e) {
+    showToast(String(e.message || '').includes('duplicate') ? 'Já existe uma competência com esse nome.' : 'Erro ao salvar competência.');
+    return;
+  }
   _competenciaEmEdicaoId = null;
   await carregarCompetencias();
   showToast('Competência atualizada.');
@@ -74,7 +80,13 @@ async function salvarEdicaoCompetencia(id) {
 
 async function criarCompetencia(nome, tipo, definicao) {
   if (!nome.trim()) { showToast('Informe o nome da competência.'); return; }
-  await sbFetch('/competencias', { method: 'POST', body: JSON.stringify({ nome: nome.trim(), tipo, definicao: definicao.trim() || null }) });
+  if (nomeJaExiste(G.competencias, nome)) { showToast('Já existe uma competência com esse nome.'); return; }
+  try {
+    await sbFetch('/competencias', { method: 'POST', body: JSON.stringify({ nome: nome.trim(), tipo, definicao: definicao.trim() || null }) });
+  } catch (e) {
+    showToast(String(e.message || '').includes('duplicate') ? 'Já existe uma competência com esse nome.' : 'Erro ao criar competência.');
+    return;
+  }
   await carregarCompetencias();
   showToast('Competência criada.');
 }

@@ -43,6 +43,11 @@ function calcularPontuacao(notas) {
   };
 }
 
+function nomeJaExiste(lista, nome, ignorarId = null) {
+  const alvo = nome.trim().toLowerCase();
+  return lista.some((item) => item.id !== ignorarId && item.nome.trim().toLowerCase() === alvo);
+}
+
 function statusLabel(status) {
   return {
     rascunho: 'Rascunho (gestor)',
