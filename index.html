@@ -186,8 +186,8 @@
         <button type="submit" class="btn-primary">Convidar colaborador</button>
         <button type="button" class="btn-link" onclick="abrirImportarColaboradores()"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Importar em lote</button>
       </form>
-      <table class="tabela">
-        <thead><tr><th>Nome</th><th>Cargo</th><th>Gestor</th><th>Papel</th></tr></thead>
+      <table class="tabela tabela-colaboradores">
+        <thead><tr><th>Nome</th><th>Cargo</th><th>Gestor</th><th>Papel</th><th>Ações</th></tr></thead>
         <tbody id="adm-lista-colaboradores"></tbody>
       </table>
     </div>
@@ -264,6 +264,25 @@
     <div class="modal-actions">
       <button class="btn-link" onclick="fecharModalImportarColaboradores()">Fechar</button>
       <button class="btn-primary" onclick="processarImportacaoColaboradores()">Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: definir nova senha de um colaborador (admin escolhe) -->
+<div id="modal-definir-senha" class="modal">
+  <div class="modal-box">
+    <h3>Definir nova senha</h3>
+    <p class="muted">Colaborador: <strong id="definir-senha-colab-nome"></strong></p>
+    <label class="campo">
+      <span>Nova senha</span>
+      <div class="campo-senha-wrap">
+        <input type="password" id="definir-senha-colab-input" minlength="6" autocomplete="new-password">
+        <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
+    </label>
+    <div class="modal-actions">
+      <button class="btn-link" onclick="fecharModalDefinirSenha()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarDefinirSenha()">Definir senha</button>
     </div>
   </div>
 </div>

@@ -1,5 +1,7 @@
 // admin/colaboradores-module.js — convite de novos colaboradores e edição de cargo/gestor/papel
 
+let _colaboradorEmEdicaoId = null;
+
 async function carregarColaboradores() {
   G.colaboradores = (await sbFetch('/perfis?select=*,cargo:cargo_id(nome,setor:setor_id(nome))&order=nome.asc')) || [];
 }
@@ -17,17 +19,36 @@ function renderAdmColaboradores() {
 
   el.innerHTML =
     G.colaboradores
-      .map(
-        (c) => `
+      .map((c) => {
+        if (c.id === _colaboradorEmEdicaoId) {
+          return `
+    <tr data-edicao="${c.id}">
+      <td colspan="3">
+        <input type="text" class="edit-nome" value="${escHtml(c.nome)}" placeholder="Nome">
+        <input type="email" class="edit-email" value="${escHtml(c.email)}" placeholder="E-mail">
+      </td>
+      <td colspan="2" class="tabela-acoes">
+        <button class="btn-icon" title="Salvar" onclick="salvarEdicaoColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
+        <button class="btn-icon" title="Cancelar" onclick="cancelarEdicaoColaborador()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </td>
+    </tr>`;
+        }
+        return `
     <tr>
       <td>${escHtml(c.nome)}<br><small>${escHtml(c.email)}</small></td>
       <td><select onchange="atualizarColaborador('${c.id}', {cargo_id: this.value})">${opcoesCargo(c)}</select></td>
       <td><select onchange="atualizarColaborador('${c.id}', {gestor_id: this.value || null})">${opcoesGestor(c)}</select></td>
       <td><select onchange="atualizarColaborador('${c.id}', {papel: this.value})">${opcoesPapel(c)}</select></td>
-    </tr>
-  `
-      )
-      .join('') || '<tr><td colspan="4">Nenhum colaborador ainda. Use o formulário acima para convidar o primeiro.</td></tr>';
+      <td class="tabela-acoes">
+        <button class="btn-icon" title="Reenviar convite" onclick="reenviarConviteColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M21 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7"/><polyline points="3 6 12 13 21 6"/><path d="M17 16l4 4m0-4l-4 4"/></svg></button>
+        <button class="btn-icon" title="Enviar link de redefinição de senha" onclick="redefinirSenhaColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.5 12.5L19 4m0 0h-4m4 0v4"/></svg></button>
+        <button class="btn-icon" title="Definir nova senha" onclick="abrirDefinirSenha('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></button>
+        <button class="btn-icon" title="Editar" onclick="editarColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="btn-icon btn-icon--perigo" title="Excluir" onclick="excluirColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
+      </td>
+    </tr>`;
+      })
+      .join('') || '<tr><td colspan="5">Nenhum colaborador ainda. Use o formulário acima para convidar o primeiro.</td></tr>';
 }
 
 function renderOpcoesNovoColaborador() {
@@ -44,6 +65,101 @@ async function atualizarColaborador(id, campos) {
   await carregarColaboradores();
   renderAdmColaboradores();
   showToast('Colaborador atualizado.');
+}
+
+function editarColaborador(id) {
+  _colaboradorEmEdicaoId = id;
+  renderAdmColaboradores();
+}
+
+function cancelarEdicaoColaborador() {
+  _colaboradorEmEdicaoId = null;
+  renderAdmColaboradores();
+}
+
+async function salvarEdicaoColaborador(id) {
+  const linha = document.querySelector(`tr[data-edicao="${id}"]`);
+  const nome = linha.querySelector('.edit-nome').value.trim();
+  const email = linha.querySelector('.edit-email').value.trim();
+  if (!nome || !email) { showToast('Preencha nome e e-mail.'); return; }
+
+  const colaborador = G.colaboradores.find((c) => c.id === id);
+  try {
+    if (email !== colaborador.email) {
+      await sbInvokeFunction('admin-colaborador', { acao: 'atualizar_email', colaborador_id: id, novo_email: email });
+    }
+    await sbFetch('/perfis?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ nome }) });
+  } catch (err) {
+    showToast('Erro ao salvar: ' + err.message);
+    return;
+  }
+  _colaboradorEmEdicaoId = null;
+  await carregarColaboradores();
+  renderAdmColaboradores();
+  showToast('Colaborador atualizado.');
+}
+
+async function reenviarConviteColaborador(id) {
+  try {
+    await sbInvokeFunction('admin-colaborador', { acao: 'reenviar_convite', colaborador_id: id });
+    showToast('Convite reenviado.');
+  } catch (err) {
+    showToast(err.message || 'Erro ao reenviar convite.');
+  }
+}
+
+async function redefinirSenhaColaborador(id) {
+  const colaborador = G.colaboradores.find((c) => c.id === id);
+  if (!colaborador) return;
+  try {
+    const redirectTo = window.location.origin + window.location.pathname;
+    const { error } = await _sbClient.auth.resetPasswordForEmail(colaborador.email, { redirectTo });
+    if (error) throw error;
+    showToast('E-mail de redefinição enviado para ' + colaborador.email + '.');
+  } catch (err) {
+    showToast('Erro ao enviar redefinição: ' + (err.message || err));
+  }
+}
+
+function abrirDefinirSenha(id) {
+  const colaborador = G.colaboradores.find((c) => c.id === id);
+  if (!colaborador) return;
+  document.getElementById('modal-definir-senha').dataset.colaboradorId = id;
+  document.getElementById('definir-senha-colab-nome').textContent = colaborador.nome;
+  document.getElementById('definir-senha-colab-input').value = '';
+  document.getElementById('modal-definir-senha').classList.add('open');
+}
+
+function fecharModalDefinirSenha() {
+  document.getElementById('modal-definir-senha').classList.remove('open');
+}
+
+async function confirmarDefinirSenha() {
+  const modal = document.getElementById('modal-definir-senha');
+  const id = modal.dataset.colaboradorId;
+  const senha = document.getElementById('definir-senha-colab-input').value;
+  if (!senha || senha.length < 6) { showToast('A senha precisa ter ao menos 6 caracteres.'); return; }
+  try {
+    await sbInvokeFunction('admin-colaborador', { acao: 'definir_senha', colaborador_id: id, senha });
+    fecharModalDefinirSenha();
+    showToast('Nova senha definida.');
+  } catch (err) {
+    showToast(err.message || 'Erro ao definir senha.');
+  }
+}
+
+async function excluirColaborador(id) {
+  const colaborador = G.colaboradores.find((c) => c.id === id);
+  if (!confirm(`Excluir o colaborador "${colaborador?.nome || ''}"? A conta de login também será removida. Essa ação não pode ser desfeita.`)) return;
+  try {
+    await sbInvokeFunction('admin-colaborador', { acao: 'excluir', colaborador_id: id });
+  } catch (err) {
+    showToast(err.message || 'Erro ao excluir colaborador.');
+    return;
+  }
+  await carregarColaboradores();
+  renderAdmColaboradores();
+  showToast('Colaborador excluído.');
 }
 
 function abrirImportarColaboradores() {
