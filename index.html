@@ -247,7 +247,7 @@
         <button type="submit" class="btn-primary">Criar ciclo</button>
       </form>
       <table class="tabela">
-        <thead><tr><th>Nome</th><th>Período</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>Nome</th><th>Período</th><th>Status</th><th>Ações</th></tr></thead>
         <tbody id="adm-lista-ciclos"></tbody>
       </table>
     </div>
@@ -283,6 +283,21 @@
     <div class="modal-actions">
       <button class="btn-link" onclick="fecharModalDefinirSenha()">Cancelar</button>
       <button class="btn-primary" onclick="confirmarDefinirSenha()">Definir senha</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: editar avaliação (RH) -->
+<div id="modal-editar-avaliacao" class="modal">
+  <div class="modal-box">
+    <h3>Editar avaliação</h3>
+    <label class="campo"><span>Colaborador</span><select id="editar-av-colaborador"></select></label>
+    <label class="campo"><span>Gestor</span><select id="editar-av-gestor"></select></label>
+    <label class="campo"><span>Ciclo</span><select id="editar-av-ciclo"></select></label>
+    <label class="campo"><span>Status</span><select id="editar-av-status"></select></label>
+    <div class="modal-actions">
+      <button class="btn-link" onclick="fecharModalEditarAvaliacao()">Cancelar</button>
+      <button class="btn-primary" onclick="salvarEdicaoAvaliacao()">Salvar</button>
     </div>
   </div>
 </div>

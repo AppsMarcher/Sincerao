@@ -50,6 +50,10 @@
 .tabela-colaboradores td[colspan] { display: flex; gap: 8px; }
 .tabela-colaboradores .edit-nome, .tabela-colaboradores .edit-email { max-width: none; flex: 1 1 auto; }
 
+.badge-ciclo-planejado { background: var(--panel-alt); color: var(--text-soft); }
+.badge-ciclo-em_andamento { background: var(--green-soft); color: var(--green); }
+.badge-ciclo-encerrado { background: var(--line); color: var(--text-faint); }
+
 #modal-importar-colaboradores .modal-box { width: min(680px, 92vw); }
 #importar-colab-texto { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
 .import-linha { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
