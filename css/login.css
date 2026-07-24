@@ -18,5 +18,5 @@
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
 }
 .logo-login { height: 44px; width: auto; display: block; margin: 0 auto 12px; }
-.login-box .muted { margin-bottom: 20px; display: block; }
+.login-box .muted { margin-bottom: 20px; display: block; text-align: center; }
 .login-box .btn-primary { width: 100%; margin-top: 8px; }
