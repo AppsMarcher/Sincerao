@@ -25,7 +25,10 @@
 .adm-tab-btn:hover { color: var(--text); }
 .adm-tab-btn.active { color: var(--primary); font-weight: 700; border-bottom-color: var(--primary); }
 
-.adm-tab-panel { display: none; margin-top: var(--space-5); }
+/* Cadastros é tela de RH/admin, não precisa caber no mobile — os cards podem
+   usar bem mais largura do que o .content { max-width: 880px } genérico. */
+#screen-admin .content { max-width: none; }
+.adm-tab-panel { display: none; margin-top: var(--space-5); min-width: 75vw; }
 
 #adm-panel-cargos form,
 #adm-panel-competencias form,
