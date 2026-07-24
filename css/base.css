@@ -117,7 +117,7 @@ a { color: var(--primary); }
 .campo:last-of-type { margin-bottom: 0; }
 .campo span { font-size: 13px; font-weight: 600; color: var(--text-soft); }
 
-input, select, textarea {
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
   background: var(--panel);
   border: 1.5px solid var(--line);
   border-radius: var(--radius-sm);
@@ -128,8 +128,16 @@ input, select, textarea {
   transition: border-color .15s;
 }
 textarea { min-height: 64px; resize: vertical; }
-input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
 input:disabled, select:disabled, textarea:disabled { background: var(--panel-alt); color: var(--text-faint); cursor: not-allowed; }
+
+input[type="checkbox"], input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
 
 .btn-primary {
   display: inline-flex;
@@ -195,8 +203,9 @@ input:disabled, select:disabled, textarea:disabled { background: var(--panel-alt
 .tabela tbody tr:hover { background: var(--panel-alt); }
 .tabela tbody tr:last-child td { border-bottom: none; }
 
-.check-row { display: flex; align-items: center; gap: var(--space-2); padding: 8px 0; font-size: 14px; }
-.check-list { display: flex; flex-direction: column; gap: 2px; margin: var(--space-3) 0; }
+.check-row { display: flex; align-items: center; gap: var(--space-3); padding: 10px 4px; font-size: 14px; border-radius: var(--radius-sm); cursor: pointer; }
+.check-row:hover { background: var(--panel-alt); }
+.check-list { display: flex; flex-direction: column; gap: 0; margin: var(--space-3) 0; }
 
 .modal { display: none; position: fixed; inset: 0; background: rgba(30,0,25,.45); align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(2px); }
 .modal.open { display: flex; }
