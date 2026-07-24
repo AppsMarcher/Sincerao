@@ -260,10 +260,14 @@
     <h3>Importar colaboradores em lote</h3>
     <p class="muted">Uma linha por colaborador — cole direto do Excel (colunas separadas por tab) ou digite separando por vírgula.<br>Ordem: <strong>Nome, E-mail, Cargo, Gestor, Papel</strong>. Cargo, Gestor e Papel são opcionais (Papel vazio vira "colaborador").</p>
     <textarea id="importar-colab-texto" rows="8" placeholder="Maria Silva, maria@marcher.com.br, Analista, João Souza, colaborador&#10;Pedro Lima, pedro@marcher.com.br, Gerente, , gestor"></textarea>
+    <div id="importar-colab-status" class="importar-status" style="display:none">
+      <span class="spinner"></span>
+      <span id="importar-colab-status-texto"></span>
+    </div>
     <div id="importar-colab-resultado"></div>
     <div class="modal-actions">
       <button class="btn-link" onclick="fecharModalImportarColaboradores()">Fechar</button>
-      <button class="btn-primary" onclick="processarImportacaoColaboradores()">Importar</button>
+      <button class="btn-primary" id="importar-colab-btn" onclick="processarImportacaoColaboradores()">Importar</button>
     </div>
   </div>
 </div>

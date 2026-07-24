@@ -175,6 +175,18 @@ input:not([type="checkbox"]):not([type="radio"]), select { max-width: 320px; }
 textarea { min-height: 64px; resize: vertical; max-width: 100%; }
 input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
 input:disabled, select:disabled, textarea:disabled { background: var(--panel-alt); color: var(--text-faint); cursor: not-allowed; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--primary-soft);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 input[type="checkbox"], input[type="radio"] {
   width: 18px;

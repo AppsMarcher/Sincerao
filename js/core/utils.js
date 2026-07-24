@@ -21,6 +21,10 @@ function showToast(m) {
   _toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function fmtData(d) {
   if (!d) return '—';
   return new Date(d + 'T12:00:00').toLocaleDateString('pt-BR');

@@ -165,6 +165,8 @@ async function excluirColaborador(id) {
 function abrirImportarColaboradores() {
   document.getElementById('importar-colab-texto').value = '';
   document.getElementById('importar-colab-resultado').innerHTML = '';
+  document.getElementById('importar-colab-status').style.display = 'none';
+  document.getElementById('importar-colab-btn').disabled = false;
   document.getElementById('modal-importar-colaboradores').classList.add('open');
 }
 
@@ -200,40 +202,60 @@ function parseLinhaImportacao(linha) {
   return { nome, email, cargo_id, gestor_id, papel };
 }
 
+// Intervalo entre convites de fato disparados (não entre linhas com erro de
+// validação, essas nem chegam a chamar a function). O serviço de e-mail por
+// trás do convite tem limite de disparos por segundo — mandar tudo de uma vez
+// gera "rate limit exceeded" e os convites seguintes falham silenciosamente,
+// mesmo problema que já tivemos no VectonPlan.
+const INTERVALO_ENVIO_CONVITE_MS = 1100;
+
+function linhaResultadoImportacaoHtml(r) {
+  return `
+    <div class="import-linha ${r.ok ? 'ok' : 'erro'}">
+      <span class="import-nome">${escHtml(r.nome)}</span>
+      <span class="import-status">${r.ok ? '✓' : '✗'} ${escHtml(r.msg)}</span>
+    </div>
+  `;
+}
+
 async function processarImportacaoColaboradores() {
   const texto = document.getElementById('importar-colab-texto').value;
   const linhas = texto.split('\n').map((l) => l.trim()).filter(Boolean);
   if (!linhas.length) { showToast('Cole ao menos uma linha.'); return; }
 
+  const btn = document.getElementById('importar-colab-btn');
+  const status = document.getElementById('importar-colab-status');
+  const statusTexto = document.getElementById('importar-colab-status-texto');
+  const resultadoEl = document.getElementById('importar-colab-resultado');
+  btn.disabled = true;
+  resultadoEl.innerHTML = '';
+  status.style.display = 'flex';
+
   const resultados = [];
-  for (const linha of linhas) {
-    const parsed = parseLinhaImportacao(linha);
+  for (let i = 0; i < linhas.length; i++) {
+    statusTexto.textContent = `Importando ${i + 1} de ${linhas.length}...`;
+    const parsed = parseLinhaImportacao(linhas[i]);
+    let r;
     if (parsed.erro) {
-      resultados.push({ nome: parsed.nome, ok: false, msg: parsed.erro });
-      continue;
+      r = { nome: parsed.nome, ok: false, msg: parsed.erro };
+    } else {
+      try {
+        await sbInvokeFunction('invite-colaborador', {
+          nome: parsed.nome, email: parsed.email, cargo_id: parsed.cargo_id, gestor_id: parsed.gestor_id, papel: parsed.papel,
+        });
+        r = { nome: parsed.nome, ok: true, msg: 'Convite enviado' };
+        await carregarColaboradores(); // atualiza G.colaboradores pra permitir que a próxima linha do lote já use este como gestor
+      } catch (err) {
+        r = { nome: parsed.nome, ok: false, msg: err.message || 'Erro ao convidar' };
+      }
+      if (i < linhas.length - 1) await sleep(INTERVALO_ENVIO_CONVITE_MS);
     }
-    try {
-      await sbInvokeFunction('invite-colaborador', {
-        nome: parsed.nome, email: parsed.email, cargo_id: parsed.cargo_id, gestor_id: parsed.gestor_id, papel: parsed.papel,
-      });
-      resultados.push({ nome: parsed.nome, ok: true, msg: 'Convite enviado' });
-      await carregarColaboradores(); // atualiza G.colaboradores pra permitir que a próxima linha do lote já use este como gestor
-    } catch (err) {
-      resultados.push({ nome: parsed.nome, ok: false, msg: err.message || 'Erro ao convidar' });
-    }
+    resultados.push(r);
+    resultadoEl.insertAdjacentHTML('beforeend', linhaResultadoImportacaoHtml(r));
   }
 
-  document.getElementById('importar-colab-resultado').innerHTML = resultados
-    .map(
-      (r) => `
-    <div class="import-linha ${r.ok ? 'ok' : 'erro'}">
-      <span class="import-nome">${escHtml(r.nome)}</span>
-      <span class="import-status">${r.ok ? '✓' : '✗'} ${escHtml(r.msg)}</span>
-    </div>
-  `
-    )
-    .join('');
-
+  status.style.display = 'none';
+  btn.disabled = false;
   await carregarColaboradores();
   renderAdmColaboradores();
   const sucesso = resultados.filter((r) => r.ok).length;

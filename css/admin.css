@@ -62,6 +62,7 @@
 
 #modal-importar-colaboradores .modal-box { width: min(680px, 92vw); }
 #importar-colab-texto { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+.importar-status { align-items: center; gap: 10px; padding: 10px 2px; font-size: 13px; color: var(--text-soft); }
 .import-linha { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
 .import-linha:last-child { border-bottom: none; }
 .import-linha .import-nome { font-weight: 600; flex: 1 1 auto; }
