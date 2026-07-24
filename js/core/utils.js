@@ -44,7 +44,7 @@ function calcularPontuacao(notas) {
 }
 
 function cargoLabel(c) {
-  return c.setor ? `${c.nome} — ${c.setor}` : c.nome;
+  return c.setor?.nome ? `${c.nome} — ${c.setor.nome}` : c.nome;
 }
 
 function nomeJaExiste(lista, nome, ignorarId = null) {

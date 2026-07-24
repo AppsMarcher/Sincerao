@@ -3,7 +3,7 @@
 async function abrirAdmin() {
   if (!ehRhOuAdmin()) { showToast('Acesso restrito ao RH.'); return; }
   goTo('screen-admin');
-  await Promise.all([carregarCargos(), carregarCompetencias(), carregarCiclos(), carregarColaboradores()]);
+  await Promise.all([carregarCargos(), carregarSetores(), carregarCompetencias(), carregarCiclos(), carregarColaboradores()]);
   admTab('cargos');
 }
 
@@ -12,6 +12,7 @@ function admTab(nome) {
   document.querySelectorAll('#screen-admin .adm-tab-btn').forEach((b) => b.classList.remove('active'));
   document.getElementById('adm-panel-' + nome).style.display = 'block';
   document.getElementById('adm-btn-' + nome).classList.add('active');
+  if (nome === 'cargos') renderSelectSetorCargo();
   if (nome === 'vinculo') renderVinculoCargoCompetencia();
   if (nome === 'ciclos') renderAdmCiclos();
   if (nome === 'colaboradores') renderAdmColaboradores();

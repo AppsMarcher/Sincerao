@@ -19,7 +19,7 @@ function renderDadosPerfil() {
       </dd>
       <dt>E-mail</dt><dd>${escHtml(p.email)}</dd>
       <dt>Cargo</dt><dd>${escHtml(p.cargo?.nome || '—')}</dd>
-      <dt>Setor</dt><dd>${escHtml(p.cargo?.setor || '—')}</dd>
+      <dt>Setor</dt><dd>${escHtml(p.cargo?.setor?.nome || '—')}</dd>
       <dt>Gestor</dt><dd>${escHtml(p.gestor?.nome || '—')}</dd>
     </dl>
   `;

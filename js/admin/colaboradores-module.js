@@ -1,7 +1,7 @@
 // admin/colaboradores-module.js — convite de novos colaboradores e edição de cargo/gestor/papel
 
 async function carregarColaboradores() {
-  G.colaboradores = (await sbFetch('/perfis?select=*,cargo:cargo_id(nome,setor)&order=nome.asc')) || [];
+  G.colaboradores = (await sbFetch('/perfis?select=*,cargo:cargo_id(nome,setor:setor_id(nome))&order=nome.asc')) || [];
 }
 
 function renderAdmColaboradores() {
