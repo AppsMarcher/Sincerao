@@ -1,5 +1,9 @@
 // dashboard/dashboard-module.js — lista de avaliações visíveis ao usuário logado
 
+function toggleNavMenu() {
+  document.getElementById('nav-menu').classList.toggle('open');
+}
+
 async function abrirDashboard() {
   goTo('screen-dashboard');
   const rows = (await sbFetch(

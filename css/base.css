@@ -93,8 +93,11 @@ a { color: var(--primary); }
 
 .logo-topbar { height: 28px; width: auto; display: block; }
 
-.topbar-actions { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
+.topbar-actions { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; position: relative; }
 .topbar-actions .btn-link { min-height: 44px; padding: 8px 12px; }
+
+.nav-hamburguer { display: none; }
+.nav-menu { display: flex; align-items: center; gap: 2px; }
 
 .icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.8; fill: none; vertical-align: -3px; }
 
