@@ -127,7 +127,11 @@ input:not([type="checkbox"]):not([type="radio"]), select, textarea {
   font-size: 16px;
   transition: border-color .15s;
 }
-textarea { min-height: 64px; resize: vertical; }
+/* Padrão único de largura pra campos de linha única — nunca deixar esticar pra
+   preencher o container (grid/flex largo). Textarea fica de fora: precisa de espaço
+   pra texto longo. */
+input:not([type="checkbox"]):not([type="radio"]), select { max-width: 320px; }
+textarea { min-height: 64px; resize: vertical; max-width: 100%; }
 input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
 input:disabled, select:disabled, textarea:disabled { background: var(--panel-alt); color: var(--text-faint); cursor: not-allowed; }
 
