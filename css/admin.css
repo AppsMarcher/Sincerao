@@ -40,7 +40,8 @@
   align-items: center;
   margin-bottom: 16px;
 }
-.btn-importar-lote { margin-bottom: 16px; }
+#form-novo-colaborador .btn-primary { margin-left: auto; }
+.btn-importar-lote { display: block; width: fit-content; margin: 0 0 16px auto; }
 
 #adm-panel-cargos input,
 #adm-panel-competencias input, #adm-panel-competencias select,
