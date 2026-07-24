@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Avaliação de Desempenho — Marcher</title>
+<title>Sincerão — Marcher Brasil</title>
+<link rel="icon" type="image/png" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
@@ -13,6 +15,7 @@
 <link rel="stylesheet" href="css/perfil.css">
 <link rel="stylesheet" href="css/avaliacao.css">
 <link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -21,8 +24,8 @@
 <!-- LOGIN -->
 <div id="screen-login" class="screen active">
   <div class="login-box">
-    <h1>Avaliação de Desempenho</h1>
-    <p class="muted">Marcher Brasil</p>
+    <img src="assets/logo.png" alt="Sincerão" class="logo-login">
+    <p class="muted">Feedback conectado ao desenvolvimento</p>
     <form id="form-login">
       <label class="campo">
         <span>E-mail</span>
@@ -40,21 +43,21 @@
 <!-- DASHBOARD -->
 <div id="screen-dashboard" class="screen">
   <header class="topbar">
-    <h2>Avaliação de Desempenho</h2>
+    <img src="assets/logo.png" alt="Sincerão" class="logo-topbar">
     <div class="topbar-actions">
       <span id="nav-nome-usuario"></span>
-      <button class="btn-link" onclick="abrirPerfil()">Perfil</button>
-      <button id="nav-admin" class="btn-link" onclick="abrirAdmin()">Cadastros</button>
-      <button class="btn-link" onclick="fazerLogout()">Sair</button>
+      <button class="btn-link" onclick="abrirPerfil()"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg> Perfil</button>
+      <button id="nav-admin" class="btn-link" onclick="abrirAdmin()"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15 1.65 1.65 0 0 0 3.17 14H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Cadastros</button>
+      <button class="btn-link" onclick="fazerLogout()"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair</button>
     </div>
   </header>
-  <main class="content">
-    <section>
-      <h3>Minhas avaliações</h3>
+  <main class="content stack">
+    <section class="card">
+      <h3><svg class="icon" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg> Minhas avaliações</h3>
       <div id="dash-minhas"></div>
     </section>
-    <section id="dash-equipe-wrap">
-      <h3>Avaliações da minha equipe</h3>
+    <section class="card" id="dash-equipe-wrap">
+      <h3><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Avaliações da minha equipe</h3>
       <div id="dash-equipe"></div>
     </section>
   </main>
@@ -63,16 +66,16 @@
 <!-- PERFIL -->
 <div id="screen-perfil" class="screen">
   <header class="topbar">
-    <button class="btn-link" onclick="abrirDashboard()">&larr; Voltar</button>
+    <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
     <h2>Meu Perfil</h2>
   </header>
-  <main class="content">
-    <section>
-      <h3>Dados</h3>
+  <main class="content stack">
+    <section class="card">
+      <h3><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg> Dados</h3>
       <div id="perfil-dados"></div>
     </section>
-    <section>
-      <h3>Trocar senha</h3>
+    <section class="card">
+      <h3><svg class="icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Trocar senha</h3>
       <form id="form-trocar-senha">
         <label class="campo">
           <span>Nova senha</span>
@@ -85,8 +88,8 @@
         <button type="submit" class="btn-primary">Salvar nova senha</button>
       </form>
     </section>
-    <section>
-      <h3>Histórico de Avaliações</h3>
+    <section class="card">
+      <h3><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg> Histórico de Avaliações</h3>
       <div id="perfil-historico"></div>
     </section>
   </main>
@@ -95,7 +98,7 @@
 <!-- AVALIAÇÃO (wizard) -->
 <div id="screen-avaliacao" class="screen">
   <header class="topbar">
-    <button class="btn-link" onclick="abrirDashboard()">&larr; Voltar</button>
+    <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
     <div>
       <h2 id="avaliacao-titulo"></h2>
       <span class="badge" id="avaliacao-status"></span>
@@ -109,19 +112,19 @@
 <!-- ADMIN / CADASTROS -->
 <div id="screen-admin" class="screen">
   <header class="topbar">
-    <button class="btn-link" onclick="abrirDashboard()">&larr; Voltar</button>
+    <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
     <h2>Cadastros</h2>
   </header>
   <div class="adm-tabs">
-    <button id="adm-btn-cargos" class="adm-tab-btn" onclick="admTab('cargos')">Cargos</button>
-    <button id="adm-btn-competencias" class="adm-tab-btn" onclick="admTab('competencias')">Competências</button>
-    <button id="adm-btn-vinculo" class="adm-tab-btn" onclick="admTab('vinculo')">Cargo × Competência</button>
-    <button id="adm-btn-ciclos" class="adm-tab-btn" onclick="admTab('ciclos')">Ciclos</button>
-    <button id="adm-btn-colaboradores" class="adm-tab-btn" onclick="admTab('colaboradores')">Colaboradores</button>
+    <button id="adm-btn-cargos" class="adm-tab-btn" onclick="admTab('cargos')"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Cargos</button>
+    <button id="adm-btn-competencias" class="adm-tab-btn" onclick="admTab('competencias')"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg> Competências</button>
+    <button id="adm-btn-vinculo" class="adm-tab-btn" onclick="admTab('vinculo')"><svg class="icon" viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg> Cargo × Competência</button>
+    <button id="adm-btn-ciclos" class="adm-tab-btn" onclick="admTab('ciclos')"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Ciclos</button>
+    <button id="adm-btn-colaboradores" class="adm-tab-btn" onclick="admTab('colaboradores')"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Colaboradores</button>
   </div>
 
   <main class="content">
-    <div id="adm-panel-cargos" class="adm-tab-panel">
+    <div id="adm-panel-cargos" class="adm-tab-panel card">
       <form onsubmit="event.preventDefault(); criarCargo(this.nome.value, this.setor.value); this.reset();">
         <input name="nome" placeholder="Nome do cargo" required>
         <input name="setor" placeholder="Setor">
@@ -133,7 +136,7 @@
       </table>
     </div>
 
-    <div id="adm-panel-competencias" class="adm-tab-panel">
+    <div id="adm-panel-competencias" class="adm-tab-panel card">
       <form onsubmit="event.preventDefault(); criarCompetencia(this.nome.value, this.tipo.value, this.definicao.value); this.reset();">
         <input name="nome" placeholder="Nome da competência" required>
         <select name="tipo">
@@ -149,7 +152,7 @@
       </table>
     </div>
 
-    <div id="adm-panel-vinculo" class="adm-tab-panel">
+    <div id="adm-panel-vinculo" class="adm-tab-panel card">
       <label class="campo">
         <span>Cargo</span>
         <select id="vinculo-select-cargo" onchange="renderVinculoLista(this.value)"></select>
@@ -157,7 +160,7 @@
       <div id="vinculo-lista-competencias" class="check-list"></div>
     </div>
 
-    <div id="adm-panel-ciclos" class="adm-tab-panel">
+    <div id="adm-panel-ciclos" class="adm-tab-panel card">
       <form onsubmit="event.preventDefault(); criarCiclo(this.nome.value, this.data_inicio.value, this.data_fim.value); this.reset();">
         <input name="nome" placeholder="Nome do ciclo (ex: 2026 - Semestre 2)" required>
         <input name="data_inicio" type="date" required>
@@ -170,7 +173,7 @@
       </table>
     </div>
 
-    <div id="adm-panel-colaboradores" class="adm-tab-panel">
+    <div id="adm-panel-colaboradores" class="adm-tab-panel card">
       <form id="form-novo-colaborador" onsubmit="event.preventDefault(); enviarConvite(this);">
         <input name="nome" placeholder="Nome" required>
         <input name="email" type="email" placeholder="E-mail" required>

@@ -1,0 +1,30 @@
+/* responsive.css — ajustes para telas pequenas (celular). Carregado por último para sobrepor. */
+
+@media (max-width: 640px) {
+  .content { padding: var(--space-4) var(--space-3); }
+  .card { padding: var(--space-4); }
+  .stack { gap: var(--space-4); }
+
+  .topbar { padding: 12px var(--space-3); }
+  .logo-topbar { height: 24px; }
+  #nav-nome-usuario { display: none; }
+
+  /* Dados do perfil: label em cima, valor embaixo (em vez de 2 colunas apertadas) */
+  .dados-lista { grid-template-columns: 1fr; row-gap: 2px; }
+  .dados-lista dt { margin-top: var(--space-2); }
+  .dados-lista dt:first-child { margin-top: 0; }
+
+  /* Linha de competência: empilha nota/comentário em vez de 4 colunas apertadas */
+  .competencia-row { grid-template-columns: 1fr; gap: var(--space-2); }
+  .competencia-row select { width: 100px; }
+
+  .etapas-nav { padding: var(--space-2) var(--space-3); }
+  .adm-tabs { padding: 0 var(--space-3); }
+
+  #form-trocar-senha { max-width: 100%; }
+
+  /* Tabelas largas (cadastros) ganham scroll horizontal contido, sem vazar a página */
+  .adm-tab-panel { overflow-x: auto; }
+
+  .resultado-final { flex-direction: column; gap: var(--space-2); }
+}

@@ -2,24 +2,30 @@
 
 .adm-tabs {
   display: flex;
-  gap: 6px;
-  padding: 0 24px;
+  gap: 4px;
+  padding: 0 32px;
   border-bottom: 1px solid var(--line);
-  background: var(--panel-alt);
+  background: var(--panel);
   flex-wrap: wrap;
 }
 .adm-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  padding: 12px 14px;
+  padding: 14px 12px;
   color: var(--text-soft);
   cursor: pointer;
   font-size: 13px;
+  font-weight: 500;
+  transition: color .15s;
 }
-.adm-tab-btn.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
+.adm-tab-btn:hover { color: var(--text); }
+.adm-tab-btn.active { color: var(--primary); font-weight: 700; border-bottom-color: var(--primary); }
 
-.adm-tab-panel { display: none; }
+.adm-tab-panel { display: none; margin-top: var(--space-5); }
 
 #adm-panel-cargos form,
 #adm-panel-competencias form,

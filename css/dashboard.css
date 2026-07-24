@@ -1,18 +1,16 @@
-/* dashboard.css — lista de avaliações do usuário logado */
+/* dashboard.css — lista de avaliações do usuário logado
+   Itens em lista dentro do card (não cards empilhados dentro de card). */
 
 .card-avaliacao {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  margin-bottom: 12px;
+  gap: var(--space-3);
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--line);
   cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .15s, box-shadow .15s;
+  border-radius: var(--radius-sm);
+  transition: background-color .15s;
 }
-.card-avaliacao:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(90, 0, 72, 0.16); }
-
-#dash-equipe-wrap { margin-top: 32px; }
+.card-avaliacao:last-child { border-bottom: none; }
+.card-avaliacao:hover { background: var(--panel-alt); padding-left: 12px; padding-right: 12px; }
