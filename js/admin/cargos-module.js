@@ -25,11 +25,15 @@ function renderAdmCargos() {
 
 async function criarCargo(nome, setor) {
   if (!nome.trim()) { showToast('Informe o nome do cargo.'); return; }
-  if (nomeJaExiste(G.cargos, nome)) { showToast('Já existe um cargo com esse nome.'); return; }
+  const setorNorm = setor.trim();
+  const jaExiste = G.cargos.some(
+    (c) => c.nome.trim().toLowerCase() === nome.trim().toLowerCase() && (c.setor || '').trim().toLowerCase() === setorNorm.toLowerCase()
+  );
+  if (jaExiste) { showToast('Já existe esse cargo nesse setor.'); return; }
   try {
-    await sbFetch('/cargos', { method: 'POST', body: JSON.stringify({ nome: nome.trim(), setor: setor.trim() || null }) });
+    await sbFetch('/cargos', { method: 'POST', body: JSON.stringify({ nome: nome.trim(), setor: setorNorm || null }) });
   } catch (e) {
-    showToast(String(e.message || '').includes('duplicate') ? 'Já existe um cargo com esse nome.' : 'Erro ao criar cargo.');
+    showToast(String(e.message || '').includes('duplicate') ? 'Já existe esse cargo nesse setor.' : 'Erro ao criar cargo.');
     return;
   }
   await carregarCargos();
