@@ -5,8 +5,28 @@
   .card { padding: var(--space-4); }
   .stack { gap: var(--space-4); }
 
-  .topbar { padding: 12px var(--space-3); }
+  .topbar { padding: 12px var(--space-3); flex-wrap: wrap; row-gap: var(--space-2); }
   .logo-topbar { height: 24px; }
+  /* Tela de avaliação: Voltar + título/status + botão de transição não cabem
+     numa linha só quando o botão de transição aparece (ex: "Enviar para
+     alinhamento"). Deixa quebrar, com o botão de transição numa linha própria. */
+  #screen-avaliacao .topbar #avaliacao-transicao:not(:empty) { flex-basis: 100%; }
+  #screen-avaliacao .topbar #avaliacao-transicao .btn-primary { width: 100%; }
+
+  /* Cards de avaliação (dashboard "Minhas avaliações" e histórico do Perfil):
+     empilha texto e badge em vez de espremer os dois numa linha só. */
+  .card-avaliacao { flex-wrap: wrap; row-gap: var(--space-2); }
+  .card-avaliacao-badges { flex-shrink: 1; }
+
+  /* Edição inline do nome no Perfil: o input precisa poder encolher além do
+     seu tamanho padrão pra sobrar espaço pro botão "Salvar" ao lado. */
+  .form-inline-editar input { min-width: 0; flex: 1 1 auto; }
+
+  /* Linha de "Declarar ciência" (Parecer Final): texto + botão podem não
+     caber lado a lado num telefone estreito. */
+  .ciencia-item { flex-wrap: wrap; row-gap: 4px; }
+
+  .login-box { padding: 28px 20px; }
 
   /* Dados do perfil: label em cima, valor embaixo (em vez de 2 colunas apertadas) */
   .dados-lista { grid-template-columns: 1fr; row-gap: 2px; }
