@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/login.css">
 <link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/perfil.css">
 <link rel="stylesheet" href="css/avaliacao.css">
 <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -42,6 +43,7 @@
     <h2>Avaliação de Desempenho</h2>
     <div class="topbar-actions">
       <span id="nav-nome-usuario"></span>
+      <button class="btn-link" onclick="abrirPerfil()">Perfil</button>
       <button id="nav-admin" class="btn-link" onclick="abrirAdmin()">Cadastros</button>
       <button class="btn-link" onclick="fazerLogout()">Sair</button>
     </div>
@@ -54,6 +56,38 @@
     <section id="dash-equipe-wrap">
       <h3>Avaliações da minha equipe</h3>
       <div id="dash-equipe"></div>
+    </section>
+  </main>
+</div>
+
+<!-- PERFIL -->
+<div id="screen-perfil" class="screen">
+  <header class="topbar">
+    <button class="btn-link" onclick="abrirDashboard()">&larr; Voltar</button>
+    <h2>Meu Perfil</h2>
+  </header>
+  <main class="content">
+    <section>
+      <h3>Dados</h3>
+      <div id="perfil-dados"></div>
+    </section>
+    <section>
+      <h3>Trocar senha</h3>
+      <form id="form-trocar-senha">
+        <label class="campo">
+          <span>Nova senha</span>
+          <input type="password" id="perfil-nova-senha" minlength="6" required autocomplete="new-password">
+        </label>
+        <label class="campo">
+          <span>Confirmar nova senha</span>
+          <input type="password" id="perfil-confirmar-senha" minlength="6" required autocomplete="new-password">
+        </label>
+        <button type="submit" class="btn-primary">Salvar nova senha</button>
+      </form>
+    </section>
+    <section>
+      <h3>Histórico de Avaliações</h3>
+      <div id="perfil-historico"></div>
     </section>
   </main>
 </div>
@@ -167,6 +201,7 @@
 <script src="js/core/utils.js"></script>
 
 <script src="js/dashboard/dashboard-module.js"></script>
+<script src="js/perfil/perfil-module.js"></script>
 
 <script src="js/avaliacao/avaliacao-core.js"></script>
 <script src="js/avaliacao/etapa-texto.js"></script>

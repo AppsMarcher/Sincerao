@@ -1,0 +1,13 @@
+/* perfil.css — dados do usuário, troca de senha, histórico */
+
+.dados-lista {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  row-gap: 8px;
+  column-gap: 12px;
+  margin: 0 0 24px;
+}
+.dados-lista dt { color: var(--text-soft); font-size: 13px; }
+.dados-lista dd { margin: 0; font-weight: 500; }
+
+#form-trocar-senha { max-width: 320px; margin-bottom: 24px; }

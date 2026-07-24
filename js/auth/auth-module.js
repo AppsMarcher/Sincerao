@@ -18,7 +18,7 @@ async function carregarPerfilLogado() {
   const user = data?.session?.user || null;
   if (!user) return null;
   G.usuario = user;
-  const rows = await sbFetch('/perfis?id=eq.' + user.id + '&select=*,cargo:cargo_id(id,nome,setor)');
+  const rows = await sbFetch('/perfis?id=eq.' + user.id + '&select=*,cargo:cargo_id(id,nome,setor),gestor:gestor_id(id,nome)');
   G.perfil = rows && rows[0] ? rows[0] : null;
   return G.perfil;
 }
