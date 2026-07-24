@@ -2,7 +2,7 @@
 
 async function renderVinculoCargoCompetencia() {
   const select = document.getElementById('vinculo-select-cargo');
-  select.innerHTML = G.cargos.filter((c) => c.ativo).map((c) => `<option value="${c.id}">${escHtml(c.nome)}</option>`).join('');
+  select.innerHTML = G.cargos.filter((c) => c.ativo).map((c) => `<option value="${c.id}">${escHtml(cargoLabel(c))}</option>`).join('');
   if (select.options.length) await renderVinculoLista(select.value || select.options[0].value);
 }
 

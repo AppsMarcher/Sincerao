@@ -43,6 +43,10 @@ function calcularPontuacao(notas) {
   };
 }
 
+function cargoLabel(c) {
+  return c.setor ? `${c.nome} — ${c.setor}` : c.nome;
+}
+
 function nomeJaExiste(lista, nome, ignorarId = null) {
   const alvo = nome.trim().toLowerCase();
   return lista.some((item) => item.id !== ignorarId && item.nome.trim().toLowerCase() === alvo);

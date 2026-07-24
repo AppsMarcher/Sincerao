@@ -27,7 +27,7 @@ async function abrirCriacaoAvaliacoes(cicloId) {
       .map(
         (c) => `
     <label class="check-row">
-      <input type="checkbox" value="${c.id}"> ${escHtml(c.nome)} <span class="tag">${escHtml(c.cargo?.nome || 'sem cargo')}</span>
+      <input type="checkbox" value="${c.id}"> ${escHtml(c.nome)} <span class="tag">${escHtml(c.cargo ? cargoLabel(c.cargo) : 'sem cargo')}</span>
     </label>
   `
       )

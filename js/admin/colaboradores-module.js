@@ -1,7 +1,7 @@
 // admin/colaboradores-module.js — convite de novos colaboradores e edição de cargo/gestor/papel
 
 async function carregarColaboradores() {
-  G.colaboradores = (await sbFetch('/perfis?select=*,cargo:cargo_id(nome)&order=nome.asc')) || [];
+  G.colaboradores = (await sbFetch('/perfis?select=*,cargo:cargo_id(nome,setor)&order=nome.asc')) || [];
 }
 
 function renderAdmColaboradores() {
@@ -9,7 +9,7 @@ function renderAdmColaboradores() {
 
   const el = document.getElementById('adm-lista-colaboradores');
   const opcoesCargo = (c) =>
-    G.cargos.filter((cg) => cg.ativo).map((cg) => `<option value="${cg.id}" ${c.cargo_id === cg.id ? 'selected' : ''}>${escHtml(cg.nome)}</option>`).join('');
+    G.cargos.filter((cg) => cg.ativo).map((cg) => `<option value="${cg.id}" ${c.cargo_id === cg.id ? 'selected' : ''}>${escHtml(cargoLabel(cg))}</option>`).join('');
   const opcoesGestor = (c) =>
     '<option value="">—</option>' +
     G.colaboradores.filter((g) => g.id !== c.id).map((g) => `<option value="${g.id}" ${c.gestor_id === g.id ? 'selected' : ''}>${escHtml(g.nome)}</option>`).join('');
@@ -34,7 +34,7 @@ function renderOpcoesNovoColaborador() {
   const cargoSelect = document.getElementById('novo-colab-cargo');
   const gestorSelect = document.getElementById('novo-colab-gestor');
   cargoSelect.innerHTML =
-    '<option value="">Sem cargo</option>' + G.cargos.filter((c) => c.ativo).map((c) => `<option value="${c.id}">${escHtml(c.nome)}</option>`).join('');
+    '<option value="">Sem cargo</option>' + G.cargos.filter((c) => c.ativo).map((c) => `<option value="${c.id}">${escHtml(cargoLabel(c))}</option>`).join('');
   gestorSelect.innerHTML =
     '<option value="">Sem gestor</option>' + G.colaboradores.map((c) => `<option value="${c.id}">${escHtml(c.nome)}</option>`).join('');
 }
