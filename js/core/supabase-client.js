@@ -36,3 +36,20 @@ async function sbFetch(path, opts = {}) {
   const txt = await r.text();
   return txt ? JSON.parse(txt) : null;
 }
+
+async function sbInvokeFunction(name, payload = {}) {
+  const token = await getSupabaseAccessToken();
+  const r = await fetch(SUPABASE_URL + '/functions/v1/' + name, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: 'Bearer ' + token,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  const txt = await r.text();
+  const data = txt ? JSON.parse(txt) : null;
+  if (!r.ok) throw new Error(data?.error || 'Erro ao chamar ' + name);
+  return data;
+}

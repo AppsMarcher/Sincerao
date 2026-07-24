@@ -23,14 +23,18 @@
 
 #adm-panel-cargos form,
 #adm-panel-competencias form,
-#adm-panel-ciclos form {
+#adm-panel-ciclos form,
+#form-novo-colaborador {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
-#adm-panel-cargos input, #adm-panel-competencias input, #adm-panel-competencias select, #adm-panel-ciclos input {
+#adm-panel-cargos input,
+#adm-panel-competencias input, #adm-panel-competencias select,
+#adm-panel-ciclos input,
+#form-novo-colaborador input, #form-novo-colaborador select {
   width: auto;
   flex: 1 1 160px;
 }

@@ -1,11 +1,12 @@
-// admin/colaboradores-module.js — edição de cargo/gestor/papel dos perfis já convidados
-// (a criação do usuário em si acontece no painel do Supabase; a linha em perfis nasce via trigger)
+// admin/colaboradores-module.js — convite de novos colaboradores e edição de cargo/gestor/papel
 
 async function carregarColaboradores() {
   G.colaboradores = (await sbFetch('/perfis?select=*,cargo:cargo_id(nome)&order=nome.asc')) || [];
 }
 
 function renderAdmColaboradores() {
+  renderOpcoesNovoColaborador();
+
   const el = document.getElementById('adm-lista-colaboradores');
   const opcoesCargo = (c) =>
     G.cargos.filter((cg) => cg.ativo).map((cg) => `<option value="${cg.id}" ${c.cargo_id === cg.id ? 'selected' : ''}>${escHtml(cg.nome)}</option>`).join('');
@@ -26,7 +27,16 @@ function renderAdmColaboradores() {
     </tr>
   `
       )
-      .join('') || '<tr><td colspan="4">Nenhum colaborador convidado ainda. Convide pelo painel do Supabase (Authentication).</td></tr>';
+      .join('') || '<tr><td colspan="4">Nenhum colaborador ainda. Use o formulário acima para convidar o primeiro.</td></tr>';
+}
+
+function renderOpcoesNovoColaborador() {
+  const cargoSelect = document.getElementById('novo-colab-cargo');
+  const gestorSelect = document.getElementById('novo-colab-gestor');
+  cargoSelect.innerHTML =
+    '<option value="">Sem cargo</option>' + G.cargos.filter((c) => c.ativo).map((c) => `<option value="${c.id}">${escHtml(c.nome)}</option>`).join('');
+  gestorSelect.innerHTML =
+    '<option value="">Sem gestor</option>' + G.colaboradores.map((c) => `<option value="${c.id}">${escHtml(c.nome)}</option>`).join('');
 }
 
 async function atualizarColaborador(id, campos) {
@@ -34,4 +44,25 @@ async function atualizarColaborador(id, campos) {
   await carregarColaboradores();
   renderAdmColaboradores();
   showToast('Colaborador atualizado.');
+}
+
+async function enviarConvite(form) {
+  const fd = new FormData(form);
+  const payload = {
+    nome: fd.get('nome').trim(),
+    email: fd.get('email').trim(),
+    cargo_id: fd.get('cargo_id') || null,
+    gestor_id: fd.get('gestor_id') || null,
+    papel: fd.get('papel'),
+  };
+  if (!payload.nome || !payload.email) { showToast('Preencha nome e e-mail.'); return; }
+  try {
+    await sbInvokeFunction('invite-colaborador', payload);
+    form.reset();
+    await carregarColaboradores();
+    renderAdmColaboradores();
+    showToast('Convite enviado para ' + payload.email + '.');
+  } catch (err) {
+    showToast('Erro ao convidar: ' + err.message);
+  }
 }

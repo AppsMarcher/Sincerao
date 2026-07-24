@@ -171,7 +171,19 @@
     </div>
 
     <div id="adm-panel-colaboradores" class="adm-tab-panel">
-      <p class="muted">Para adicionar um novo colaborador, convide-o pelo painel do Supabase (Authentication &gt; Invite user). O cadastro aqui aparece automaticamente após o primeiro acesso.</p>
+      <form id="form-novo-colaborador" onsubmit="event.preventDefault(); enviarConvite(this);">
+        <input name="nome" placeholder="Nome" required>
+        <input name="email" type="email" placeholder="E-mail" required>
+        <select name="cargo_id" id="novo-colab-cargo"><option value="">Sem cargo</option></select>
+        <select name="gestor_id" id="novo-colab-gestor"><option value="">Sem gestor</option></select>
+        <select name="papel">
+          <option value="colaborador">colaborador</option>
+          <option value="gestor">gestor</option>
+          <option value="rh">rh</option>
+          <option value="admin">admin</option>
+        </select>
+        <button type="submit" class="btn-primary">Convidar colaborador</button>
+      </form>
       <table class="tabela">
         <thead><tr><th>Nome</th><th>Cargo</th><th>Gestor</th><th>Papel</th></tr></thead>
         <tbody id="adm-lista-colaboradores"></tbody>
