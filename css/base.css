@@ -270,6 +270,8 @@ input[type="checkbox"], input[type="radio"] {
 .btn-icon--ativo:hover { background: var(--green-soft); color: var(--green); }
 .btn-icon--inativo { color: var(--text-faint); }
 .btn-icon--inativo:hover { background: var(--primary-soft); color: var(--primary); }
+.btn-icon--perigo { color: var(--text-faint); }
+.btn-icon--perigo:hover { background: rgba(220, 38, 38, 0.1); color: var(--red); }
 
 .check-row { display: flex; align-items: center; gap: var(--space-3); padding: 10px 4px; font-size: 14px; border-radius: var(--radius-sm); cursor: pointer; }
 .check-row:hover { background: var(--panel-alt); }

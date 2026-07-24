@@ -31,6 +31,7 @@ function linhaSetorHtml(s) {
       <td class="tabela-acoes">
         <button class="btn-icon" title="Editar" onclick="editarSetor('${s.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="btn-icon ${s.ativo ? 'btn-icon--ativo' : 'btn-icon--inativo'}" title="${s.ativo ? 'Desativar' : 'Reativar'}" onclick="toggleSetorAtivo('${s.id}', ${!s.ativo})"><svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></button>
+        <button class="btn-icon btn-icon--perigo" title="Excluir" onclick="excluirSetor('${s.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
       </td>
     </tr>
   `;
@@ -90,4 +91,17 @@ async function criarSetor(nome) {
 async function toggleSetorAtivo(id, novoValor) {
   await sbFetch('/setores?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ ativo: novoValor }) });
   await carregarSetores();
+}
+
+async function excluirSetor(id) {
+  const setor = G.setores.find((s) => s.id === id);
+  if (!confirm(`Excluir o setor "${setor?.nome || ''}"? Essa ação não pode ser desfeita.`)) return;
+  try {
+    await sbFetch('/setores?id=eq.' + id, { method: 'DELETE' });
+  } catch (e) {
+    showToast(String(e.message || '').includes('foreign key') ? 'Não é possível excluir: há cargos vinculados a esse setor.' : 'Erro ao excluir setor.');
+    return;
+  }
+  await carregarSetores();
+  showToast('Setor excluído.');
 }

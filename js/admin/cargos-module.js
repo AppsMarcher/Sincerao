@@ -23,6 +23,7 @@ function linhaCargoHtml(c) {
       <td class="tabela-acoes">
         <button class="btn-icon" title="Editar" onclick="editarCargo('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="btn-icon ${c.ativo ? 'btn-icon--ativo' : 'btn-icon--inativo'}" title="${c.ativo ? 'Desativar' : 'Reativar'}" onclick="toggleCargoAtivo('${c.id}', ${!c.ativo})"><svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></button>
+        <button class="btn-icon btn-icon--perigo" title="Excluir" onclick="excluirCargo('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
       </td>
     </tr>
   `;
@@ -97,4 +98,17 @@ async function criarCargo(nome, setorId) {
 async function toggleCargoAtivo(id, novoValor) {
   await sbFetch('/cargos?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ ativo: novoValor }) });
   await carregarCargos();
+}
+
+async function excluirCargo(id) {
+  const cargo = G.cargos.find((c) => c.id === id);
+  if (!confirm(`Excluir o cargo "${cargo?.nome || ''}"? Essa ação não pode ser desfeita.`)) return;
+  try {
+    await sbFetch('/cargos?id=eq.' + id, { method: 'DELETE' });
+  } catch (e) {
+    showToast(String(e.message || '').includes('foreign key') ? 'Não é possível excluir: há colaboradores vinculados a esse cargo.' : 'Erro ao excluir cargo.');
+    return;
+  }
+  await carregarCargos();
+  showToast('Cargo excluído.');
 }
