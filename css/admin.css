@@ -40,6 +40,8 @@
   align-items: center;
   margin-bottom: 16px;
 }
+.btn-importar-lote { margin-bottom: 16px; }
+
 #adm-panel-cargos input,
 #adm-panel-competencias input, #adm-panel-competencias select,
 #adm-panel-ciclos input,
