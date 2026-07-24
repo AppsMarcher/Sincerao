@@ -46,6 +46,84 @@ async function atualizarColaborador(id, campos) {
   showToast('Colaborador atualizado.');
 }
 
+function abrirImportarColaboradores() {
+  document.getElementById('importar-colab-texto').value = '';
+  document.getElementById('importar-colab-resultado').innerHTML = '';
+  document.getElementById('modal-importar-colaboradores').classList.add('open');
+}
+
+function fecharModalImportarColaboradores() {
+  document.getElementById('modal-importar-colaboradores').classList.remove('open');
+}
+
+const PAPEIS_VALIDOS = ['colaborador', 'gestor', 'rh', 'admin'];
+
+function parseLinhaImportacao(linha) {
+  const campos = (linha.includes('\t') ? linha.split('\t') : linha.split(',')).map((c) => c.trim());
+  const [nome, email, cargoNome, gestorNome, papelTexto] = campos;
+
+  if (!nome || !email) return { erro: 'Nome e e-mail são obrigatórios', nome: nome || email || '(linha vazia)' };
+
+  let cargo_id = null;
+  if (cargoNome) {
+    const cargo = G.cargos.find((c) => c.nome.trim().toLowerCase() === cargoNome.toLowerCase());
+    if (!cargo) return { erro: `Cargo "${cargoNome}" não encontrado`, nome };
+    cargo_id = cargo.id;
+  }
+
+  let gestor_id = null;
+  if (gestorNome) {
+    const gestor = G.colaboradores.find((c) => c.nome.trim().toLowerCase() === gestorNome.toLowerCase());
+    if (!gestor) return { erro: `Gestor "${gestorNome}" não encontrado`, nome };
+    gestor_id = gestor.id;
+  }
+
+  const papel = papelTexto ? papelTexto.toLowerCase() : 'colaborador';
+  if (!PAPEIS_VALIDOS.includes(papel)) return { erro: `Papel "${papelTexto}" inválido (use colaborador, gestor, rh ou admin)`, nome };
+
+  return { nome, email, cargo_id, gestor_id, papel };
+}
+
+async function processarImportacaoColaboradores() {
+  const texto = document.getElementById('importar-colab-texto').value;
+  const linhas = texto.split('\n').map((l) => l.trim()).filter(Boolean);
+  if (!linhas.length) { showToast('Cole ao menos uma linha.'); return; }
+
+  const resultados = [];
+  for (const linha of linhas) {
+    const parsed = parseLinhaImportacao(linha);
+    if (parsed.erro) {
+      resultados.push({ nome: parsed.nome, ok: false, msg: parsed.erro });
+      continue;
+    }
+    try {
+      await sbInvokeFunction('invite-colaborador', {
+        nome: parsed.nome, email: parsed.email, cargo_id: parsed.cargo_id, gestor_id: parsed.gestor_id, papel: parsed.papel,
+      });
+      resultados.push({ nome: parsed.nome, ok: true, msg: 'Convite enviado' });
+      await carregarColaboradores(); // atualiza G.colaboradores pra permitir que a próxima linha do lote já use este como gestor
+    } catch (err) {
+      resultados.push({ nome: parsed.nome, ok: false, msg: err.message || 'Erro ao convidar' });
+    }
+  }
+
+  document.getElementById('importar-colab-resultado').innerHTML = resultados
+    .map(
+      (r) => `
+    <div class="import-linha ${r.ok ? 'ok' : 'erro'}">
+      <span class="import-nome">${escHtml(r.nome)}</span>
+      <span class="import-status">${r.ok ? '✓' : '✗'} ${escHtml(r.msg)}</span>
+    </div>
+  `
+    )
+    .join('');
+
+  await carregarColaboradores();
+  renderAdmColaboradores();
+  const sucesso = resultados.filter((r) => r.ok).length;
+  showToast(`${sucesso} de ${resultados.length} colaborador(es) importado(s).`);
+}
+
 async function enviarConvite(form) {
   const fd = new FormData(form);
   const payload = {

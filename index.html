@@ -184,6 +184,7 @@
           <option value="admin">admin</option>
         </select>
         <button type="submit" class="btn-primary">Convidar colaborador</button>
+        <button type="button" class="btn-link" onclick="abrirImportarColaboradores()"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Importar em lote</button>
       </form>
       <table class="tabela">
         <thead><tr><th>Nome</th><th>Cargo</th><th>Gestor</th><th>Papel</th></tr></thead>
@@ -251,6 +252,20 @@
       </table>
     </div>
   </main>
+</div>
+
+<!-- MODAL: importar colaboradores em lote -->
+<div id="modal-importar-colaboradores" class="modal">
+  <div class="modal-box">
+    <h3>Importar colaboradores em lote</h3>
+    <p class="muted">Uma linha por colaborador — cole direto do Excel (colunas separadas por tab) ou digite separando por vírgula.<br>Ordem: <strong>Nome, E-mail, Cargo, Gestor, Papel</strong>. Cargo, Gestor e Papel são opcionais (Papel vazio vira "colaborador").</p>
+    <textarea id="importar-colab-texto" rows="8" placeholder="Maria Silva, maria@marcher.com.br, Analista, João Souza, colaborador&#10;Pedro Lima, pedro@marcher.com.br, Gerente, , gestor"></textarea>
+    <div id="importar-colab-resultado"></div>
+    <div class="modal-actions">
+      <button class="btn-link" onclick="fecharModalImportarColaboradores()">Fechar</button>
+      <button class="btn-primary" onclick="processarImportacaoColaboradores()">Importar</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL: criar avaliações de um ciclo -->
