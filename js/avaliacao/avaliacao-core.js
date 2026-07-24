@@ -24,11 +24,15 @@ function podeEditarEtapa(av, etapaId) {
 }
 
 async function abrirAvaliacao(id) {
-  goTo('screen-avaliacao');
   const rows = await sbFetch(
     '/avaliacoes?id=eq.' + id + '&select=*,colaborador:colaborador_id(id,nome,cargo_id),gestor:gestor_id(id,nome),ciclo:ciclo_id(nome)'
   );
   const av = rows[0];
+  if (!av) {
+    showToast('Essa avaliação não está disponível — o ciclo pode estar fora do período de vigência.');
+    return;
+  }
+  goTo('screen-avaliacao');
   const [notas, plano, cargoComp] = await Promise.all([
     sbFetch('/avaliacao_notas?avaliacao_id=eq.' + id),
     sbFetch('/avaliacao_plano_desenvolvimento?avaliacao_id=eq.' + id + '&order=ordem.asc'),
