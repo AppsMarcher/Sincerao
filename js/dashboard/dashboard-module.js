@@ -35,20 +35,40 @@ function renderDashboard() {
   } else {
     secaoGestor.style.display = 'none';
   }
+
+  const secaoTodas = document.getElementById('dash-todas-wrap');
+  if (ehRhOuAdmin()) {
+    secaoTodas.style.display = '';
+    const pendentePrimeiro = (a) => (a.status === 'concluida' && !a.ciencia_rh_em ? 0 : 1);
+    const todasOrdenadas = [...G.avaliacoes].sort((a, b) => pendentePrimeiro(a) - pendentePrimeiro(b));
+    document.getElementById('dash-todas').innerHTML =
+      linhasAvaliacaoHtml(todasOrdenadas, 'rh') || '<p class="empty">Nenhuma avaliação criada ainda.</p>';
+  } else {
+    secaoTodas.style.display = 'none';
+  }
 }
 
 function linhasAvaliacaoHtml(lista, papelVisao) {
   return lista
-    .map(
-      (a) => `
+    .map((a) => {
+      const pendenteCiencia = a.status === 'concluida' && !a.ciencia_rh_em;
+      const titulo = papelVisao === 'rh' ? a.colaborador?.nome : papelVisao === 'gestor' ? a.colaborador?.nome : a.ciclo?.nome;
+      const subtitulo =
+        papelVisao === 'rh'
+          ? `${escHtml(a.ciclo?.nome || '')} · Gestor: ${escHtml(a.gestor?.nome || '')}`
+          : `${escHtml(a.ciclo?.nome || '')}${papelVisao === 'gestor' ? '' : ' · Gestor: ' + escHtml(a.gestor?.nome || '')}`;
+      return `
     <div class="card-avaliacao" onclick="abrirAvaliacao('${a.id}')">
       <div>
-        <strong>${escHtml(papelVisao === 'gestor' ? a.colaborador?.nome : a.ciclo?.nome)}</strong>
-        <div class="muted">${escHtml(a.ciclo?.nome || '')}${papelVisao === 'gestor' ? '' : ' · Gestor: ' + escHtml(a.gestor?.nome || '')}</div>
+        <strong>${escHtml(titulo)}</strong>
+        <div class="muted">${subtitulo}</div>
       </div>
-      <span class="badge">${escHtml(statusLabel(a.status))}</span>
+      <div class="card-avaliacao-badges">
+        ${pendenteCiencia ? '<span class="badge badge-atencao">Aguardando sua ciência</span>' : ''}
+        <span class="badge">${escHtml(statusLabel(a.status))}</span>
+      </div>
     </div>
-  `
-    )
+  `;
+    })
     .join('');
 }
