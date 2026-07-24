@@ -7,11 +7,12 @@
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 14px 18px;
-  margin-bottom: 10px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
   cursor: pointer;
-  transition: border-color .15s;
+  box-shadow: var(--shadow);
+  transition: transform .15s, box-shadow .15s;
 }
-.card-avaliacao:hover { border-color: var(--blue); }
+.card-avaliacao:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(90, 0, 72, 0.16); }
 
 #dash-equipe-wrap { margin-top: 32px; }

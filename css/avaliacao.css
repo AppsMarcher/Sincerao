@@ -17,7 +17,7 @@
   color: var(--text-soft);
   cursor: pointer;
 }
-.etapa-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+.etapa-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
 .escala-item { font-size: 13px; padding: 4px 0; color: var(--text-soft); }
 

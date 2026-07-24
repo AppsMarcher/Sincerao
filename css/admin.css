@@ -17,7 +17,7 @@
   cursor: pointer;
   font-size: 13px;
 }
-.adm-tab-btn.active { color: var(--text); border-bottom-color: var(--blue); }
+.adm-tab-btn.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
 
 .adm-tab-panel { display: none; }
 
