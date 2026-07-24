@@ -44,6 +44,19 @@ async function iniciarApp() {
   await entrarNoApp(perfil);
 }
 
+async function solicitarRecuperacaoSenha() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) { showToast('Digite seu e-mail no campo acima primeiro.'); return; }
+  try {
+    const redirectTo = window.location.origin + window.location.pathname;
+    const { error } = await _sbClient.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+    showToast('Enviamos um e-mail com o link de recuperação.');
+  } catch (err) {
+    showToast('Erro ao solicitar recuperação: ' + (err.message || err));
+  }
+}
+
 async function entrarNoApp(perfil) {
   document.getElementById('nav-nome-usuario').textContent = perfil.nome;
   document.getElementById('nav-admin').style.display = ehRhOuAdmin() ? '' : 'none';
