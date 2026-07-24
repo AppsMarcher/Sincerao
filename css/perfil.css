@@ -12,5 +12,5 @@
 
 #form-trocar-senha { max-width: 320px; margin-bottom: 24px; }
 
-.form-inline-editar { display: flex; gap: 8px; align-items: center; }
-.form-inline-editar input { width: auto; flex: 1 1 200px; padding: 4px 8px; }
+.form-inline-editar { display: flex; gap: var(--space-2); align-items: center; }
+.form-inline-editar input { width: auto; flex: 1 1 200px; }
