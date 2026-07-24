@@ -33,7 +33,10 @@
       </label>
       <label class="campo">
         <span>Senha</span>
-        <input type="password" id="login-senha" required autocomplete="current-password">
+        <div class="campo-senha-wrap">
+          <input type="password" id="login-senha" required autocomplete="current-password">
+          <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
       </label>
       <button type="submit" class="btn-primary">Entrar</button>
     </form>
@@ -50,11 +53,17 @@
     <form id="form-definir-senha">
       <label class="campo">
         <span>Nova senha</span>
-        <input type="password" id="definir-senha-nova" minlength="6" required autocomplete="new-password">
+        <div class="campo-senha-wrap">
+          <input type="password" id="definir-senha-nova" minlength="6" required autocomplete="new-password">
+          <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
       </label>
       <label class="campo">
         <span>Confirmar senha</span>
-        <input type="password" id="definir-senha-confirmar" minlength="6" required autocomplete="new-password">
+        <div class="campo-senha-wrap">
+          <input type="password" id="definir-senha-confirmar" minlength="6" required autocomplete="new-password">
+          <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
       </label>
       <button type="submit" class="btn-primary">Salvar e entrar</button>
     </form>
@@ -100,11 +109,17 @@
       <form id="form-trocar-senha">
         <label class="campo">
           <span>Nova senha</span>
-          <input type="password" id="perfil-nova-senha" minlength="6" required autocomplete="new-password">
+          <div class="campo-senha-wrap">
+            <input type="password" id="perfil-nova-senha" minlength="6" required autocomplete="new-password">
+            <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
         </label>
         <label class="campo">
           <span>Confirmar nova senha</span>
-          <input type="password" id="perfil-confirmar-senha" minlength="6" required autocomplete="new-password">
+          <div class="campo-senha-wrap">
+            <input type="password" id="perfil-confirmar-senha" minlength="6" required autocomplete="new-password">
+            <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
         </label>
         <button type="submit" class="btn-primary">Salvar nova senha</button>
       </form>
