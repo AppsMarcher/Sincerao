@@ -37,6 +37,14 @@ async function iniciarApp() {
     goTo('screen-login');
     return;
   }
+  if (AUTH_URL_TYPE === 'invite' || AUTH_URL_TYPE === 'recovery') {
+    goTo('screen-definir-senha');
+    return;
+  }
+  await entrarNoApp(perfil);
+}
+
+async function entrarNoApp(perfil) {
   document.getElementById('nav-nome-usuario').textContent = perfil.nome;
   document.getElementById('nav-admin').style.display = ehRhOuAdmin() ? '' : 'none';
   await abrirDashboard();
@@ -57,5 +65,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  const formSenha = document.getElementById('form-definir-senha');
+  if (formSenha) {
+    formSenha.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nova = document.getElementById('definir-senha-nova').value;
+      const confirmar = document.getElementById('definir-senha-confirmar').value;
+      if (nova !== confirmar) { showToast('As senhas não coincidem.'); return; }
+      try {
+        const { error } = await _sbClient.auth.updateUser({ password: nova });
+        if (error) throw error;
+        history.replaceState(null, '', window.location.pathname);
+        showToast('Senha definida com sucesso.');
+        await entrarNoApp(G.perfil);
+      } catch (err) {
+        showToast('Erro ao definir senha: ' + (err.message || err));
+      }
+    });
+  }
+
   iniciarApp();
 });

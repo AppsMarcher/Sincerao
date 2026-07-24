@@ -3,8 +3,12 @@
 const SUPABASE_URL = window.AVD_SUPABASE.projectUrl;
 const SUPABASE_KEY = window.AVD_SUPABASE.anonKey;
 
+// Captura o tipo de link de auth (invite/recovery) ANTES do supabase-js processar
+// e limpar o hash da URL — é a única janela síncrona pra saber por que a sessão existe.
+const AUTH_URL_TYPE = new URLSearchParams((window.location.hash || '').replace(/^#/, '')).get('type');
+
 const _sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { detectSessionInUrl: false },
+  auth: { detectSessionInUrl: true },
 });
 
 async function getSupabaseAccessToken() {

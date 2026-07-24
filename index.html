@@ -22,7 +22,7 @@
 <div id="toast" class="toast"></div>
 
 <!-- LOGIN -->
-<div id="screen-login" class="screen active">
+<div id="screen-login" class="screen tela-auth active">
   <div class="login-box">
     <img src="assets/logo.png" alt="Sincerão" class="logo-login">
     <p class="muted">Feedback conectado ao desenvolvimento</p>
@@ -39,6 +39,26 @@
     </form>
   </div>
   <p class="login-footer">Desenvolvido por <a href="mailto:ti@marcher.com.br">@MarcherBrasil</a></p>
+</div>
+
+<!-- DEFINIR SENHA (primeiro acesso via convite, ou recuperação de senha) -->
+<div id="screen-definir-senha" class="screen tela-auth">
+  <div class="login-box">
+    <img src="assets/logo.png" alt="Sincerão" class="logo-login">
+    <h2>Defina sua senha</h2>
+    <p class="muted">Complete seu cadastro criando uma senha de acesso.</p>
+    <form id="form-definir-senha">
+      <label class="campo">
+        <span>Nova senha</span>
+        <input type="password" id="definir-senha-nova" minlength="6" required autocomplete="new-password">
+      </label>
+      <label class="campo">
+        <span>Confirmar senha</span>
+        <input type="password" id="definir-senha-confirmar" minlength="6" required autocomplete="new-password">
+      </label>
+      <button type="submit" class="btn-primary">Salvar e entrar</button>
+    </form>
+  </div>
 </div>
 
 <!-- DASHBOARD -->

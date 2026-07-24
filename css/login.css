@@ -1,6 +1,7 @@
-/* login.css — tela de login: fundo em gradiente roxo-vinho (hero), card branco central */
+/* login.css — telas de autenticação (login, definir senha): fundo em gradiente
+   roxo-vinho (hero), card branco central. Compartilhado via .tela-auth. */
 
-#screen-login {
+.tela-auth {
   display: none;
   min-height: 100vh;
   flex-direction: column;
@@ -9,7 +10,7 @@
   gap: var(--space-4);
   background: linear-gradient(135deg, var(--primary) 0%, #7a0a63 45%, #a3155f 100%);
 }
-#screen-login.active { display: flex; }
+.tela-auth.active { display: flex; }
 
 .login-box {
   width: min(360px, 90vw);
@@ -20,6 +21,7 @@
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
 }
 .logo-login { height: 44px; width: auto; display: block; margin: 0 auto 12px; }
+.login-box h2 { text-align: center; margin-bottom: 8px; }
 .login-box .muted { margin-bottom: 20px; display: block; text-align: center; }
 .login-box .btn-primary { width: 100%; margin-top: 8px; }
 
