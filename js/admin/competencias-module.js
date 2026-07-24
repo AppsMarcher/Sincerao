@@ -12,7 +12,7 @@ function renderAdmCompetencias() {
   if (!el) return;
   el.innerHTML =
     G.competencias.map((c) => (c.id === _competenciaEmEdicaoId ? linhaCompetenciaEdicaoHtml(c) : linhaCompetenciaHtml(c))).join('') ||
-    '<tr><td colspan="5">Nenhuma competência cadastrada.</td></tr>';
+    '<tr><td colspan="4">Nenhuma competência cadastrada.</td></tr>';
 }
 
 function linhaCompetenciaHtml(c) {
@@ -21,10 +21,9 @@ function linhaCompetenciaHtml(c) {
       <td>${escHtml(c.nome)}</td>
       <td>${c.tipo === 'comportamental' ? 'Comportamental' : 'Técnica'}</td>
       <td>${escHtml(c.definicao || '—')}</td>
-      <td>${c.ativo ? 'Ativa' : 'Inativa'}</td>
-      <td>
-        <button class="btn-link" onclick="editarCompetencia('${c.id}')">Editar</button>
-        <button class="btn-link" onclick="toggleCompetenciaAtiva('${c.id}', ${!c.ativo})">${c.ativo ? 'Desativar' : 'Reativar'}</button>
+      <td class="tabela-acoes">
+        <button class="btn-icon" title="Editar" onclick="editarCompetencia('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="btn-icon ${c.ativo ? 'btn-icon--ativo' : 'btn-icon--inativo'}" title="${c.ativo ? 'Desativar' : 'Reativar'}" onclick="toggleCompetenciaAtiva('${c.id}', ${!c.ativo})"><svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></button>
       </td>
     </tr>
   `;
@@ -41,10 +40,9 @@ function linhaCompetenciaEdicaoHtml(c) {
         </select>
       </td>
       <td><input type="text" class="edit-definicao" value="${escHtml(c.definicao || '')}"></td>
-      <td>${c.ativo ? 'Ativa' : 'Inativa'}</td>
-      <td>
-        <button class="btn-link" onclick="salvarEdicaoCompetencia('${c.id}')">Salvar</button>
-        <button class="btn-link" onclick="cancelarEdicaoCompetencia()">Cancelar</button>
+      <td class="tabela-acoes">
+        <button class="btn-icon" title="Salvar" onclick="salvarEdicaoCompetencia('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
+        <button class="btn-icon" title="Cancelar" onclick="cancelarEdicaoCompetencia()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </td>
     </tr>
   `;

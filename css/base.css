@@ -248,6 +248,28 @@ input[type="checkbox"], input[type="radio"] {
 .tabela tbody tr:hover { background: var(--panel-alt); }
 .tabela tbody tr:last-child td { border-bottom: none; }
 
+.tabela-acoes { display: flex; align-items: center; gap: 2px; }
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+.btn-icon .icon { width: 16px; height: 16px; }
+.btn-icon:hover { background: var(--panel-alt); color: var(--primary); }
+.btn-icon--ativo { color: var(--green); }
+.btn-icon--ativo:hover { background: var(--green-soft); color: var(--green); }
+.btn-icon--inativo { color: var(--text-faint); }
+.btn-icon--inativo:hover { background: var(--primary-soft); color: var(--primary); }
+
 .check-row { display: flex; align-items: center; gap: var(--space-3); padding: 10px 4px; font-size: 14px; border-radius: var(--radius-sm); cursor: pointer; }
 .check-row:hover { background: var(--panel-alt); }
 .check-list { display: flex; flex-direction: column; gap: 0; margin: var(--space-3) 0; }
