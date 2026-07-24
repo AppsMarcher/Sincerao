@@ -91,9 +91,7 @@ a { color: var(--primary); }
 .topbar .btn-link:hover { background: rgba(255, 255, 255, 0.15); }
 .topbar .badge { background: rgba(255, 255, 255, 0.18); color: #fff; }
 
-.brand-topbar { display: flex; align-items: center; gap: 10px; }
-.icon-topbar { height: 28px; width: 28px; display: block; }
-.wordmark-topbar { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 19px; color: #fff; }
+.logo-topbar { height: 28px; width: auto; display: block; }
 
 .topbar-actions { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
 .topbar-actions .btn-link { min-height: 44px; padding: 8px 12px; }
