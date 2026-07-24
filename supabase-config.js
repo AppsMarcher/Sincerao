@@ -1,0 +1,4 @@
+window.AVD_SUPABASE = {
+  projectUrl: "COLE_AQUI_A_URL_DO_PROJETO_SUPABASE",
+  anonKey: "COLE_AQUI_A_ANON_KEY"
+};

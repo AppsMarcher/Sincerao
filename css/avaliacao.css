@@ -1,0 +1,48 @@
+/* avaliacao.css — wizard das 8 etapas, competências, plano de desenvolvimento, parecer/ciência */
+
+.etapas-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 24px;
+  background: var(--panel-alt);
+  border-bottom: 1px solid var(--line);
+}
+.etapa-btn {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+.etapa-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+.escala-item { font-size: 13px; padding: 4px 0; color: var(--text-soft); }
+
+.competencia-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabela-scroll { overflow-x: auto; }
+.tabela-plano { width: 100%; border-collapse: collapse; min-width: 720px; }
+.tabela-plano th, .tabela-plano td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.tabela-plano input { min-width: 100px; }
+
+.resultado-final {
+  display: flex;
+  gap: 24px;
+  background: var(--panel-alt);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 16px 0;
+}
+
+.ciencia-wrap { margin-top: 20px; }
+.ciencia-item { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-size: 13px; }

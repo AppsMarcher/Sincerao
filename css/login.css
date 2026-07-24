@@ -1,0 +1,20 @@
+/* login.css — tela de login */
+
+#screen-login {
+  display: none;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+#screen-login.active { display: flex; }
+
+.login-box {
+  width: min(360px, 90vw);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+.login-box h1 { font-size: 20px; margin: 0 0 4px; }
+.login-box .btn-primary { width: 100%; margin-top: 8px; }

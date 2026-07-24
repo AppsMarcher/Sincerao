@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avaliação de Desempenho — Marcher</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/login.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/avaliacao.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<!-- LOGIN -->
+<div id="screen-login" class="screen active">
+  <div class="login-box">
+    <h1>Avaliação de Desempenho</h1>
+    <p class="muted">Marcher Brasil</p>
+    <form id="form-login">
+      <label class="campo">
+        <span>E-mail</span>
+        <input type="email" id="login-email" required autocomplete="username">
+      </label>
+      <label class="campo">
+        <span>Senha</span>
+        <input type="password" id="login-senha" required autocomplete="current-password">
+      </label>
+      <button type="submit" class="btn-primary">Entrar</button>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="screen-dashboard" class="screen">
+  <header class="topbar">
+    <h2>Avaliação de Desempenho</h2>
+    <div class="topbar-actions">
+      <span id="nav-nome-usuario"></span>
+      <button id="nav-admin" class="btn-link" onclick="abrirAdmin()">Cadastros</button>
+      <button class="btn-link" onclick="fazerLogout()">Sair</button>
+    </div>
+  </header>
+  <main class="content">
+    <section>
+      <h3>Minhas avaliações</h3>
+      <div id="dash-minhas"></div>
+    </section>
+    <section id="dash-equipe-wrap">
+      <h3>Avaliações da minha equipe</h3>
+      <div id="dash-equipe"></div>
+    </section>
+  </main>
+</div>
+
+<!-- AVALIAÇÃO (wizard) -->
+<div id="screen-avaliacao" class="screen">
+  <header class="topbar">
+    <button class="btn-link" onclick="abrirDashboard()">&larr; Voltar</button>
+    <div>
+      <h2 id="avaliacao-titulo"></h2>
+      <span class="badge" id="avaliacao-status"></span>
+    </div>
+    <div id="avaliacao-transicao"></div>
+  </header>
+  <div class="etapas-nav" id="etapas-nav"></div>
+  <main class="content" id="etapa-conteudo"></main>
+</div>
+
+<!-- ADMIN / CADASTROS -->
+<div id="screen-admin" class="screen">
+  <header class="topbar">
+    <button class="btn-link" onclick="abrirDashboard()">&larr; Voltar</button>
+    <h2>Cadastros</h2>
+  </header>
+  <div class="adm-tabs">
+    <button id="adm-btn-cargos" class="adm-tab-btn" onclick="admTab('cargos')">Cargos</button>
+    <button id="adm-btn-competencias" class="adm-tab-btn" onclick="admTab('competencias')">Competências</button>
+    <button id="adm-btn-vinculo" class="adm-tab-btn" onclick="admTab('vinculo')">Cargo × Competência</button>
+    <button id="adm-btn-ciclos" class="adm-tab-btn" onclick="admTab('ciclos')">Ciclos</button>
+    <button id="adm-btn-colaboradores" class="adm-tab-btn" onclick="admTab('colaboradores')">Colaboradores</button>
+  </div>
+
+  <main class="content">
+    <div id="adm-panel-cargos" class="adm-tab-panel">
+      <form onsubmit="event.preventDefault(); criarCargo(this.nome.value, this.setor.value); this.reset();">
+        <input name="nome" placeholder="Nome do cargo" required>
+        <input name="setor" placeholder="Setor">
+        <button type="submit" class="btn-primary">Adicionar cargo</button>
+      </form>
+      <table class="tabela">
+        <thead><tr><th>Nome</th><th>Setor</th><th>Status</th><th></th></tr></thead>
+        <tbody id="adm-lista-cargos"></tbody>
+      </table>
+    </div>
+
+    <div id="adm-panel-competencias" class="adm-tab-panel">
+      <form onsubmit="event.preventDefault(); criarCompetencia(this.nome.value, this.tipo.value, this.definicao.value); this.reset();">
+        <input name="nome" placeholder="Nome da competência" required>
+        <select name="tipo">
+          <option value="comportamental">Comportamental</option>
+          <option value="tecnica">Técnica</option>
+        </select>
+        <input name="definicao" placeholder="Definição (opcional)">
+        <button type="submit" class="btn-primary">Adicionar competência</button>
+      </form>
+      <table class="tabela">
+        <thead><tr><th>Nome</th><th>Tipo</th><th>Definição</th><th>Status</th><th></th></tr></thead>
+        <tbody id="adm-lista-competencias"></tbody>
+      </table>
+    </div>
+
+    <div id="adm-panel-vinculo" class="adm-tab-panel">
+      <label class="campo">
+        <span>Cargo</span>
+        <select id="vinculo-select-cargo" onchange="renderVinculoLista(this.value)"></select>
+      </label>
+      <div id="vinculo-lista-competencias" class="check-list"></div>
+    </div>
+
+    <div id="adm-panel-ciclos" class="adm-tab-panel">
+      <form onsubmit="event.preventDefault(); criarCiclo(this.nome.value, this.data_inicio.value, this.data_fim.value); this.reset();">
+        <input name="nome" placeholder="Nome do ciclo (ex: 2026 - Semestre 2)" required>
+        <input name="data_inicio" type="date" required>
+        <input name="data_fim" type="date" required>
+        <button type="submit" class="btn-primary">Criar ciclo</button>
+      </form>
+      <table class="tabela">
+        <thead><tr><th>Nome</th><th>Período</th><th>Status</th><th></th></tr></thead>
+        <tbody id="adm-lista-ciclos"></tbody>
+      </table>
+    </div>
+
+    <div id="adm-panel-colaboradores" class="adm-tab-panel">
+      <p class="muted">Para adicionar um novo colaborador, convide-o pelo painel do Supabase (Authentication &gt; Invite user). O cadastro aqui aparece automaticamente após o primeiro acesso.</p>
+      <table class="tabela">
+        <thead><tr><th>Nome</th><th>Cargo</th><th>Gestor</th><th>Papel</th></tr></thead>
+        <tbody id="adm-lista-colaboradores"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: criar avaliações de um ciclo -->
+<div id="modal-criar-avaliacoes" class="modal">
+  <div class="modal-box">
+    <h3>Criar avaliações do ciclo</h3>
+    <div id="modal-lista-colaboradores" class="check-list"></div>
+    <div class="modal-actions">
+      <button class="btn-link" onclick="fecharModalCriarAvaliacoes()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarCriacaoAvaliacoes()">Criar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+
+<script src="js/core/constants.js"></script>
+<script src="js/core/supabase-client.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/core/utils.js"></script>
+
+<script src="js/dashboard/dashboard-module.js"></script>
+
+<script src="js/avaliacao/avaliacao-core.js"></script>
+<script src="js/avaliacao/etapa-texto.js"></script>
+<script src="js/avaliacao/etapa-competencias.js"></script>
+<script src="js/avaliacao/etapa-plano.js"></script>
+<script src="js/avaliacao/etapa-parecer.js"></script>
+
+<script src="js/admin/cargos-module.js"></script>
+<script src="js/admin/competencias-module.js"></script>
+<script src="js/admin/vinculo-module.js"></script>
+<script src="js/admin/ciclos-module.js"></script>
+<script src="js/admin/colaboradores-module.js"></script>
+<script src="js/admin/admin-shell.js"></script>
+
+<script src="js/auth/auth-module.js"></script>
+</body>
+</html>

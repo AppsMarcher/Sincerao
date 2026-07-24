@@ -1,0 +1,17 @@
+/* dashboard.css — lista de avaliações do usuário logado */
+
+.card-avaliacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.card-avaliacao:hover { border-color: var(--blue); }
+
+#dash-equipe-wrap { margin-top: 32px; }
