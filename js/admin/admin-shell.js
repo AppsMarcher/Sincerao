@@ -10,7 +10,7 @@ async function abrirAdmin() {
 function admTab(nome) {
   document.querySelectorAll('#screen-admin .adm-tab-panel').forEach((p) => (p.style.display = 'none'));
   document.querySelectorAll('#screen-admin .adm-tab-btn').forEach((b) => b.classList.remove('active'));
-  document.getElementById('adm-panel-' + nome).style.display = '';
+  document.getElementById('adm-panel-' + nome).style.display = 'block';
   document.getElementById('adm-btn-' + nome).classList.add('active');
   if (nome === 'vinculo') renderVinculoCargoCompetencia();
   if (nome === 'ciclos') renderAdmCiclos();
