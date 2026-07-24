@@ -24,4 +24,4 @@
 .login-box .btn-primary { width: 100%; margin-top: 8px; }
 
 .login-footer { color: rgba(255, 255, 255, 0.75); font-size: 13px; margin: 0; }
-.login-footer a { color: #fff; font-weight: 600; }
+.login-footer a { color: #fff; font-weight: 600; text-decoration: none; }
