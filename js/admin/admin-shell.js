@@ -4,7 +4,7 @@ async function abrirAdmin() {
   if (!ehRhOuAdmin()) { showToast('Acesso restrito ao RH.'); return; }
   goTo('screen-admin');
   await Promise.all([carregarCargos(), carregarSetores(), carregarCompetencias(), carregarCiclos(), carregarColaboradores()]);
-  admTab('cargos');
+  admTab('colaboradores');
 }
 
 function admTab(nome) {

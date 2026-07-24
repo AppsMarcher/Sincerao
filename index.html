@@ -162,24 +162,32 @@
     <h2>Cadastros</h2>
   </header>
   <div class="adm-tabs">
-    <button id="adm-btn-cargos" class="adm-tab-btn" onclick="admTab('cargos')"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Cargos</button>
+    <button id="adm-btn-colaboradores" class="adm-tab-btn" onclick="admTab('colaboradores')"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Colaboradores</button>
     <button id="adm-btn-setores" class="adm-tab-btn" onclick="admTab('setores')"><svg class="icon" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/></svg> Setores</button>
+    <button id="adm-btn-cargos" class="adm-tab-btn" onclick="admTab('cargos')"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Cargos</button>
     <button id="adm-btn-competencias" class="adm-tab-btn" onclick="admTab('competencias')"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg> Competências</button>
     <button id="adm-btn-vinculo" class="adm-tab-btn" onclick="admTab('vinculo')"><svg class="icon" viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg> Cargo × Competência</button>
     <button id="adm-btn-ciclos" class="adm-tab-btn" onclick="admTab('ciclos')"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Ciclos</button>
-    <button id="adm-btn-colaboradores" class="adm-tab-btn" onclick="admTab('colaboradores')"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Colaboradores</button>
   </div>
 
   <main class="content">
-    <div id="adm-panel-cargos" class="adm-tab-panel card">
-      <form onsubmit="event.preventDefault(); criarCargo(this.nome.value, this.setor_id.value); this.reset();">
-        <input name="nome" placeholder="Nome do cargo" required>
-        <select name="setor_id" id="cargo-select-setor"><option value="">Sem setor</option></select>
-        <button type="submit" class="btn-primary">Adicionar cargo</button>
+    <div id="adm-panel-colaboradores" class="adm-tab-panel card">
+      <form id="form-novo-colaborador" onsubmit="event.preventDefault(); enviarConvite(this);">
+        <input name="nome" placeholder="Nome" required>
+        <input name="email" type="email" placeholder="E-mail" required>
+        <select name="cargo_id" id="novo-colab-cargo"><option value="">Sem cargo</option></select>
+        <select name="gestor_id" id="novo-colab-gestor"><option value="">Sem gestor</option></select>
+        <select name="papel">
+          <option value="colaborador">colaborador</option>
+          <option value="gestor">gestor</option>
+          <option value="rh">rh</option>
+          <option value="admin">admin</option>
+        </select>
+        <button type="submit" class="btn-primary">Convidar colaborador</button>
       </form>
       <table class="tabela">
-        <thead><tr><th>Nome</th><th>Setor</th><th>Ações</th></tr></thead>
-        <tbody id="adm-lista-cargos"></tbody>
+        <thead><tr><th>Nome</th><th>Cargo</th><th>Gestor</th><th>Papel</th></tr></thead>
+        <tbody id="adm-lista-colaboradores"></tbody>
       </table>
     </div>
 
@@ -191,6 +199,18 @@
       <table class="tabela">
         <thead><tr><th>Nome</th><th>Ações</th></tr></thead>
         <tbody id="adm-lista-setores"></tbody>
+      </table>
+    </div>
+
+    <div id="adm-panel-cargos" class="adm-tab-panel card">
+      <form onsubmit="event.preventDefault(); criarCargo(this.nome.value, this.setor_id.value); this.reset();">
+        <input name="nome" placeholder="Nome do cargo" required>
+        <select name="setor_id" id="cargo-select-setor"><option value="">Sem setor</option></select>
+        <button type="submit" class="btn-primary">Adicionar cargo</button>
+      </form>
+      <table class="tabela">
+        <thead><tr><th>Nome</th><th>Setor</th><th>Ações</th></tr></thead>
+        <tbody id="adm-lista-cargos"></tbody>
       </table>
     </div>
 
@@ -228,26 +248,6 @@
       <table class="tabela">
         <thead><tr><th>Nome</th><th>Período</th><th>Status</th><th></th></tr></thead>
         <tbody id="adm-lista-ciclos"></tbody>
-      </table>
-    </div>
-
-    <div id="adm-panel-colaboradores" class="adm-tab-panel card">
-      <form id="form-novo-colaborador" onsubmit="event.preventDefault(); enviarConvite(this);">
-        <input name="nome" placeholder="Nome" required>
-        <input name="email" type="email" placeholder="E-mail" required>
-        <select name="cargo_id" id="novo-colab-cargo"><option value="">Sem cargo</option></select>
-        <select name="gestor_id" id="novo-colab-gestor"><option value="">Sem gestor</option></select>
-        <select name="papel">
-          <option value="colaborador">colaborador</option>
-          <option value="gestor">gestor</option>
-          <option value="rh">rh</option>
-          <option value="admin">admin</option>
-        </select>
-        <button type="submit" class="btn-primary">Convidar colaborador</button>
-      </form>
-      <table class="tabela">
-        <thead><tr><th>Nome</th><th>Cargo</th><th>Gestor</th><th>Papel</th></tr></thead>
-        <tbody id="adm-lista-colaboradores"></tbody>
       </table>
     </div>
   </main>
