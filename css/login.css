@@ -23,7 +23,7 @@
 .logo-login { height: 44px; width: auto; display: block; margin: 0 auto 12px; }
 .login-box h2 { text-align: center; margin-bottom: 8px; }
 .login-box .muted { margin-bottom: 20px; display: block; text-align: center; }
-.login-box .btn-primary { width: 100%; margin-top: 8px; }
+.login-box .btn-primary { width: 100%; }
 .login-esqueci { display: block; margin: 12px auto 0; }
 
 .login-footer { color: rgba(255, 255, 255, 0.75); font-size: 13px; margin: 0; }
