@@ -4,6 +4,13 @@ function toggleNavMenu() {
   document.getElementById('nav-menu').classList.toggle('open');
 }
 
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('nav-menu');
+  if (!menu || !menu.classList.contains('open')) return;
+  if (e.target.closest('#nav-menu') || e.target.closest('.nav-hamburguer')) return;
+  menu.classList.remove('open');
+});
+
 async function abrirDashboard() {
   goTo('screen-dashboard');
   const rows = (await sbFetch(
