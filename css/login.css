@@ -211,7 +211,7 @@
   border: 1px solid rgba(197, 92, 235, 0.36);
   border-radius: 14px;
   outline: none;
-  background: rgba(22, 6, 45, 0.42);
+  background: rgba(61, 22, 92, 0.62);
   color: #fff;
   font-size: 17px;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
@@ -223,8 +223,21 @@
 
 #screen-login .login-input-wrap input:focus {
   border-color: rgba(255, 38, 131, 0.8);
-  background: rgba(31, 8, 59, 0.58);
+  background: rgba(76, 27, 111, 0.74);
   box-shadow: 0 0 0 3px rgba(255, 38, 131, 0.12);
+}
+
+/* Impede o preenchimento automático do navegador de clarear os campos. */
+#screen-login .login-input-wrap input:-webkit-autofill,
+#screen-login .login-input-wrap input:-webkit-autofill:hover,
+#screen-login .login-input-wrap input:-webkit-autofill:focus,
+#screen-login .login-input-wrap input:-webkit-autofill:active {
+  border-color: rgba(197, 92, 235, 0.48);
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+  box-shadow: 0 0 0 1000px #351451 inset;
+  -webkit-box-shadow: 0 0 0 1000px #351451 inset;
+  transition: background-color 9999s ease-out 0s;
 }
 
 #screen-login .btn-olho {
@@ -319,6 +332,90 @@
 #screen-definir-senha .login-box h2 { margin-bottom: 8px; text-align: center; }
 #screen-definir-senha .login-box .muted { display: block; margin-bottom: 20px; text-align: center; }
 #screen-definir-senha .login-box .btn-primary { width: 100%; }
+
+/* Mantém toda a experiência visível em notebooks e janelas de pouca altura. */
+@media (min-width: 781px) and (max-height: 760px) {
+  .login-hero {
+    padding-top: 26px;
+    padding-bottom: 26px;
+  }
+  .login-hero-logo {
+    height: 40px;
+  }
+  .login-hero-copy {
+    margin-top: 28px;
+  }
+  .login-hero h1 {
+    font-size: clamp(43px, 4vw, 56px);
+  }
+  .login-hero-subtitulo {
+    margin-top: 14px;
+    font-size: 17px;
+    line-height: 1.4;
+  }
+  .login-beneficios {
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .login-beneficio {
+    grid-template-columns: 50px minmax(0, 1fr);
+    gap: 14px;
+  }
+  .login-beneficio-icone {
+    width: 48px;
+    height: 48px;
+  }
+  .login-beneficio-icone svg {
+    width: 25px;
+    height: 25px;
+  }
+  .login-beneficio strong {
+    margin-bottom: 2px;
+    font-size: 15px;
+  }
+  .login-beneficio p {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .login-acesso {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  #screen-login .login-box {
+    padding: 30px 38px;
+    border-radius: 28px;
+  }
+  #screen-login .login-box h2 {
+    font-size: 29px;
+  }
+  .login-subtitulo {
+    margin: 8px 0 20px;
+    font-size: 16px;
+  }
+  #screen-login .campo {
+    margin-bottom: 14px;
+  }
+  #screen-login .campo > span:first-child {
+    margin-bottom: 7px;
+  }
+  #screen-login .login-input-wrap input {
+    height: 54px;
+    font-size: 16px;
+  }
+  #screen-login .login-esqueci {
+    margin: -3px 0 18px auto;
+  }
+  #screen-login .login-entrar {
+    min-height: 56px;
+    font-size: 18px;
+  }
+  .login-primeiro-acesso {
+    margin-top: 12px;
+  }
+  .login-footer {
+    margin-top: 4px;
+  }
+}
 
 @media (max-width: 1050px) {
   .login-layout {
