@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="css/dashboard.css?v=10">
 <link rel="stylesheet" href="css/perfil.css?v=10">
 <link rel="stylesheet" href="css/avaliacao.css?v=10">
-<link rel="stylesheet" href="css/admin.css?v=14">
+<link rel="stylesheet" href="css/admin.css?v=15">
 <link rel="stylesheet" href="css/responsive.css?v=14">
 </head>
 <body>
@@ -421,9 +421,14 @@
 </div>
 
 <!-- MODAL: criar avaliações de um ciclo -->
-<div id="modal-criar-avaliacoes" class="modal">
+<div id="modal-criar-avaliacoes" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-criar-avaliacoes-titulo" onclick="if (event.target === this) fecharModalCriarAvaliacoes()">
   <div class="modal-box">
-    <h3>Criar avaliações do ciclo</h3>
+    <div class="modal-cabecalho">
+      <h3 id="modal-criar-avaliacoes-titulo">Criar avaliações do ciclo</h3>
+      <button type="button" class="btn-icon modal-fechar" aria-label="Fechar" onclick="fecharModalCriarAvaliacoes()">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
     <div id="modal-lista-colaboradores" class="check-list"></div>
     <div class="modal-actions">
       <button class="btn-link" onclick="fecharModalCriarAvaliacoes()">Cancelar</button>
@@ -456,7 +461,7 @@
 <script src="js/admin/ciclos-module.js?v=11"></script>
 <script src="js/admin/colaboradores-module.js?v=11"></script>
 <script src="js/admin/auditoria-module.js?v=12"></script>
-<script src="js/admin/admin-shell.js?v=12"></script>
+<script src="js/admin/admin-shell.js?v=13"></script>
 
 <script src="js/auth/auth-module.js?v=11"></script>
 </body>

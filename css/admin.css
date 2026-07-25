@@ -201,6 +201,45 @@
 .import-linha.ok .import-status { color: var(--green); }
 .import-linha.erro .import-status { color: var(--red); }
 
+/* Modal de criação de avaliações: cabeçalho e ações ficam fixos; somente a
+   lista central rola, inclusive em notebooks com pouca altura. */
+body.modal-criar-avaliacoes-open { overflow: hidden; }
+#modal-criar-avaliacoes {
+  padding: 16px;
+  overflow: hidden;
+}
+#modal-criar-avaliacoes .modal-box {
+  display: flex;
+  width: min(560px, 100%);
+  max-height: calc(100dvh - 32px);
+  flex-direction: column;
+  overflow: hidden;
+}
+#modal-criar-avaliacoes .modal-cabecalho {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+#modal-criar-avaliacoes .modal-cabecalho h3 { margin: 0; }
+#modal-criar-avaliacoes .modal-fechar { flex: 0 0 auto; }
+#modal-lista-colaboradores {
+  min-height: 0;
+  margin: var(--space-4) 0 0;
+  padding-right: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+#modal-criar-avaliacoes .modal-actions {
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+
 /* Auditoria operacional */
 .auditoria-cabecalho {
   display: flex;

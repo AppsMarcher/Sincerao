@@ -1,5 +1,7 @@
 // admin/admin-shell.js — orquestra as abas de cadastro e o modal de criação de avaliações do ciclo
 
+let _criacaoAvaliacoesTrigger = null;
+
 async function abrirAdmin() {
   if (!ehRhOuAdmin()) { showToast('Acesso restrito ao RH.'); return; }
   goTo('screen-admin');
@@ -21,6 +23,7 @@ function admTab(nome) {
 
 async function abrirCriacaoAvaliacoes(cicloId) {
   const modal = document.getElementById('modal-criar-avaliacoes');
+  _criacaoAvaliacoesTrigger = document.activeElement;
   modal.dataset.cicloId = cicloId;
   const el = document.getElementById('modal-lista-colaboradores');
   el.innerHTML =
@@ -35,10 +38,16 @@ async function abrirCriacaoAvaliacoes(cicloId) {
       )
       .join('') || '<p>Nenhum colaborador com gestor definido. Cadastre o gestor na aba Colaboradores primeiro.</p>';
   modal.classList.add('open');
+  document.body.classList.add('modal-criar-avaliacoes-open');
+  modal.querySelector('.modal-fechar')?.focus();
 }
 
 function fecharModalCriarAvaliacoes() {
-  document.getElementById('modal-criar-avaliacoes').classList.remove('open');
+  const modal = document.getElementById('modal-criar-avaliacoes');
+  modal.classList.remove('open');
+  document.body.classList.remove('modal-criar-avaliacoes-open');
+  if (_criacaoAvaliacoesTrigger?.isConnected) _criacaoAvaliacoesTrigger.focus();
+  _criacaoAvaliacoesTrigger = null;
 }
 
 async function confirmarCriacaoAvaliacoes() {
@@ -57,3 +66,9 @@ async function confirmarCriacaoAvaliacoes() {
   fecharModalCriarAvaliacoes();
   showToast('Avaliações criadas para o ciclo.');
 }
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && document.getElementById('modal-criar-avaliacoes')?.classList.contains('open')) {
+    fecharModalCriarAvaliacoes();
+  }
+});
