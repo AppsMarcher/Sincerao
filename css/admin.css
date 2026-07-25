@@ -41,7 +41,11 @@
   margin-bottom: 16px;
 }
 .btn-importar-lote { display: block; width: fit-content; margin: 0 0 16px auto; }
-.busca-colaboradores { display: block; margin: 0 0 16px; font-size: 12.5px; }
+.busca-colaboradores { display: block; margin: 0 0 16px; }
+/* especificidade por ID pra vencer o input:not(...):not(...) genérico do
+   base.css (cada :not() conta como classe, então fica mais específico que
+   uma classe sozinha). */
+#busca-colaboradores { font-size: 12.5px; }
 
 #adm-panel-cargos input,
 #adm-panel-competencias input, #adm-panel-competencias select,
@@ -52,23 +56,30 @@
 
 /* Form de convite mais compacto, pedido explícito -- foge da regra geral de
    nunca customizar tamanho de input por caso, mas aqui é intencional: o
-   objetivo é caber nome/e-mail/cargo/gestor/papel/botão numa linha só. */
-/* flex-wrap:nowrap (ID+classe pra vencer a especificidade de #form-novo-colaborador)
-   garante que o botão nunca quebre pra linha de baixo -- os inputs/selects
-   encolhem (min-width:0 remove o piso de largura pelo conteúdo) pra abrir espaço. */
+   objetivo é caber nome/e-mail/cargo/gestor/papel/botão numa linha só, sem
+   vão vazio no meio. flex-wrap:nowrap (ID+classe pra vencer a especificidade
+   de #form-novo-colaborador) garante que nada quebre pra linha de baixo --
+   nome/e-mail crescem mais (flex-grow:2) que os selects (flex-grow:1) pra
+   preencher a linha inteira e sobrar espaço pro texto completo digitado. */
 #form-novo-colaborador.form-novo-colaborador-compacta { flex-wrap: nowrap; }
-.form-novo-colaborador-compacta input,
-.form-novo-colaborador-compacta select {
-  flex: 0 1 120px;
+/* seletor ID+classe (não só .form-novo-colaborador-compacta) pra vencer o
+   input:not(...):not(...) do base.css -- do contrário font-size/min-height/
+   padding "compactos" perdem a guerra de especificidade e nunca aplicam. */
+#form-novo-colaborador.form-novo-colaborador-compacta input {
+  flex: 2 1 160px;
+  min-width: 0;
+  font-size: 12.5px;
+  min-height: 38px;
+  padding: 8px 12px;
+}
+#form-novo-colaborador.form-novo-colaborador-compacta select {
+  flex: 1 1 100px;
   min-width: 0;
   font-size: 12.5px;
   min-height: 38px;
   padding: 8px 12px;
 }
 .form-novo-colaborador-compacta .btn-primary { flex: 0 0 auto; font-size: 13px; min-height: 38px; padding: 0 20px; }
-/* Nome/E-mail ficam à esquerda; cargo/gestor/papel + botão formam um grupo
-   colado à direita na mesma linha. */
-#novo-colab-cargo { margin-left: auto; }
 
 .th-sort { cursor: pointer; user-select: none; white-space: nowrap; }
 .th-sort:hover { color: var(--primary); }
