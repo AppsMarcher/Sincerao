@@ -61,9 +61,14 @@
 .badge-ciclo-em_andamento { background: var(--green-soft); color: var(--green); }
 .badge-ciclo-encerrado { background: var(--line); color: var(--text-faint); }
 
-#modal-importar-colaboradores .modal-box { width: min(680px, 92vw); }
+/* max-height + overflow no modal inteiro é rede de segurança pra janelas
+   baixas; quem normalmente rola é só a lista de resultado (max-height logo
+   abaixo) -- assim título/textarea/botões continuam visíveis num lote grande
+   em vez do modal crescer sem limite e "prender" a tela. */
+#modal-importar-colaboradores .modal-box { width: min(680px, 92vw); max-height: 85vh; overflow-y: auto; }
 #importar-colab-texto { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
 .importar-status { align-items: center; gap: 10px; padding: 10px 2px; font-size: 13px; color: var(--text-soft); }
+#importar-colab-resultado { max-height: 260px; overflow-y: auto; }
 .import-linha { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
 .import-linha:last-child { border-bottom: none; }
 .import-linha .import-nome { font-weight: 600; flex: 1 1 auto; }
