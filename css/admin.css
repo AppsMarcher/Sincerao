@@ -103,6 +103,57 @@
 .badge-ciclo-em_andamento { background: var(--green-soft); color: var(--green); }
 .badge-ciclo-encerrado { background: var(--line); color: var(--text-faint); }
 
+/* Mesma escala tipográfica da tela Colaboradores em todas as abas administrativas. */
+#adm-panel-setores,
+#adm-panel-cargos,
+#adm-panel-competencias,
+#adm-panel-vinculo,
+#adm-panel-ciclos,
+#adm-panel-auditoria {
+  font-size: 12.5px;
+}
+#adm-panel-setores .tabela,
+#adm-panel-setores .tabela th,
+#adm-panel-setores .tabela td,
+#adm-panel-cargos .tabela,
+#adm-panel-cargos .tabela th,
+#adm-panel-cargos .tabela td,
+#adm-panel-competencias .tabela,
+#adm-panel-competencias .tabela th,
+#adm-panel-competencias .tabela td,
+#adm-panel-ciclos .tabela,
+#adm-panel-ciclos .tabela th,
+#adm-panel-ciclos .tabela td,
+#adm-panel-auditoria .tabela,
+#adm-panel-auditoria .tabela th,
+#adm-panel-auditoria .tabela td {
+  font-size: 12.5px;
+}
+#adm-panel-setores input,
+#adm-panel-setores select,
+#adm-panel-cargos input,
+#adm-panel-cargos select,
+#adm-panel-competencias input,
+#adm-panel-competencias select,
+#adm-panel-vinculo input,
+#adm-panel-vinculo select,
+#adm-panel-ciclos input,
+#adm-panel-ciclos select,
+#adm-panel-auditoria input,
+#adm-panel-auditoria select {
+  font-size: 12.5px;
+}
+#adm-panel-vinculo .check-row { font-size: 12.5px; }
+#adm-panel-setores .btn-primary,
+#adm-panel-cargos .btn-primary,
+#adm-panel-competencias .btn-primary,
+#adm-panel-ciclos .btn-primary,
+#adm-panel-auditoria .btn-primary {
+  font-size: 13px;
+}
+#adm-panel-ciclos .badge,
+#adm-panel-auditoria .badge { font-size: 12px; }
+
 /* max-height + overflow no modal inteiro é rede de segurança pra janelas
    baixas; quem normalmente rola é só a lista de resultado (max-height logo
    abaixo) -- assim título/textarea/botões continuam visíveis num lote grande
@@ -139,7 +190,7 @@
 #auditoria-status { min-height: 22px; margin-bottom: 8px; }
 .tabela-auditoria { min-width: 1100px; }
 .tabela-auditoria th,
-.tabela-auditoria td { font-size: 12px; vertical-align: top; }
+.tabela-auditoria td { font-size: 12.5px; vertical-align: top; }
 .tabela-auditoria .auditoria-data { white-space: nowrap; }
 .tabela-auditoria .auditoria-campos { max-width: 220px; }
 .auditoria-acao-insert { background: var(--green-soft); color: var(--green); }
