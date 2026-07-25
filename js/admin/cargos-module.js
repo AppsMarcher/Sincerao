@@ -20,11 +20,11 @@ function linhaCargoHtml(c) {
     <tr>
       <td>${escHtml(c.nome)}</td>
       <td>${escHtml(c.setor?.nome || '—')}</td>
-      <td class="tabela-acoes">
+      <td><div class="tabela-acoes">
         <button class="btn-icon" title="Editar" onclick="editarCargo('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="btn-icon ${c.ativo ? 'btn-icon--ativo' : 'btn-icon--inativo'}" title="${c.ativo ? 'Desativar' : 'Reativar'}" onclick="toggleCargoAtivo('${c.id}', ${!c.ativo})"><svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></button>
         <button class="btn-icon btn-icon--perigo" title="Excluir" onclick="excluirCargo('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
-      </td>
+      </div></td>
     </tr>
   `;
 }
@@ -41,10 +41,10 @@ function linhaCargoEdicaoHtml(c) {
     <tr data-edicao="${c.id}">
       <td><input type="text" class="edit-nome" value="${escHtml(c.nome)}"></td>
       <td><select class="edit-setor">${opcoesSetorHtml(c.setor?.id || null)}</select></td>
-      <td class="tabela-acoes">
+      <td><div class="tabela-acoes">
         <button class="btn-icon" title="Salvar" onclick="salvarEdicaoCargo('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
         <button class="btn-icon" title="Cancelar" onclick="cancelarEdicaoCargo()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </td>
+      </div></td>
     </tr>
   `;
 }

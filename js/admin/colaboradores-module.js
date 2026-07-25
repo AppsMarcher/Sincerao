@@ -52,14 +52,14 @@ function renderAdmColaboradores() {
         if (c.id === _colaboradorEmEdicaoId) {
           return `
     <tr data-edicao="${c.id}">
-      <td colspan="3">
+      <td colspan="3"><div class="tabela-edit-campos">
         <input type="text" class="edit-nome" value="${escHtml(c.nome)}" placeholder="Nome">
         <input type="email" class="edit-email" value="${escHtml(c.email)}" placeholder="E-mail">
-      </td>
-      <td colspan="3" class="tabela-acoes">
+      </div></td>
+      <td colspan="3"><div class="tabela-acoes">
         <button class="btn-icon" title="Salvar" onclick="salvarEdicaoColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
         <button class="btn-icon" title="Cancelar" onclick="cancelarEdicaoColaborador()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </td>
+      </div></td>
     </tr>`;
         }
         return `
@@ -69,13 +69,13 @@ function renderAdmColaboradores() {
       <td><select class="select-gestor" onchange="atualizarColaborador('${c.id}', {gestor_id: this.value || null})">${opcoesGestor(c)}</select></td>
       <td><select onchange="atualizarColaborador('${c.id}', {papel: this.value})">${opcoesPapel(c)}</select></td>
       <td class="col-status">${statusTextoHtml(c)}</td>
-      <td class="tabela-acoes">
+      <td><div class="tabela-acoes">
         <button class="btn-icon" title="Reenviar convite" onclick="reenviarConviteColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M21 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7"/><polyline points="3 6 12 13 21 6"/><path d="M17 16l4 4m0-4l-4 4"/></svg></button>
         <button class="btn-icon" title="Enviar link de redefinição de senha" onclick="redefinirSenhaColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.5 12.5L19 4m0 0h-4m4 0v4"/></svg></button>
         <button class="btn-icon" title="Definir nova senha" onclick="abrirDefinirSenha('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></button>
         <button class="btn-icon" title="Editar" onclick="editarColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="btn-icon btn-icon--perigo" title="Excluir" onclick="excluirColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
-      </td>
+      </div></td>
     </tr>`;
       })
       .join('') || `<tr><td colspan="6">${termo ? 'Nenhum colaborador encontrado.' : 'Nenhum colaborador ainda. Use o formulário acima para convidar o primeiro.'}</td></tr>`;

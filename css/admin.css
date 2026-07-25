@@ -55,7 +55,7 @@
 .tabela-colaboradores, .tabela-colaboradores th, .tabela-colaboradores td { font-size: 12.5px; }
 .tabela-colaboradores small { font-size: 12.5px; }
 .tabela-colaboradores select { font-size: 12.5px; }
-.tabela-colaboradores td[colspan] { display: flex; gap: 8px; }
+.tabela-edit-campos { display: flex; gap: 8px; }
 .tabela-colaboradores .edit-nome, .tabela-colaboradores .edit-email { max-width: none; flex: 1 1 auto; }
 .tabela-colaboradores .select-gestor { max-width: 150px; }
 .tabela-colaboradores .col-status { text-align: center; }
