@@ -224,14 +224,43 @@ body.modal-criar-avaliacoes-open { overflow: hidden; }
 }
 #modal-criar-avaliacoes .modal-cabecalho h3 { margin: 0; }
 #modal-criar-avaliacoes .modal-fechar { flex: 0 0 auto; }
+.modal-busca-colaborador {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  margin-top: var(--space-4);
+}
+.modal-busca-colaborador > .icon {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 13px;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  color: var(--text-faint);
+  pointer-events: none;
+}
+#modal-busca-colaborador {
+  width: 100%;
+  max-width: none;
+  padding-left: 40px;
+  font-size: 13px;
+}
+.modal-busca-vazio {
+  flex: 1 1 auto;
+  margin: var(--space-5) 0;
+  text-align: center;
+}
 #modal-lista-colaboradores {
   min-height: 0;
-  margin: var(--space-4) 0 0;
+  margin: var(--space-3) 0 0;
   padding-right: 8px;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
+#modal-lista-colaboradores .check-row[hidden] { display: none; }
 #modal-criar-avaliacoes .modal-actions {
   flex: 0 0 auto;
   margin-top: 0;

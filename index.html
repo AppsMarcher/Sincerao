@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="css/dashboard.css?v=10">
 <link rel="stylesheet" href="css/perfil.css?v=10">
 <link rel="stylesheet" href="css/avaliacao.css?v=10">
-<link rel="stylesheet" href="css/admin.css?v=15">
+<link rel="stylesheet" href="css/admin.css?v=16">
 <link rel="stylesheet" href="css/responsive.css?v=14">
 </head>
 <body>
@@ -429,6 +429,11 @@
         <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
+    <label class="modal-busca-colaborador">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      <input type="search" id="modal-busca-colaborador" aria-label="Pesquisar colaborador" placeholder="Pesquisar por nome ou cargo" autocomplete="off" oninput="filtrarColaboradoresCriacao(this.value)">
+    </label>
+    <p id="modal-busca-colaborador-vazio" class="modal-busca-vazio muted" hidden>Nenhuma pessoa encontrada.</p>
     <div id="modal-lista-colaboradores" class="check-list"></div>
     <div class="modal-actions">
       <button class="btn-link" onclick="fecharModalCriarAvaliacoes()">Cancelar</button>
@@ -461,7 +466,7 @@
 <script src="js/admin/ciclos-module.js?v=11"></script>
 <script src="js/admin/colaboradores-module.js?v=11"></script>
 <script src="js/admin/auditoria-module.js?v=12"></script>
-<script src="js/admin/admin-shell.js?v=13"></script>
+<script src="js/admin/admin-shell.js?v=14"></script>
 
 <script src="js/auth/auth-module.js?v=11"></script>
 </body>

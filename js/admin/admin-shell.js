@@ -25,21 +25,44 @@ async function abrirCriacaoAvaliacoes(cicloId) {
   const modal = document.getElementById('modal-criar-avaliacoes');
   _criacaoAvaliacoesTrigger = document.activeElement;
   modal.dataset.cicloId = cicloId;
+  const busca = document.getElementById('modal-busca-colaborador');
+  busca.value = '';
+  document.getElementById('modal-busca-colaborador-vazio').hidden = true;
   const el = document.getElementById('modal-lista-colaboradores');
   el.innerHTML =
     G.colaboradores
       .filter((c) => c.gestor_id)
-      .map(
-        (c) => `
-    <label class="check-row">
+      .map((c) => {
+        const cargo = c.cargo ? cargoLabel(c.cargo) : 'sem cargo';
+        return `
+    <label class="check-row" data-busca="${escHtml(normalizarBuscaCriacaoAvaliacoes(c.nome + ' ' + cargo))}">
       <input type="checkbox" value="${c.id}"> ${escHtml(c.nome)} <span class="tag">${escHtml(c.cargo ? cargoLabel(c.cargo) : 'sem cargo')}</span>
     </label>
-  `
-      )
+  `;
+      })
       .join('') || '<p>Nenhum colaborador com gestor definido. Cadastre o gestor na aba Colaboradores primeiro.</p>';
   modal.classList.add('open');
   document.body.classList.add('modal-criar-avaliacoes-open');
-  modal.querySelector('.modal-fechar')?.focus();
+  busca.focus();
+}
+
+function normalizarBuscaCriacaoAvaliacoes(valor) {
+  return String(valor || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+function filtrarColaboradoresCriacao(valor) {
+  const termo = normalizarBuscaCriacaoAvaliacoes(valor.trim());
+  const linhas = [...document.querySelectorAll('#modal-lista-colaboradores .check-row')];
+  let visiveis = 0;
+  linhas.forEach((linha) => {
+    const exibir = !termo || linha.dataset.busca.includes(termo);
+    linha.hidden = !exibir;
+    if (exibir) visiveis += 1;
+  });
+  document.getElementById('modal-busca-colaborador-vazio').hidden = visiveis > 0 || !termo;
 }
 
 function fecharModalCriarAvaliacoes() {
