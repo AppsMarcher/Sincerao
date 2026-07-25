@@ -230,6 +230,16 @@ input[type="checkbox"], input[type="radio"] {
 }
 .btn-link:hover { background: var(--primary-soft); }
 
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-faint);
+}
+.status-dot--ativo { background: var(--green); }
+.status-dot--pendente { background: var(--red); }
+
 .badge {
   display: inline-flex;
   align-items: center;

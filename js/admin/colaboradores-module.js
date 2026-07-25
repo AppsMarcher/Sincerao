@@ -1,9 +1,28 @@
 // admin/colaboradores-module.js — convite de novos colaboradores e edição de cargo/gestor/papel
 
 let _colaboradorEmEdicaoId = null;
+let _buscaColaboradores = '';
 
 async function carregarColaboradores() {
   G.colaboradores = (await sbFetch('/perfis?select=*,cargo:cargo_id(nome,setor:setor_id(nome))&order=nome.asc')) || [];
+  try {
+    const status = (await sbFetch('/rpc/colaboradores_confirmados', { method: 'POST', body: '{}' })) || [];
+    const statusPorId = Object.fromEntries(status.map((s) => [s.id, s.ativo]));
+    G.colaboradores.forEach((c) => { c.ativo = statusPorId[c.id] ?? null; });
+  } catch (e) {
+    G.colaboradores.forEach((c) => { c.ativo = null; }); // migration 011 ainda não rodada, ou erro -- não quebra a tela
+  }
+}
+
+function filtrarColaboradores(termo) {
+  _buscaColaboradores = termo;
+  renderAdmColaboradores();
+}
+
+function statusDotHtml(c) {
+  if (c.ativo === true) return '<span class="status-dot status-dot--ativo" title="Login ativado"></span>';
+  if (c.ativo === false) return '<span class="status-dot status-dot--pendente" title="Convite pendente"></span>';
+  return '<span class="status-dot" title="Status indisponível"></span>';
 }
 
 function renderAdmColaboradores() {
@@ -17,8 +36,18 @@ function renderAdmColaboradores() {
     G.colaboradores.filter((g) => g.id !== c.id).map((g) => `<option value="${g.id}" ${c.gestor_id === g.id ? 'selected' : ''}>${escHtml(g.nome)}</option>`).join('');
   const opcoesPapel = (c) => ['colaborador', 'gestor', 'rh', 'admin'].map((p) => `<option value="${p}" ${c.papel === p ? 'selected' : ''}>${p}</option>`).join('');
 
+  const termo = _buscaColaboradores.trim().toLowerCase();
+  const lista = !termo
+    ? G.colaboradores
+    : G.colaboradores.filter(
+        (c) =>
+          c.nome.toLowerCase().includes(termo) ||
+          c.email.toLowerCase().includes(termo) ||
+          (c.cargo?.nome || '').toLowerCase().includes(termo)
+      );
+
   el.innerHTML =
-    G.colaboradores
+    lista
       .map((c) => {
         if (c.id === _colaboradorEmEdicaoId) {
           return `
@@ -27,7 +56,7 @@ function renderAdmColaboradores() {
         <input type="text" class="edit-nome" value="${escHtml(c.nome)}" placeholder="Nome">
         <input type="email" class="edit-email" value="${escHtml(c.email)}" placeholder="E-mail">
       </td>
-      <td colspan="2" class="tabela-acoes">
+      <td colspan="3" class="tabela-acoes">
         <button class="btn-icon" title="Salvar" onclick="salvarEdicaoColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
         <button class="btn-icon" title="Cancelar" onclick="cancelarEdicaoColaborador()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </td>
@@ -39,6 +68,7 @@ function renderAdmColaboradores() {
       <td><select onchange="atualizarColaborador('${c.id}', {cargo_id: this.value})">${opcoesCargo(c)}</select></td>
       <td><select onchange="atualizarColaborador('${c.id}', {gestor_id: this.value || null})">${opcoesGestor(c)}</select></td>
       <td><select onchange="atualizarColaborador('${c.id}', {papel: this.value})">${opcoesPapel(c)}</select></td>
+      <td>${statusDotHtml(c)}</td>
       <td class="tabela-acoes">
         <button class="btn-icon" title="Reenviar convite" onclick="reenviarConviteColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M21 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7"/><polyline points="3 6 12 13 21 6"/><path d="M17 16l4 4m0-4l-4 4"/></svg></button>
         <button class="btn-icon" title="Enviar link de redefinição de senha" onclick="redefinirSenhaColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.5 12.5L19 4m0 0h-4m4 0v4"/></svg></button>
@@ -48,7 +78,7 @@ function renderAdmColaboradores() {
       </td>
     </tr>`;
       })
-      .join('') || '<tr><td colspan="5">Nenhum colaborador ainda. Use o formulário acima para convidar o primeiro.</td></tr>';
+      .join('') || `<tr><td colspan="6">${termo ? 'Nenhum colaborador encontrado.' : 'Nenhum colaborador ainda. Use o formulário acima para convidar o primeiro.'}</td></tr>`;
 }
 
 function renderOpcoesNovoColaborador() {
