@@ -1,5 +1,16 @@
 // avaliacao/etapa-plano.js — etapa 6: plano de desenvolvimento (tabela multi-linha, preenchida em conjunto)
 
+const _filasGravacaoPlano = new Map();
+
+function enfileirarGravacaoPlano(id, tarefa) {
+  const anterior = _filasGravacaoPlano.get(id) || Promise.resolve();
+  const atual = anterior.catch(() => {}).then(tarefa);
+  _filasGravacaoPlano.set(id, atual);
+  return atual.finally(() => {
+    if (_filasGravacaoPlano.get(id) === atual) _filasGravacaoPlano.delete(id);
+  });
+}
+
 function renderEtapaPlano() {
   const av = G.avaliacaoAtual;
   const editavel = podeEditarEtapa(av, 'plano_desenvolvimento');
@@ -19,8 +30,11 @@ function renderEtapaPlano() {
 }
 
 function linhaPlanoHtml(l, editavel) {
-  const campo = (key, tipo = 'text') =>
-    `<input type="${tipo}" value="${escHtml(l[key] || '')}" ${editavel ? '' : 'disabled'} onblur="salvarLinhaPlano('${l.id}','${key}', this.value)">`;
+  const campo = (key, tipo = 'text') => {
+    const rascunho = editavel ? lerRascunhoEtapa(G.avaliacaoAtual.id, `plano_${l.id}_${key}`) : null;
+    const valor = rascunho?.valores?.valor ?? l[key] ?? '';
+    return `<input type="${tipo}" value="${escHtml(valor)}" ${editavel ? `oninput="salvarRascunhoPlano('${l.id}','${key}', this.value)"` : 'disabled'} onblur="salvarLinhaPlano('${l.id}','${key}', this.value)">`;
+  };
   return `<tr data-linha="${l.id}">
     <td>${campo('competencia')}</td>
     <td>${campo('acao')}</td>
@@ -32,23 +46,67 @@ function linhaPlanoHtml(l, editavel) {
   </tr>`;
 }
 
+function salvarRascunhoPlano(id, campo, valor) {
+  salvarRascunhoEtapa(G.avaliacaoAtual.id, `plano_${id}_${campo}`, { valor });
+}
+
 async function adicionarLinhaPlano() {
   const av = G.avaliacaoAtual;
-  const nova = await sbFetch('/avaliacao_plano_desenvolvimento', {
-    method: 'POST',
-    body: JSON.stringify({ avaliacao_id: av.id, competencia: '', acao: '', ordem: (av.plano || []).length }),
-  });
-  av.plano.push(nova[0]);
-  renderEtapaPlano();
+  try {
+    const nova = await sbFetch('/avaliacao_plano_desenvolvimento', {
+      method: 'POST',
+      body: JSON.stringify({ avaliacao_id: av.id, competencia: '', acao: '', ordem: (av.plano || []).length }),
+    });
+    av.plano.push(nova[0]);
+    renderEtapaPlano();
+  } catch {
+    showToast('Não foi possível adicionar a linha do plano.');
+  }
 }
 
 async function salvarLinhaPlano(id, campo, valor) {
-  await sbFetch('/avaliacao_plano_desenvolvimento?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ [campo]: valor || null }) });
+  return enfileirarGravacaoPlano(id, async () => {
+    const av = G.avaliacaoAtual;
+    const linha = av.plano.find((item) => item.id === id);
+    if (!linha) return;
+    try {
+      const salvo = await sbFetch(
+        '/avaliacao_plano_desenvolvimento?id=eq.' + id + '&versao=eq.' + (Number(linha.versao) || 1),
+        { method: 'PATCH', body: JSON.stringify({ [campo]: valor || null }) }
+      );
+      if (!salvo?.length) {
+        const remoto = await sbFetch('/avaliacao_plano_desenvolvimento?id=eq.' + id);
+        if (remoto?.[0]) Object.assign(linha, remoto[0]);
+        showToast('Conflito: esta linha foi alterada em outra sessão. O valor digitado permanece na tela; revise antes de sair.');
+        return;
+      }
+      Object.assign(linha, salvo[0]);
+      limparRascunhoEtapa(av.id, `plano_${id}_${campo}`);
+    } catch {
+      showToast('Não foi possível salvar esta linha. O valor permanece na tela.');
+    }
+  });
 }
 
 async function removerLinhaPlano(id) {
   const av = G.avaliacaoAtual;
-  await sbFetch('/avaliacao_plano_desenvolvimento?id=eq.' + id, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
-  av.plano = av.plano.filter((l) => l.id !== id);
-  renderEtapaPlano();
+  const linha = av.plano.find((item) => item.id === id);
+  if (!linha) return;
+  try {
+    const removido = await sbFetch(
+      '/avaliacao_plano_desenvolvimento?id=eq.' + id + '&versao=eq.' + (Number(linha.versao) || 1),
+      { method: 'DELETE' }
+    );
+    if (!removido?.length) {
+      showToast('Conflito: esta linha foi alterada em outra sessão e não foi removida.');
+      return;
+    }
+    av.plano = av.plano.filter((l) => l.id !== id);
+    ['competencia', 'acao', 'prazo', 'responsavel', 'indicador_sucesso', 'acompanhamento'].forEach((campo) => {
+      limparRascunhoEtapa(av.id, `plano_${id}_${campo}`);
+    });
+    renderEtapaPlano();
+  } catch {
+    showToast('Não foi possível remover a linha do plano.');
+  }
 }

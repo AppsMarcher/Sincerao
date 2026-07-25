@@ -64,26 +64,113 @@ function renderBotoesTransicao() {
   }
 }
 
-async function atualizarAvaliacao(patch) {
+function valoresIguais(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function mesclarPatchAvaliacao(base, remoto, patch) {
+  const resultado = { ...patch };
+
+  if (patch.dados) {
+    const dadosMesclados = { ...(remoto.dados || {}) };
+    const chavesAlteradas = Object.keys(patch.dados).filter(
+      (chave) => !valoresIguais(patch.dados[chave], base.dados?.[chave])
+    );
+    for (const chave of chavesAlteradas) {
+      if (
+        !valoresIguais(remoto.dados?.[chave], base.dados?.[chave])
+        && !valoresIguais(remoto.dados?.[chave], patch.dados[chave])
+      ) return null;
+      dadosMesclados[chave] = patch.dados[chave];
+    }
+    resultado.dados = dadosMesclados;
+  }
+
+  for (const [campo, valor] of Object.entries(patch)) {
+    if (campo === 'dados') continue;
+    if (!valoresIguais(remoto[campo], base[campo]) && !valoresIguais(remoto[campo], valor)) return null;
+    resultado[campo] = valor;
+  }
+
+  return resultado;
+}
+
+let _filaAtualizacaoAvaliacao = Promise.resolve();
+
+function atualizarAvaliacao(patch) {
+  const baseAoSolicitar = JSON.parse(JSON.stringify(G.avaliacaoAtual));
+  const tarefa = _filaAtualizacaoAvaliacao
+    .catch(() => {})
+    .then(() => {
+      let patchSeguro = patch;
+      if (Number(G.avaliacaoAtual.versao) !== Number(baseAoSolicitar.versao)) {
+        patchSeguro = mesclarPatchAvaliacao(baseAoSolicitar, G.avaliacaoAtual, patch);
+        if (!patchSeguro) {
+          showToast('Conflito: outra gravação local alterou esta mesma etapa. Revise antes de salvar novamente.');
+          throw new Error('Conflito de edição concorrente.');
+        }
+      }
+      return atualizarAvaliacaoComConcorrencia(patchSeguro);
+    });
+  _filaAtualizacaoAvaliacao = tarefa;
+  return tarefa;
+}
+
+async function atualizarAvaliacaoComConcorrencia(patch) {
   const av = G.avaliacaoAtual;
-  await sbFetch('/avaliacoes?id=eq.' + av.id, { method: 'PATCH', body: JSON.stringify(patch) });
-  Object.assign(av, patch);
+  let patchAtual = patch;
+
+  for (let tentativa = 0; tentativa < 4; tentativa++) {
+    const versaoEsperada = Number(av.versao) || 1;
+    const salvo = await sbFetch('/avaliacoes?id=eq.' + av.id + '&versao=eq.' + versaoEsperada, {
+      method: 'PATCH',
+      body: JSON.stringify(patchAtual),
+    });
+
+    if (salvo?.length) {
+      Object.assign(av, salvo[0]);
+      return salvo[0];
+    }
+
+    const rows = await sbFetch('/avaliacoes?id=eq.' + av.id + '&select=*');
+    const remoto = rows?.[0];
+    if (!remoto) throw new Error('A avaliação não está mais disponível.');
+
+    const patchMesclado = mesclarPatchAvaliacao(av, remoto, patchAtual);
+    Object.assign(av, remoto);
+    if (!patchMesclado) {
+      showToast('Conflito: outra sessão alterou esta mesma etapa. Seus dados continuam na tela; revise antes de salvar novamente.');
+      throw new Error('Conflito de edição concorrente.');
+    }
+    patchAtual = patchMesclado;
+  }
+
+  showToast('Não foi possível salvar com segurança após várias alterações simultâneas.');
+  throw new Error('Concorrência excessiva ao salvar a avaliação.');
 }
 
 async function liberarParaAutoavaliacao() {
-  await atualizarAvaliacao({ status: 'aguardando_autoavaliacao', liberado_autoavaliacao_em: new Date().toISOString(), etapa_atual: 4 });
-  document.getElementById('avaliacao-status').textContent = statusLabel(G.avaliacaoAtual.status);
-  renderBotoesTransicao();
-  renderEtapaAtiva();
-  showToast('Liberado para autoavaliação do colaborador.');
+  try {
+    await atualizarAvaliacao({ status: 'aguardando_autoavaliacao', liberado_autoavaliacao_em: new Date().toISOString(), etapa_atual: 4 });
+    document.getElementById('avaliacao-status').textContent = statusLabel(G.avaliacaoAtual.status);
+    renderBotoesTransicao();
+    renderEtapaAtiva();
+    showToast('Liberado para autoavaliação do colaborador.');
+  } catch (err) {
+    if (!String(err?.message || '').includes('Conflito')) showToast('Não foi possível liberar a autoavaliação.');
+  }
 }
 
 async function enviarParaAlinhamento() {
-  await atualizarAvaliacao({ status: 'aguardando_alinhamento', alinhamento_em: new Date().toISOString(), etapa_atual: 6 });
-  document.getElementById('avaliacao-status').textContent = statusLabel(G.avaliacaoAtual.status);
-  renderBotoesTransicao();
-  renderEtapaAtiva();
-  showToast('Enviado para alinhamento.');
+  try {
+    await atualizarAvaliacao({ status: 'aguardando_alinhamento', alinhamento_em: new Date().toISOString(), etapa_atual: 6 });
+    document.getElementById('avaliacao-status').textContent = statusLabel(G.avaliacaoAtual.status);
+    renderBotoesTransicao();
+    renderEtapaAtiva();
+    showToast('Enviado para alinhamento.');
+  } catch (err) {
+    if (!String(err?.message || '').includes('Conflito')) showToast('Não foi possível enviar para alinhamento.');
+  }
 }
 
 function renderNavEtapas() {

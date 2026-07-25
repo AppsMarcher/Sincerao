@@ -110,6 +110,7 @@ function fecharModalEditarAvaliacao() {
 async function salvarEdicaoAvaliacao() {
   const modal = document.getElementById('modal-editar-avaliacao');
   const id = modal.dataset.avaliacaoId;
+  const avaliacaoAtual = G.avaliacoes.find((a) => a.id === id);
   const patch = {
     colaborador_id: document.getElementById('editar-av-colaborador').value,
     gestor_id: document.getElementById('editar-av-gestor').value,
@@ -117,7 +118,14 @@ async function salvarEdicaoAvaliacao() {
     status: document.getElementById('editar-av-status').value,
   };
   try {
-    await sbFetch('/avaliacoes?id=eq.' + id, { method: 'PATCH', body: JSON.stringify(patch) });
+    const salvo = await sbFetch('/avaliacoes?id=eq.' + id + '&versao=eq.' + (Number(avaliacaoAtual?.versao) || 1), {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    });
+    if (!salvo?.length) {
+      showToast('Conflito: esta avaliação foi alterada por outra pessoa. Feche e abra a edição novamente.');
+      return;
+    }
   } catch (e) {
     showToast(String(e.message || '').includes('duplicate') ? 'Esse colaborador já tem avaliação nesse ciclo.' : 'Erro ao salvar avaliação.');
     return;
@@ -131,7 +139,11 @@ async function excluirAvaliacao(id) {
   const av = G.avaliacoes.find((a) => a.id === id);
   if (!confirm(`Excluir a avaliação de "${av?.colaborador?.nome || ''}" (${av?.ciclo?.nome || ''})? Essa ação não pode ser desfeita.`)) return;
   try {
-    await sbFetch('/avaliacoes?id=eq.' + id, { method: 'DELETE' });
+    const removido = await sbFetch('/avaliacoes?id=eq.' + id + '&versao=eq.' + (Number(av?.versao) || 1), { method: 'DELETE' });
+    if (!removido?.length) {
+      showToast('Conflito: a avaliação mudou desde que a lista foi carregada e não foi excluída.');
+      return;
+    }
   } catch (e) {
     showToast('Erro ao excluir avaliação.');
     return;
