@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="css/base.css?v=7">
-<link rel="stylesheet" href="css/login.css?v=7">
-<link rel="stylesheet" href="css/dashboard.css?v=7">
-<link rel="stylesheet" href="css/perfil.css?v=7">
-<link rel="stylesheet" href="css/avaliacao.css?v=7">
-<link rel="stylesheet" href="css/admin.css?v=7">
-<link rel="stylesheet" href="css/responsive.css?v=7">
+<link rel="stylesheet" href="css/base.css?v=8">
+<link rel="stylesheet" href="css/login.css?v=8">
+<link rel="stylesheet" href="css/dashboard.css?v=8">
+<link rel="stylesheet" href="css/perfil.css?v=8">
+<link rel="stylesheet" href="css/avaliacao.css?v=8">
+<link rel="stylesheet" href="css/admin.css?v=8">
+<link rel="stylesheet" href="css/responsive.css?v=8">
 </head>
 <body>
 
@@ -172,7 +172,8 @@
 
   <main class="content">
     <div id="adm-panel-colaboradores" class="adm-tab-panel card">
-      <form id="form-novo-colaborador" onsubmit="event.preventDefault(); enviarConvite(this);">
+      <button type="button" class="btn-link btn-importar-lote" onclick="abrirImportarColaboradores()"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Importar em lote</button>
+      <form id="form-novo-colaborador" class="form-novo-colaborador-compacta" onsubmit="event.preventDefault(); enviarConvite(this);">
         <input name="nome" placeholder="Nome" required>
         <input name="email" type="email" placeholder="E-mail" required>
         <select name="cargo_id" id="novo-colab-cargo"><option value="">Sem cargo</option></select>
@@ -186,9 +187,18 @@
         <button type="submit" class="btn-primary">Convidar colaborador</button>
       </form>
       <input type="search" id="busca-colaboradores" class="busca-colaboradores" placeholder="Buscar por nome, cargo ou e-mail" oninput="filtrarColaboradores(this.value)">
-      <button type="button" class="btn-link btn-importar-lote" onclick="abrirImportarColaboradores()"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Importar em lote</button>
       <table class="tabela tabela-colaboradores">
-        <thead><tr><th>Nome</th><th>Cargo</th><th>Gestor</th><th>Papel</th><th class="col-status">Status</th><th>Ações</th></tr></thead>
+        <colgroup>
+          <col style="width:19%"><col style="width:19%"><col style="width:20%"><col style="width:16%"><col style="width:7%"><col style="width:19%">
+        </colgroup>
+        <thead><tr>
+          <th class="th-sort" onclick="ordenarColaboradores('nome')">Nome<span class="sort-ind" id="sort-ind-nome"></span></th>
+          <th class="th-sort" onclick="ordenarColaboradores('cargo')">Cargo<span class="sort-ind" id="sort-ind-cargo"></span></th>
+          <th class="th-sort" onclick="ordenarColaboradores('gestor')">Gestor<span class="sort-ind" id="sort-ind-gestor"></span></th>
+          <th class="th-sort" onclick="ordenarColaboradores('papel')">Papel<span class="sort-ind" id="sort-ind-papel"></span></th>
+          <th class="col-status">Status</th>
+          <th>Ações</th>
+        </tr></thead>
         <tbody id="adm-lista-colaboradores"></tbody>
       </table>
     </div>
@@ -320,30 +330,30 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="supabase-config.js?v=7"></script>
+<script src="supabase-config.js?v=8"></script>
 
-<script src="js/core/constants.js?v=7"></script>
-<script src="js/core/supabase-client.js?v=7"></script>
-<script src="js/core/state.js?v=7"></script>
-<script src="js/core/utils.js?v=7"></script>
+<script src="js/core/constants.js?v=8"></script>
+<script src="js/core/supabase-client.js?v=8"></script>
+<script src="js/core/state.js?v=8"></script>
+<script src="js/core/utils.js?v=8"></script>
 
-<script src="js/dashboard/dashboard-module.js?v=7"></script>
-<script src="js/perfil/perfil-module.js?v=7"></script>
+<script src="js/dashboard/dashboard-module.js?v=8"></script>
+<script src="js/perfil/perfil-module.js?v=8"></script>
 
-<script src="js/avaliacao/avaliacao-core.js?v=7"></script>
-<script src="js/avaliacao/etapa-texto.js?v=7"></script>
-<script src="js/avaliacao/etapa-competencias.js?v=7"></script>
-<script src="js/avaliacao/etapa-plano.js?v=7"></script>
-<script src="js/avaliacao/etapa-parecer.js?v=7"></script>
+<script src="js/avaliacao/avaliacao-core.js?v=8"></script>
+<script src="js/avaliacao/etapa-texto.js?v=8"></script>
+<script src="js/avaliacao/etapa-competencias.js?v=8"></script>
+<script src="js/avaliacao/etapa-plano.js?v=8"></script>
+<script src="js/avaliacao/etapa-parecer.js?v=8"></script>
 
-<script src="js/admin/cargos-module.js?v=7"></script>
-<script src="js/admin/setores-module.js?v=7"></script>
-<script src="js/admin/competencias-module.js?v=7"></script>
-<script src="js/admin/vinculo-module.js?v=7"></script>
-<script src="js/admin/ciclos-module.js?v=7"></script>
-<script src="js/admin/colaboradores-module.js?v=7"></script>
-<script src="js/admin/admin-shell.js?v=7"></script>
+<script src="js/admin/cargos-module.js?v=8"></script>
+<script src="js/admin/setores-module.js?v=8"></script>
+<script src="js/admin/competencias-module.js?v=8"></script>
+<script src="js/admin/vinculo-module.js?v=8"></script>
+<script src="js/admin/ciclos-module.js?v=8"></script>
+<script src="js/admin/colaboradores-module.js?v=8"></script>
+<script src="js/admin/admin-shell.js?v=8"></script>
 
-<script src="js/auth/auth-module.js?v=7"></script>
+<script src="js/auth/auth-module.js?v=8"></script>
 </body>
 </html>

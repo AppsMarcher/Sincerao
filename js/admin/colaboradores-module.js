@@ -2,6 +2,30 @@
 
 let _colaboradorEmEdicaoId = null;
 let _buscaColaboradores = '';
+let _ordenacaoColaboradores = { coluna: null, dir: 1 };
+
+function ordenarColaboradores(coluna) {
+  const o = _ordenacaoColaboradores;
+  if (o.coluna === coluna) o.dir *= -1;
+  else { o.coluna = coluna; o.dir = 1; }
+  renderAdmColaboradores();
+}
+
+function valorOrdenacaoColaborador(c, coluna) {
+  if (coluna === 'nome') return c.nome.toLowerCase();
+  if (coluna === 'cargo') return (c.cargo?.nome || '').toLowerCase();
+  if (coluna === 'gestor') return (G.colaboradores.find((g) => g.id === c.gestor_id)?.nome || '').toLowerCase();
+  if (coluna === 'papel') return c.papel || '';
+  return '';
+}
+
+function atualizarSetasOrdenacao() {
+  const { coluna, dir } = _ordenacaoColaboradores;
+  ['nome', 'cargo', 'gestor', 'papel'].forEach((col) => {
+    const el = document.getElementById('sort-ind-' + col);
+    if (el) el.textContent = col === coluna ? (dir === 1 ? ' ▲' : ' ▼') : '';
+  });
+}
 
 async function carregarColaboradores() {
   G.colaboradores = (await sbFetch('/perfis?select=*,cargo:cargo_id(nome,setor:setor_id(nome))&order=nome.asc')) || [];
@@ -37,7 +61,7 @@ function renderAdmColaboradores() {
   const opcoesPapel = (c) => ['colaborador', 'gestor', 'rh', 'admin'].map((p) => `<option value="${p}" ${c.papel === p ? 'selected' : ''}>${p}</option>`).join('');
 
   const termo = _buscaColaboradores.trim().toLowerCase();
-  const lista = !termo
+  let lista = !termo
     ? G.colaboradores
     : G.colaboradores.filter(
         (c) =>
@@ -45,6 +69,12 @@ function renderAdmColaboradores() {
           c.email.toLowerCase().includes(termo) ||
           (c.cargo?.nome || '').toLowerCase().includes(termo)
       );
+
+  if (_ordenacaoColaboradores.coluna) {
+    const { coluna, dir } = _ordenacaoColaboradores;
+    lista = [...lista].sort((a, b) => valorOrdenacaoColaborador(a, coluna).localeCompare(valorOrdenacaoColaborador(b, coluna), 'pt-BR') * dir);
+  }
+  atualizarSetasOrdenacao();
 
   el.innerHTML =
     lista

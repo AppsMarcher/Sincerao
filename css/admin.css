@@ -40,7 +40,6 @@
   align-items: center;
   margin-bottom: 16px;
 }
-#form-novo-colaborador .btn-primary { margin-left: auto; }
 .btn-importar-lote { display: block; width: fit-content; margin: 0 0 16px auto; }
 .busca-colaboradores { display: block; margin: 0 0 16px; }
 
@@ -52,12 +51,29 @@
   flex: 1 1 160px;
 }
 
+/* Form de convite mais compacto, pedido explícito -- foge da regra geral de
+   nunca customizar tamanho de input por caso, mas aqui é intencional: o
+   objetivo é caber nome/e-mail/cargo/gestor/papel/botão numa linha só. */
+.form-novo-colaborador-compacta input,
+.form-novo-colaborador-compacta select {
+  flex: 1 1 120px;
+  font-size: 13px;
+  min-height: 38px;
+  padding: 8px 12px;
+}
+.form-novo-colaborador-compacta .btn-primary { font-size: 13px; min-height: 38px; padding: 0 20px; }
+
+.th-sort { cursor: pointer; user-select: none; white-space: nowrap; }
+.th-sort:hover { color: var(--primary); }
+.sort-ind { font-size: 10px; color: var(--primary); margin-left: 2px; }
+
+.tabela-colaboradores { table-layout: fixed; }
 .tabela-colaboradores, .tabela-colaboradores th, .tabela-colaboradores td { font-size: 12.5px; }
 .tabela-colaboradores small { font-size: 12.5px; }
 .tabela-colaboradores select { font-size: 12.5px; }
 .tabela-edit-campos { display: flex; gap: 8px; }
 .tabela-colaboradores .edit-nome, .tabela-colaboradores .edit-email { max-width: none; flex: 1 1 auto; }
-.tabela-colaboradores .select-gestor { max-width: 150px; }
+.tabela-colaboradores select { max-width: 100%; }
 .tabela-colaboradores .col-status { text-align: center; }
 
 .status-texto { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
