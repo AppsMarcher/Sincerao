@@ -56,12 +56,12 @@
    objetivo é caber nome/e-mail/cargo/gestor/papel/botão numa linha só. */
 .form-novo-colaborador-compacta input,
 .form-novo-colaborador-compacta select {
-  flex: 1 1 120px;
+  flex: 0 1 120px;
   font-size: 13px;
   min-height: 38px;
   padding: 8px 12px;
 }
-.form-novo-colaborador-compacta .btn-primary { font-size: 13px; min-height: 38px; padding: 0 20px; }
+.form-novo-colaborador-compacta .btn-primary { flex: 0 0 auto; font-size: 13px; min-height: 38px; padding: 0 20px; }
 
 .th-sort { cursor: pointer; user-select: none; white-space: nowrap; }
 .th-sort:hover { color: var(--primary); }
