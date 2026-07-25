@@ -41,12 +41,11 @@
   margin-bottom: 16px;
 }
 .btn-importar-lote { display: block; width: fit-content; margin: 0 0 16px auto; }
-.busca-colaboradores { display: block; margin: 0 0 16px; }
+.busca-colaboradores { display: block; margin: 0 0 16px; font-size: 12.5px; }
 
 #adm-panel-cargos input,
 #adm-panel-competencias input, #adm-panel-competencias select,
-#adm-panel-ciclos input,
-#form-novo-colaborador input, #form-novo-colaborador select {
+#adm-panel-ciclos input {
   width: auto;
   flex: 1 1 160px;
 }
@@ -54,14 +53,22 @@
 /* Form de convite mais compacto, pedido explícito -- foge da regra geral de
    nunca customizar tamanho de input por caso, mas aqui é intencional: o
    objetivo é caber nome/e-mail/cargo/gestor/papel/botão numa linha só. */
+/* flex-wrap:nowrap (ID+classe pra vencer a especificidade de #form-novo-colaborador)
+   garante que o botão nunca quebre pra linha de baixo -- os inputs/selects
+   encolhem (min-width:0 remove o piso de largura pelo conteúdo) pra abrir espaço. */
+#form-novo-colaborador.form-novo-colaborador-compacta { flex-wrap: nowrap; }
 .form-novo-colaborador-compacta input,
 .form-novo-colaborador-compacta select {
   flex: 0 1 120px;
-  font-size: 13px;
+  min-width: 0;
+  font-size: 12.5px;
   min-height: 38px;
   padding: 8px 12px;
 }
 .form-novo-colaborador-compacta .btn-primary { flex: 0 0 auto; font-size: 13px; min-height: 38px; padding: 0 20px; }
+/* Nome/E-mail ficam à esquerda; cargo/gestor/papel + botão formam um grupo
+   colado à direita na mesma linha. */
+#novo-colab-cargo { margin-left: auto; }
 
 .th-sort { cursor: pointer; user-select: none; white-space: nowrap; }
 .th-sort:hover { color: var(--primary); }
