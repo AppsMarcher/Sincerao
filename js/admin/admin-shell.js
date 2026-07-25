@@ -16,6 +16,7 @@ function admTab(nome) {
   if (nome === 'vinculo') renderVinculoCargoCompetencia();
   if (nome === 'ciclos') renderAdmCiclos();
   if (nome === 'colaboradores') renderAdmColaboradores();
+  if (nome === 'auditoria') carregarAuditoria(true);
 }
 
 async function abrirCriacaoAvaliacoes(cicloId) {

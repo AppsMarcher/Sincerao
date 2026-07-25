@@ -116,3 +116,69 @@
 .import-linha .import-nome { font-weight: 600; flex: 1 1 auto; }
 .import-linha.ok .import-status { color: var(--green); }
 .import-linha.erro .import-status { color: var(--red); }
+
+/* Auditoria operacional */
+.auditoria-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.auditoria-cabecalho h3 { margin: 0 0 4px; }
+.auditoria-cabecalho p { margin: 0; }
+.auditoria-filtros {
+  display: grid;
+  grid-template-columns: minmax(190px, 1.5fr) repeat(4, minmax(135px, 1fr)) auto auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.auditoria-filtros input,
+.auditoria-filtros select { min-width: 0; font-size: 12.5px; }
+#auditoria-status { min-height: 22px; margin-bottom: 8px; }
+.tabela-auditoria { min-width: 1100px; }
+.tabela-auditoria th,
+.tabela-auditoria td { font-size: 12px; vertical-align: top; }
+.tabela-auditoria .auditoria-data { white-space: nowrap; }
+.tabela-auditoria .auditoria-campos { max-width: 220px; }
+.auditoria-acao-insert { background: var(--green-soft); color: var(--green); }
+.auditoria-acao-update { background: var(--yellow-soft, #fff4d6); color: var(--yellow, #8a5a00); }
+.auditoria-acao-delete { background: var(--red-soft, #ffe8e8); color: var(--red); }
+.auditoria-detalhes { min-width: 70px; }
+.auditoria-detalhes summary { cursor: pointer; color: var(--primary); font-weight: 700; }
+.auditoria-detalhes[open] {
+  position: relative;
+  width: min(760px, 72vw);
+}
+.auditoria-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 10px 0;
+}
+.auditoria-comparacao {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.auditoria-comparacao > div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel-alt);
+}
+.auditoria-comparacao pre {
+  max-height: 340px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 11px/1.45 ui-monospace, Consolas, monospace;
+}
+.auditoria-mais { display: block; margin: 16px auto 0; }
+
+@media (max-width: 1000px) {
+  .auditoria-filtros { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+  .auditoria-comparacao { grid-template-columns: 1fr; }
+}

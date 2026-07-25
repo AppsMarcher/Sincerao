@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="css/dashboard.css?v=10">
 <link rel="stylesheet" href="css/perfil.css?v=10">
 <link rel="stylesheet" href="css/avaliacao.css?v=10">
-<link rel="stylesheet" href="css/admin.css?v=10">
+<link rel="stylesheet" href="css/admin.css?v=12">
 <link rel="stylesheet" href="css/responsive.css?v=10">
 </head>
 <body>
@@ -159,7 +159,7 @@
 <div id="screen-admin" class="screen">
   <header class="topbar">
     <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
-    <h2>Cadastros</h2>
+    <h2>Administração</h2>
   </header>
   <div class="adm-tabs">
     <button id="adm-btn-colaboradores" class="adm-tab-btn" onclick="admTab('colaboradores')"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Colaboradores</button>
@@ -168,6 +168,7 @@
     <button id="adm-btn-competencias" class="adm-tab-btn" onclick="admTab('competencias')"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg> Competências</button>
     <button id="adm-btn-vinculo" class="adm-tab-btn" onclick="admTab('vinculo')"><svg class="icon" viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg> Cargo × Competência</button>
     <button id="adm-btn-ciclos" class="adm-tab-btn" onclick="admTab('ciclos')"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Ciclos</button>
+    <button id="adm-btn-auditoria" class="adm-tab-btn" onclick="admTab('auditoria')"><svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Auditoria</button>
   </div>
 
   <main class="content">
@@ -262,6 +263,49 @@
         <tbody id="adm-lista-ciclos"></tbody>
       </table>
     </div>
+
+    <div id="adm-panel-auditoria" class="adm-tab-panel card">
+      <div class="auditoria-cabecalho">
+        <div>
+          <h3>Auditoria operacional</h3>
+          <p class="muted">Histórico imutável das alterações realizadas no sistema.</p>
+        </div>
+        <button type="button" class="btn-link" onclick="exportarAuditoriaCsv()">Exportar CSV</button>
+      </div>
+      <form id="form-filtros-auditoria" class="auditoria-filtros" onsubmit="event.preventDefault(); carregarAuditoria(true);">
+        <input type="search" id="auditoria-busca" placeholder="Usuário, e-mail ou registro">
+        <select id="auditoria-tabela">
+          <option value="">Todas as entidades</option>
+          <option value="avaliacoes">Avaliações</option>
+          <option value="avaliacao_notas">Notas</option>
+          <option value="avaliacao_plano_desenvolvimento">Plano de desenvolvimento</option>
+          <option value="perfis">Colaboradores</option>
+          <option value="ciclos_avaliacao">Ciclos</option>
+          <option value="cargos">Cargos</option>
+          <option value="setores">Setores</option>
+          <option value="competencias">Competências</option>
+          <option value="cargo_competencias">Cargo × competência</option>
+        </select>
+        <select id="auditoria-acao">
+          <option value="">Todas as ações</option>
+          <option value="INSERT">Inclusão</option>
+          <option value="UPDATE">Alteração</option>
+          <option value="DELETE">Exclusão</option>
+        </select>
+        <input type="date" id="auditoria-data-inicio" title="Data inicial">
+        <input type="date" id="auditoria-data-fim" title="Data final">
+        <button type="submit" class="btn-primary">Filtrar</button>
+        <button type="button" class="btn-link" onclick="limparFiltrosAuditoria()">Limpar</button>
+      </form>
+      <div id="auditoria-status" class="muted"></div>
+      <div class="tabela-scroll">
+        <table class="tabela tabela-auditoria">
+          <thead><tr><th>Data e hora</th><th>Usuário</th><th>Ação</th><th>Entidade</th><th>Campos</th><th>Detalhes</th></tr></thead>
+          <tbody id="auditoria-lista"></tbody>
+        </table>
+      </div>
+      <button type="button" id="auditoria-mais" class="btn-link auditoria-mais" onclick="carregarAuditoria(false)" style="display:none">Carregar mais</button>
+    </div>
   </main>
 </div>
 
@@ -352,7 +396,8 @@
 <script src="js/admin/vinculo-module.js?v=11"></script>
 <script src="js/admin/ciclos-module.js?v=11"></script>
 <script src="js/admin/colaboradores-module.js?v=11"></script>
-<script src="js/admin/admin-shell.js?v=11"></script>
+<script src="js/admin/auditoria-module.js?v=12"></script>
+<script src="js/admin/admin-shell.js?v=12"></script>
 
 <script src="js/auth/auth-module.js?v=11"></script>
 </body>
