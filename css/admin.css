@@ -57,6 +57,13 @@
 .tabela-colaboradores select { font-size: 12.5px; }
 .tabela-colaboradores td[colspan] { display: flex; gap: 8px; }
 .tabela-colaboradores .edit-nome, .tabela-colaboradores .edit-email { max-width: none; flex: 1 1 auto; }
+.tabela-colaboradores .select-gestor { max-width: 150px; }
+.tabela-colaboradores .col-status { text-align: center; }
+
+.status-texto { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+.status-texto--ativo { color: var(--green); }
+.status-texto--inativo { color: var(--red); }
+.status-texto--indefinido { color: var(--text-faint); }
 
 .badge-ciclo-planejado { background: var(--panel-alt); color: var(--text-soft); }
 .badge-ciclo-em_andamento { background: var(--green-soft); color: var(--green); }

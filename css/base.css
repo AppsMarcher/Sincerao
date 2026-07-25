@@ -230,16 +230,6 @@ input[type="checkbox"], input[type="radio"] {
 }
 .btn-link:hover { background: var(--primary-soft); }
 
-.status-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--text-faint);
-}
-.status-dot--ativo { background: var(--green); }
-.status-dot--pendente { background: var(--red); }
-
 .badge {
   display: inline-flex;
   align-items: center;
@@ -266,7 +256,7 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 .tabela { width: 100%; border-collapse: collapse; }
-.tabela th, .tabela td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.tabela th, .tabela td { text-align: left; vertical-align: middle; padding: 12px 10px; border-bottom: 1px solid var(--line); font-size: 14px; }
 .tabela th { color: var(--text-soft); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
 .tabela tbody tr:hover { background: var(--panel-alt); }
 .tabela tbody tr:last-child td { border-bottom: none; }

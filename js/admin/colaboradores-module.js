@@ -19,10 +19,10 @@ function filtrarColaboradores(termo) {
   renderAdmColaboradores();
 }
 
-function statusDotHtml(c) {
-  if (c.ativo === true) return '<span class="status-dot status-dot--ativo" title="Login ativado"></span>';
-  if (c.ativo === false) return '<span class="status-dot status-dot--pendente" title="Convite pendente"></span>';
-  return '<span class="status-dot" title="Status indisponível"></span>';
+function statusTextoHtml(c) {
+  if (c.ativo === true) return '<span class="status-texto status-texto--ativo">Ativo</span>';
+  if (c.ativo === false) return '<span class="status-texto status-texto--inativo">Inativo</span>';
+  return '<span class="status-texto status-texto--indefinido">—</span>';
 }
 
 function renderAdmColaboradores() {
@@ -66,9 +66,9 @@ function renderAdmColaboradores() {
     <tr>
       <td>${escHtml(c.nome)}<br><small>${escHtml(c.email)}</small></td>
       <td><select onchange="atualizarColaborador('${c.id}', {cargo_id: this.value})">${opcoesCargo(c)}</select></td>
-      <td><select onchange="atualizarColaborador('${c.id}', {gestor_id: this.value || null})">${opcoesGestor(c)}</select></td>
+      <td><select class="select-gestor" onchange="atualizarColaborador('${c.id}', {gestor_id: this.value || null})">${opcoesGestor(c)}</select></td>
       <td><select onchange="atualizarColaborador('${c.id}', {papel: this.value})">${opcoesPapel(c)}</select></td>
-      <td>${statusDotHtml(c)}</td>
+      <td class="col-status">${statusTextoHtml(c)}</td>
       <td class="tabela-acoes">
         <button class="btn-icon" title="Reenviar convite" onclick="reenviarConviteColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M21 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7"/><polyline points="3 6 12 13 21 6"/><path d="M17 16l4 4m0-4l-4 4"/></svg></button>
         <button class="btn-icon" title="Enviar link de redefinição de senha" onclick="redefinirSenhaColaborador('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.5 12.5L19 4m0 0h-4m4 0v4"/></svg></button>
