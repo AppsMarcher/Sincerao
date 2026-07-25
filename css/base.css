@@ -93,6 +93,47 @@ a { color: var(--primary); }
 
 .logo-topbar { height: 28px; width: auto; display: block; }
 
+.topbar-interna {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+.topbar-interna > .btn-link:first-child { justify-self: start; }
+.topbar-marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+.topbar-marca:hover { background: rgba(255, 255, 255, 0.1); }
+.topbar-marca:focus-visible {
+  outline-color: #fff;
+  outline-offset: 3px;
+}
+.logo-topbar-interna {
+  display: block;
+  width: 145px;
+  height: auto;
+}
+.topbar-titulo {
+  min-width: 0;
+  justify-self: end;
+  text-align: right;
+}
+.topbar-contexto-avaliacao {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.topbar-contexto-avaliacao .topbar-titulo { max-width: 100%; }
+.topbar-contexto-avaliacao h2 { overflow-wrap: anywhere; }
+
 .topbar-actions { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; position: relative; }
 .topbar-actions .btn-link { min-height: 44px; padding: 8px 12px; }
 

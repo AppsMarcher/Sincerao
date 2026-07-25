@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="css/base.css?v=10">
+<link rel="stylesheet" href="css/base.css?v=14">
 <link rel="stylesheet" href="css/login.css?v=10">
 <link rel="stylesheet" href="css/dashboard.css?v=10">
 <link rel="stylesheet" href="css/perfil.css?v=10">
 <link rel="stylesheet" href="css/avaliacao.css?v=10">
 <link rel="stylesheet" href="css/admin.css?v=13">
-<link rel="stylesheet" href="css/responsive.css?v=10">
+<link rel="stylesheet" href="css/responsive.css?v=14">
 </head>
 <body>
 
@@ -105,9 +105,12 @@
 
 <!-- PERFIL -->
 <div id="screen-perfil" class="screen">
-  <header class="topbar">
+  <header class="topbar topbar-interna">
     <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
-    <h2>Meu Perfil</h2>
+    <button type="button" class="topbar-marca" onclick="abrirDashboard()" aria-label="Ir para o início">
+      <img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna">
+    </button>
+    <h2 class="topbar-titulo">Meu Perfil</h2>
   </header>
   <main class="content stack">
     <section class="card">
@@ -143,13 +146,18 @@
 
 <!-- AVALIAÇÃO (wizard) -->
 <div id="screen-avaliacao" class="screen">
-  <header class="topbar">
+  <header class="topbar topbar-interna topbar-interna-avaliacao">
     <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
-    <div>
-      <h2 id="avaliacao-titulo"></h2>
-      <span class="badge" id="avaliacao-status"></span>
+    <button type="button" class="topbar-marca" onclick="abrirDashboard()" aria-label="Ir para o início">
+      <img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna">
+    </button>
+    <div class="topbar-contexto-avaliacao">
+      <div class="topbar-titulo">
+        <h2 id="avaliacao-titulo"></h2>
+        <span class="badge" id="avaliacao-status"></span>
+      </div>
+      <div id="avaliacao-transicao"></div>
     </div>
-    <div id="avaliacao-transicao"></div>
   </header>
   <div class="etapas-nav" id="etapas-nav"></div>
   <main class="content" id="etapa-conteudo"></main>
@@ -157,9 +165,12 @@
 
 <!-- ADMIN / CADASTROS -->
 <div id="screen-admin" class="screen">
-  <header class="topbar">
+  <header class="topbar topbar-interna">
     <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
-    <h2>Administração</h2>
+    <button type="button" class="topbar-marca" onclick="abrirDashboard()" aria-label="Ir para o início">
+      <img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna">
+    </button>
+    <h2 class="topbar-titulo">Administração</h2>
   </header>
   <div class="adm-tabs">
     <button id="adm-btn-colaboradores" class="adm-tab-btn" onclick="admTab('colaboradores')"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Colaboradores</button>
