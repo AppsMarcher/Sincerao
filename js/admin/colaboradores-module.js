@@ -202,12 +202,12 @@ function parseLinhaImportacao(linha) {
   return { nome, email, cargo_id, gestor_id, papel };
 }
 
-// Intervalo entre convites de fato disparados (não entre linhas com erro de
-// validação, essas nem chegam a chamar a function). O serviço de e-mail por
-// trás do convite tem limite de disparos por segundo — mandar tudo de uma vez
-// gera "rate limit exceeded" e os convites seguintes falham silenciosamente,
-// mesmo problema que já tivemos no VectonPlan.
-const INTERVALO_ENVIO_CONVITE_MS = 1100;
+// O Resend aceita no máximo 10 requisições/segundo. Lotes de 8 em paralelo +
+// pausa de 1,2s entre lotes fica folgado desse teto (mesma estratégia usada
+// no ExiladosApp pro mesmo problema). Mandar tudo de uma vez gera "rate limit
+// exceeded" e os convites seguintes falham silenciosamente.
+const TAMANHO_LOTE_IMPORTACAO = 8;
+const PAUSA_ENTRE_LOTES_MS = 1200;
 
 function linhaResultadoImportacaoHtml(r) {
   return `
@@ -216,6 +216,19 @@ function linhaResultadoImportacaoHtml(r) {
       <span class="import-status">${r.ok ? '✓' : '✗'} ${escHtml(r.msg)}</span>
     </div>
   `;
+}
+
+async function enviarLinhaImportacao(linha) {
+  const parsed = parseLinhaImportacao(linha);
+  if (parsed.erro) return { nome: parsed.nome, ok: false, msg: parsed.erro };
+  try {
+    await sbInvokeFunction('invite-colaborador', {
+      nome: parsed.nome, email: parsed.email, cargo_id: parsed.cargo_id, gestor_id: parsed.gestor_id, papel: parsed.papel,
+    });
+    return { nome: parsed.nome, ok: true, msg: 'Convite enviado' };
+  } catch (err) {
+    return { nome: parsed.nome, ok: false, msg: err.message || 'Erro ao convidar' };
+  }
 }
 
 async function processarImportacaoColaboradores() {
@@ -232,31 +245,29 @@ async function processarImportacaoColaboradores() {
   status.style.display = 'flex';
 
   const resultados = [];
-  for (let i = 0; i < linhas.length; i++) {
-    statusTexto.textContent = `Importando ${i + 1} de ${linhas.length}...`;
-    const parsed = parseLinhaImportacao(linhas[i]);
-    let r;
-    if (parsed.erro) {
-      r = { nome: parsed.nome, ok: false, msg: parsed.erro };
-    } else {
-      try {
-        await sbInvokeFunction('invite-colaborador', {
-          nome: parsed.nome, email: parsed.email, cargo_id: parsed.cargo_id, gestor_id: parsed.gestor_id, papel: parsed.papel,
-        });
-        r = { nome: parsed.nome, ok: true, msg: 'Convite enviado' };
-        await carregarColaboradores(); // atualiza G.colaboradores pra permitir que a próxima linha do lote já use este como gestor
-      } catch (err) {
-        r = { nome: parsed.nome, ok: false, msg: err.message || 'Erro ao convidar' };
-      }
-      if (i < linhas.length - 1) await sleep(INTERVALO_ENVIO_CONVITE_MS);
-    }
-    resultados.push(r);
-    resultadoEl.insertAdjacentHTML('beforeend', linhaResultadoImportacaoHtml(r));
+  const totalLotes = Math.ceil(linhas.length / TAMANHO_LOTE_IMPORTACAO);
+
+  for (let lote = 0; lote < totalLotes; lote++) {
+    const inicio = lote * TAMANHO_LOTE_IMPORTACAO;
+    const linhasDoLote = linhas.slice(inicio, inicio + TAMANHO_LOTE_IMPORTACAO);
+    const fim = Math.min(inicio + linhasDoLote.length, linhas.length);
+    statusTexto.textContent = `Importando ${inicio + 1}–${fim} de ${linhas.length}...`;
+
+    // Cada linha já captura seu próprio erro e devolve um resultado — nenhuma
+    // rejeita, então uma falha isolada não derruba o lote inteiro.
+    const resultadosDoLote = await Promise.all(linhasDoLote.map(enviarLinhaImportacao));
+
+    resultadosDoLote.forEach((r) => {
+      resultados.push(r);
+      resultadoEl.insertAdjacentHTML('beforeend', linhaResultadoImportacaoHtml(r));
+    });
+
+    await carregarColaboradores(); // libera quem entrou neste lote pra ser gestor no próximo
+    if (lote < totalLotes - 1) await sleep(PAUSA_ENTRE_LOTES_MS);
   }
 
   status.style.display = 'none';
   btn.disabled = false;
-  await carregarColaboradores();
   renderAdmColaboradores();
   const sucesso = resultados.filter((r) => r.ok).length;
   showToast(`${sucesso} de ${resultados.length} colaborador(es) importado(s).`);
