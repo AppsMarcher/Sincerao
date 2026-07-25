@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="css/dashboard.css?v=10">
 <link rel="stylesheet" href="css/perfil.css?v=10">
 <link rel="stylesheet" href="css/avaliacao.css?v=10">
-<link rel="stylesheet" href="css/admin.css?v=13">
+<link rel="stylesheet" href="css/admin.css?v=14">
 <link rel="stylesheet" href="css/responsive.css?v=14">
 </head>
 <body>
@@ -300,6 +300,13 @@
         <span>Cargo</span>
         <select id="vinculo-select-cargo" onchange="renderVinculoLista(this.value)"></select>
       </label>
+      <div class="vinculo-acoes" aria-label="Ações rápidas de seleção">
+        <span class="vinculo-acoes-label">Seleção rápida</span>
+        <button type="button" class="btn-link vinculo-acao-btn" onclick="aplicarSelecaoVinculos('todas')">Marcar todas</button>
+        <button type="button" class="btn-link vinculo-acao-btn" onclick="aplicarSelecaoVinculos('nenhuma')">Desmarcar todas</button>
+        <button type="button" class="btn-link vinculo-acao-btn" onclick="aplicarSelecaoVinculos('comportamental')">Marcar comportamentais</button>
+        <button type="button" class="btn-link vinculo-acao-btn" onclick="aplicarSelecaoVinculos('tecnica')">Marcar técnicas</button>
+      </div>
       <div id="vinculo-lista-competencias" class="check-list"></div>
     </div>
 
@@ -445,7 +452,7 @@
 <script src="js/admin/cargos-module.js?v=11"></script>
 <script src="js/admin/setores-module.js?v=11"></script>
 <script src="js/admin/competencias-module.js?v=11"></script>
-<script src="js/admin/vinculo-module.js?v=11"></script>
+<script src="js/admin/vinculo-module.js?v=12"></script>
 <script src="js/admin/ciclos-module.js?v=11"></script>
 <script src="js/admin/colaboradores-module.js?v=11"></script>
 <script src="js/admin/auditoria-module.js?v=12"></script>
