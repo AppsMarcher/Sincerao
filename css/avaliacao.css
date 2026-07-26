@@ -96,6 +96,28 @@
 .tabela-plano th, .tabela-plano td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
 .tabela-plano input { min-width: 100px; }
 
+.plano-competencias { margin: 0 0 14px; }
+.plano-competencias-toggle { min-height: 36px; }
+.plano-competencias-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 12px;
+  background: var(--panel-alt);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.plano-competencia-item {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--text-soft);
+  font-size: 13px;
+}
+.plano-competencias-vazia { margin: 10px 0 0; }
+
 .resultado-final {
   display: flex;
   gap: 24px;

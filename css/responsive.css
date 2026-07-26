@@ -66,31 +66,31 @@
 
   .resultado-final { flex-direction: column; gap: var(--space-2); }
 
-  /* Fase 2 é a experiência prioritária no celular: cada controle recebe área
-     de toque generosa, sem navegação horizontal nem botões espremidos. */
-  #screen-avaliacao.avaliacao-colaborador-mobile .topbar {
+  /* Fases 2 e 3 são a experiência prioritária no celular: cada controle
+     recebe área de toque generosa, sem botões espremidos. */
+  #screen-avaliacao.avaliacao-mobile-prioritaria .topbar {
     padding: var(--space-3);
     row-gap: var(--space-3);
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile .topbar-contexto-avaliacao {
+  #screen-avaliacao.avaliacao-mobile-prioritaria .topbar-contexto-avaliacao {
     align-items: flex-start;
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile .topbar-contexto-avaliacao .topbar-titulo {
+  #screen-avaliacao.avaliacao-mobile-prioritaria .topbar-contexto-avaliacao .topbar-titulo {
     align-items: flex-start;
     text-align: left;
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile .topbar-titulo h2 {
+  #screen-avaliacao.avaliacao-mobile-prioritaria .topbar-titulo h2 {
     font-size: 17px;
     line-height: 1.25;
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile .etapas-nav {
+  #screen-avaliacao.avaliacao-mobile-prioritaria .etapas-nav {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-2);
     overflow: visible;
     padding: var(--space-3);
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-btn {
+  #screen-avaliacao.avaliacao-mobile-prioritaria .etapa-btn {
     min-width: 0;
     min-height: 46px;
     padding: 9px 8px;
@@ -98,43 +98,94 @@
     font-size: 12px;
     line-height: 1.2;
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-btn.active {
+  #screen-avaliacao.avaliacao-mobile-prioritaria .etapa-btn.active {
     padding-top: 9px;
     padding-bottom: 9px;
     font-size: 12px;
     transform: none;
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile #etapa-conteudo {
+  #screen-avaliacao.avaliacao-mobile-prioritaria #etapa-conteudo {
     padding: var(--space-4) var(--space-3) calc(var(--space-5) + env(safe-area-inset-bottom));
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile #etapa-conteudo h3 {
+  #screen-avaliacao.avaliacao-mobile-prioritaria #etapa-conteudo h3 {
     margin-top: 0;
     font-size: 21px;
     line-height: 1.2;
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile .campo > span {
+  #screen-avaliacao.avaliacao-mobile-prioritaria .campo > span {
     font-size: 14px;
     line-height: 1.35;
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile textarea,
-  #screen-avaliacao.avaliacao-colaborador-mobile select {
+  #screen-avaliacao.avaliacao-mobile-prioritaria textarea,
+  #screen-avaliacao.avaliacao-mobile-prioritaria select,
+  #screen-avaliacao.avaliacao-mobile-prioritaria input {
     font-size: 16px;
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile textarea {
+  #screen-avaliacao.avaliacao-mobile-prioritaria textarea {
     min-height: 132px;
     padding: 13px;
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-acoes {
+  #screen-avaliacao.avaliacao-mobile-prioritaria .etapa-acoes {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-2);
     margin-top: var(--space-4);
   }
-  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-acoes .btn-link,
-  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-acoes .btn-primary,
-  #screen-avaliacao.avaliacao-colaborador-mobile #form-etapa .btn-primary {
+  #screen-avaliacao.avaliacao-mobile-prioritaria .etapa-acoes .btn-link,
+  #screen-avaliacao.avaliacao-mobile-prioritaria .etapa-acoes .btn-primary,
+  #screen-avaliacao.avaliacao-mobile-prioritaria #form-etapa .btn-primary {
     width: 100%;
     min-height: 48px;
     justify-content: center;
+  }
+
+  /* Etapa 6: no telefone cada linha do plano vira um cartão de campos,
+     preservando contexto sem exigir rolagem horizontal. */
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-scroll { overflow: visible; }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .plano-competencias-toggle {
+    width: 100%;
+    min-height: 44px;
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .plano-competencias-lista {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano,
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano tbody,
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano tr,
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td {
+    display: block;
+    width: 100%;
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano { min-width: 0; }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano thead { display: none; }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano tr {
+    margin-bottom: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td {
+    padding: 0 0 var(--space-2);
+    border: 0;
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-soft);
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano input {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td:last-child { padding-bottom: 0; }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td:last-child .btn-link {
+    width: 100%;
+    min-height: 44px;
   }
 }

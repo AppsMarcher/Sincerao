@@ -48,8 +48,10 @@ async function abrirAvaliacao(id) {
   av.competenciasCargo = (cargoComp || []).map((cc) => cc.competencia);
   G.avaliacaoAtual = av;
   document.getElementById('screen-avaliacao').classList.toggle(
-    'avaliacao-colaborador-mobile',
-    meuPapelNaAvaliacao(av) === 'colaborador' && av.status === 'aguardando_autoavaliacao'
+    'avaliacao-mobile-prioritaria',
+    // As fases 2 e 3 são preenchidas pelo colaborador e/ou pelo gestor e
+    // precisam da mesma experiência de toque no celular.
+    ['aguardando_autoavaliacao', 'aguardando_alinhamento'].includes(av.status)
   );
   const ciclo = av.ciclo || (await sbFetch('/ciclos_avaliacao?id=eq.' + av.ciclo_id + '&select=nome'))?.[0];
   av.ciclo = ciclo;

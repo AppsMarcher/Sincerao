@@ -13,9 +13,9 @@ function renderEtapaParecer() {
     <h3>Parecer Final</h3>
     ${(rascunhoGestor || rascunhoColaborador) ? '<p class="muted">Rascunho local recuperado. Salve o parecer para confirmar no banco.</p>' : ''}
     <label class="campo"><span>Parecer do Gestor</span><textarea id="parecer-gestor" ${podeGestor ? '' : 'disabled'}>${escHtml(rascunhoGestor?.valores?.valor ?? dados.parecer_gestor ?? '')}</textarea></label>
-    ${podeGestor ? '<button class="btn-link" onclick="salvarParecer(\'parecer_gestor\')">Salvar parecer do gestor</button>' : ''}
+    ${podeGestor ? '<div class="etapa-acoes"><button class="btn-link" onclick="salvarParecer(\'parecer_gestor\')">Salvar parecer do gestor</button></div>' : ''}
     <label class="campo"><span>Parecer do Colaborador</span><textarea id="parecer-colaborador" ${podeColaborador ? '' : 'disabled'}>${escHtml(rascunhoColaborador?.valores?.valor ?? dados.parecer_colaborador ?? '')}</textarea></label>
-    ${podeColaborador ? '<button class="btn-link" onclick="salvarParecer(\'parecer_colaborador\')">Salvar parecer do colaborador</button>' : ''}
+    ${podeColaborador ? '<div class="etapa-acoes"><button class="btn-link" onclick="salvarParecer(\'parecer_colaborador\')">Salvar parecer do colaborador</button></div>' : ''}
     ${concluida ? renderResultadoFinal(av) : ''}
     ${av.status === 'aguardando_alinhamento' ? '<p class="muted">A avaliação será concluída quando os dois pareceres forem salvos.</p>' : ''}
     ${concluida ? renderCiencia(av, papel) : ''}
