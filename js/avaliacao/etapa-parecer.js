@@ -52,9 +52,15 @@ async function salvarParecerConsenso() {
   const av = G.avaliacaoAtual;
   const valor = document.getElementById('parecer-consenso').value.trim();
   if (!valor) { showToast('Preencha o parecer final antes de concluir.'); return; }
+  const notas = (av.notas || []).map((n) => n.nota).filter((n) => n != null);
+  const { pontuacaoGeral, percentual, classificacao } = calcularPontuacao(notas);
+  if (pontuacaoGeral == null) {
+    showToast('Preencha as notas das competências antes de concluir.');
+    return;
+  }
   const novosDados = { ...av.dados, parecer: { ...(av.dados.parecer || {}), parecer_consenso: valor } };
   try {
-    await atualizarAvaliacao({ dados: novosDados, status: 'concluida', concluida_em: new Date().toISOString() });
+    await atualizarAvaliacao({ dados: novosDados, status: 'concluida', concluida_em: new Date().toISOString(), pontuacao_geral: pontuacaoGeral, percentual, classificacao });
     limparRascunhoEtapa(av.id, 'parecer_consenso');
     showToast('Parecer salvo e avaliação concluída.');
     document.getElementById('avaliacao-status').textContent = statusLabel(av.status);

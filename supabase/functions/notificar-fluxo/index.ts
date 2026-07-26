@@ -2,9 +2,10 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+const escHtml = (valor: unknown) => String(valor ?? '').replace(/[&<>"']/g, (caractere) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[caractere] || caractere));
 
 function emailHtml(titulo: string, mensagem: string) {
-  return `<main style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:32px;color:#1e1e1e"><img src="https://sincerao.marcher.com.br/assets/logo.png" alt="Sincerão" width="176"><h1 style="color:#5a0048">${titulo}</h1><p style="line-height:1.6">${mensagem}</p><table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:24px 0"><tr><td align="center" bgcolor="#5a0048" style="border-radius:100px"><a href="https://sincerao.marcher.com.br" style="display:inline-block;padding:14px 28px;font-family:Arial,sans-serif;font-size:15px;font-weight:700;line-height:1;text-decoration:none;color:#ffffff">Abrir o Sincerão</a></td></tr></table></main>`;
+  return `<main style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:32px;color:#1e1e1e"><img src="https://sincerao.marcher.com.br/assets/logo.png" alt="Sincerão" width="176"><h1 style="color:#5a0048">${escHtml(titulo)}</h1><p style="line-height:1.6">${mensagem}</p><table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:24px 0"><tr><td align="center" bgcolor="#5a0048" style="border-radius:100px"><a href="https://sincerao.marcher.com.br" style="display:inline-block;padding:14px 28px;font-family:Arial,sans-serif;font-size:15px;font-weight:700;line-height:1;text-decoration:none;color:#ffffff">Abrir o Sincerão</a></td></tr></table></main>`;
 }
 
 Deno.serve(async (req) => {
@@ -28,7 +29,7 @@ Deno.serve(async (req) => {
       const { data: avaliacoes } = await admin.from('avaliacoes').select('colaborador_id,gestor_id').eq('ciclo_id', ciclo_id);
       const envolvidos = Array.from(new Set((avaliacoes || []).flatMap((avaliacao) => [avaliacao.colaborador_id, avaliacao.gestor_id])));
       const { data: pessoas } = envolvidos.length
-        ? await admin.from('perfis').select('email').in('id', envolvidos)
+        ? await admin.from('perfis').select('id,email,nome').in('id', envolvidos)
         : { data: [] };
       const destinatarios = Array.from(new Set((pessoas || []).map((pessoa) => pessoa.email).filter(Boolean)));
       if (!destinatarios.length) return json({ error: 'Não há envolvidos com e-mail cadastrado neste ciclo.' }, 400);
@@ -36,7 +37,9 @@ Deno.serve(async (req) => {
       const key = Deno.env.get('RESEND_API_KEY');
       if (!key) return json({ ok: true, email: 'não configurado' });
       const titulo = `Ciclo de avaliação iniciado: ${ciclo.nome}`;
-      const mensagem = `O ciclo <strong>${ciclo.nome}</strong> foi iniciado. As avaliações serão conduzidas entre gestores e colaboradores envolvidos, de ${ciclo.data_inicio.split('-').reverse().join('/')} a ${ciclo.data_fim.split('-').reverse().join('/')}.`;
+      const nomes = new Map((pessoas || []).map((pessoa) => [pessoa.id, pessoa.nome]));
+      const participantes = (avaliacoes || []).map((avaliacao) => `Colaborador: <strong>${escHtml(nomes.get(avaliacao.colaborador_id) || 'não informado')}</strong> · Gestor: <strong>${escHtml(nomes.get(avaliacao.gestor_id) || 'não informado')}</strong>`).join('<br>');
+      const mensagem = `O ciclo <strong>${escHtml(ciclo.nome)}</strong> foi iniciado. As avaliações serão conduzidas entre gestores e colaboradores envolvidos, de ${ciclo.data_inicio.split('-').reverse().join('/')} a ${ciclo.data_fim.split('-').reverse().join('/')}.<br><br><strong>Participantes</strong><br>${participantes}`;
       const response = await fetch('https://api.resend.com/emails', { method:'POST', headers:{ Authorization:`Bearer ${key}`,'Content-Type':'application/json' }, body:JSON.stringify({ from:Deno.env.get('RESEND_FROM') || 'Sincerão <no-reply@marcher.com.br>', to: destinatarios, subject:titulo, html:emailHtml(titulo,mensagem) }) });
       if (!response.ok) return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
       return json({ ok:true });
@@ -57,7 +60,8 @@ Deno.serve(async (req) => {
     const key = Deno.env.get('RESEND_API_KEY');
     if (!key) return json({ ok: true, email: 'não configurado' });
     const [titulo,mensagem] = textos[evento];
-    const response = await fetch('https://api.resend.com/emails', { method:'POST', headers:{ Authorization:`Bearer ${key}`,'Content-Type':'application/json' }, body:JSON.stringify({ from:Deno.env.get('RESEND_FROM') || 'Sincerão <no-reply@marcher.com.br>', to:(pessoas || []).map(p=>p.email), subject:titulo, html:emailHtml(titulo,mensagem) }) });
+    const envolvidos = `<br><br>Colaborador: <strong>${escHtml(av.colaborador?.nome || 'não informado')}</strong><br>Gestor: <strong>${escHtml(av.gestor?.nome || 'não informado')}</strong>`;
+    const response = await fetch('https://api.resend.com/emails', { method:'POST', headers:{ Authorization:`Bearer ${key}`,'Content-Type':'application/json' }, body:JSON.stringify({ from:Deno.env.get('RESEND_FROM') || 'Sincerão <no-reply@marcher.com.br>', to:(pessoas || []).map(p=>p.email), subject:titulo, html:emailHtml(titulo,mensagem + envolvidos) }) });
     if (!response.ok) return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
     return json({ ok:true });
   } catch (e) { return json({ error: String(e) }, 500); }
