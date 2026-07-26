@@ -113,6 +113,7 @@ a { color: var(--primary); }
   outline-color: #fff;
   outline-offset: 3px;
 }
+.topbar-atualizar { padding: 0; }
 .logo-topbar-interna {
   display: block;
   width: 145px;

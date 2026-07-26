@@ -8,6 +8,18 @@ function toggleNavMenu(botao) {
   menu?.classList.toggle('open');
 }
 
+async function recarregarAplicacao() {
+  document.querySelectorAll('.nav-menu.open').forEach((menu) => menu.classList.remove('open'));
+
+  if ('caches' in window) {
+    const nomes = await caches.keys();
+    await Promise.all(nomes.map((nome) => caches.delete(nome)));
+  }
+
+  navigator.serviceWorker?.getRegistration().then((registro) => registro?.update()).catch(() => {});
+  window.location.reload();
+}
+
 document.addEventListener('click', (e) => {
   if (e.target.closest('.nav-menu') || e.target.closest('.nav-hamburguer')) return;
   document.querySelectorAll('.nav-menu.open').forEach((menu) => menu.classList.remove('open'));
