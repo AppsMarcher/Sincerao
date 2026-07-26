@@ -61,8 +61,14 @@ async function carregarNotificacoes() {
 
 async function limparNotificacoesGestor() {
   if (!ehGestor()) return;
-  if (!confirm('Limpar todas as suas notificações? Essa ação não pode ser desfeita.')) return;
+  const modal = document.getElementById('modal-confirmar-fluxo');
+  document.getElementById('confirmar-fluxo-titulo').textContent = 'Limpar notificações?';
+  document.getElementById('confirmar-fluxo-texto').textContent = 'Todas as suas notificações serão removidas. Essa ação não pode ser desfeita.';
+  modal._acaoConfirmada = executarLimpezaNotificacoes;
+  modal.classList.add('open');
+}
 
+async function executarLimpezaNotificacoes() {
   const botaoLimpar = document.getElementById('btn-limpar-notificacoes');
   botaoLimpar.disabled = true;
   try {
