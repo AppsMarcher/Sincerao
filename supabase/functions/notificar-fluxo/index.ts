@@ -4,7 +4,7 @@ const corsHeaders = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
 function emailHtml(titulo: string, mensagem: string) {
-  return `<main style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:32px;color:#1e1e1e"><img src="https://sincerao.marcher.com.br/assets/logo.png" alt="Sincerão" width="176"><h1 style="color:#5a0048">${titulo}</h1><p style="line-height:1.6">${mensagem}</p><p><a href="https://sincerao.marcher.com.br" style="display:inline-block;padding:12px 20px;border-radius:24px;background:#5a0048;color:white;text-decoration:none">Abrir o Sincerão</a></p></main>`;
+  return `<main style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:32px;color:#1e1e1e"><img src="https://sincerao.marcher.com.br/assets/logo.png" alt="Sincerão" width="176"><h1 style="color:#5a0048">${titulo}</h1><p style="line-height:1.6">${mensagem}</p><table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:24px 0"><tr><td align="center" bgcolor="#5a0048" style="border-radius:100px"><a href="https://sincerao.marcher.com.br" style="display:inline-block;padding:14px 28px;font-family:Arial,sans-serif;font-size:15px;font-weight:700;line-height:1;text-decoration:none;color:#ffffff">Abrir o Sincerão</a></td></tr></table></main>`;
 }
 
 Deno.serve(async (req) => {
