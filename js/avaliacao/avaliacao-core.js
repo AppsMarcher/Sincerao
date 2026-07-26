@@ -25,7 +25,7 @@ function podeEditarEtapa(av, etapaId) {
 
 async function abrirAvaliacao(id) {
   let rows = await sbFetch(
-    '/avaliacoes?id=eq.' + id + '&select=*,colaborador:colaborador_id(id,nome,cargo_id),gestor:gestor_id(id,nome),ciclo:ciclo_id(nome)'
+    '/avaliacoes?id=eq.' + id + '&select=*,colaborador:colaborador_id(id,nome,email,cargo_id),gestor:gestor_id(id,nome,email),ciclo:ciclo_id(nome)'
   );
   let av = rows[0];
   // Na Fase 2 o banco bloqueia a linha original para o colaborador, pois ela
@@ -101,6 +101,12 @@ function imprimirAvaliacao() {
     ? `<table><thead><tr><th>Competência</th><th>Ação</th><th>Prazo</th><th>Responsável</th><th>Indicador de sucesso</th><th>Acompanhamento</th></tr></thead><tbody>${av.plano.map((linha) => `<tr><td>${escHtml(linha.competencia || '—')}</td><td>${escHtml(linha.acao || '—')}</td><td>${escHtml(linha.prazo || '—')}</td><td>${escHtml(linha.responsavel || '—')}</td><td>${escHtml(linha.indicador_sucesso || '—')}</td><td>${escHtml(linha.acompanhamento || '—')}</td></tr>`).join('')}</tbody></table>`
     : '<p>Não há plano de desenvolvimento registrado.</p>';
   const parecer = dados.parecer?.parecer_consenso || [dados.parecer?.parecer_gestor, dados.parecer?.parecer_colaborador].filter(Boolean).join('\n\n') || 'Não informado.';
+  const dataHora = (data) => data ? new Date(data).toLocaleString('pt-BR') : 'Pendente';
+  const ciencia = `<h2>Ciência</h2><table><thead><tr><th>Participante</th><th>E-mail</th><th>Data e hora</th></tr></thead><tbody>${[
+    ['Colaborador', av.colaborador?.nome, av.colaborador?.email, av.ciencia_colaborador_em],
+    ['Gestor', av.gestor?.nome, av.gestor?.email, av.ciencia_gestor_em],
+    ['RH', av.ciencia_rh_nome, av.ciencia_rh_email, av.ciencia_rh_em],
+  ].map(([papel, nome, email, data]) => `<tr><td><strong>${escHtml(papel)}</strong><br>${escHtml(nome || 'Não identificado')}</td><td>${escHtml(email || '—')}</td><td>${escHtml(dataHora(data))}</td></tr>`).join('')}</tbody></table>`;
   const pagina = (numero, titulo, conteudo) => `<article class="pagina"><header><span>Etapa ${numero} de 8</span><h1>${escHtml(titulo)}</h1><p><strong>Colaborador:</strong> ${escHtml(av.colaborador?.nome || '—')} &nbsp;|&nbsp; <strong>Gestor:</strong> ${escHtml(av.gestor?.nome || '—')}<br><strong>Ciclo:</strong> ${escHtml(av.ciclo?.nome || '—')}</p></header>${conteudo}</article>`;
   const paginas = [
     pagina(1, 'Resultados do período', texto('resultados')),
@@ -110,7 +116,7 @@ function imprimirAvaliacao() {
     pagina(5, 'Feedback do colaborador ao gestor', texto('feedback_colaborador')),
     pagina(6, 'Plano de desenvolvimento', plano),
     pagina(7, 'Resumo da avaliação', texto('resumo')),
-    pagina(8, 'Parecer final', `<section><h3>Parecer do gestor e colaborador</h3><p>${escHtml(parecer).replace(/\n/g, '<br>')}</p></section><h2>Resultado final</h2><p><strong>Pontuação geral:</strong> ${escHtml(av.pontuacao_geral ?? '—')} / 5<br><strong>Percentual:</strong> ${escHtml(av.percentual ?? '—')}%<br><strong>Classificação:</strong> ${escHtml(av.classificacao || '—')}</p>`),
+    pagina(8, 'Parecer final', `<section><h3>Parecer do gestor e colaborador</h3><p>${escHtml(parecer).replace(/\n/g, '<br>')}</p></section><h2>Resultado final</h2><p><strong>Pontuação geral:</strong> ${escHtml(av.pontuacao_geral ?? '—')} / 5<br><strong>Percentual:</strong> ${escHtml(av.percentual ?? '—')}%<br><strong>Classificação:</strong> ${escHtml(av.classificacao || '—')}</p>${ciencia}`),
   ];
   const janela = window.open('', '_blank');
   if (!janela) { showToast('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.'); return; }

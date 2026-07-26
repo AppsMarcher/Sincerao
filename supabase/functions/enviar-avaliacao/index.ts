@@ -32,6 +32,12 @@ function relatorioHtml(av: any, notas: any[], plano: any[]) {
     ? `<table><thead><tr><th>Competência</th><th>Ação</th><th>Prazo</th><th>Responsável</th><th>Indicador de sucesso</th><th>Acompanhamento</th></tr></thead><tbody>${plano.map((linha) => `<tr><td>${esc(linha.competencia)}</td><td>${esc(linha.acao)}</td><td>${esc(linha.prazo)}</td><td>${esc(linha.responsavel)}</td><td>${esc(linha.indicador_sucesso)}</td><td>${esc(linha.acompanhamento)}</td></tr>`).join('')}</tbody></table>`
     : '<p>Não há plano de desenvolvimento registrado.</p>';
   const parecer = dados.parecer?.parecer_consenso || [dados.parecer?.parecer_gestor, dados.parecer?.parecer_colaborador].filter(Boolean).join('\n\n');
+  const dataHora = (data: string | null | undefined) => data ? new Date(data).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : 'Pendente';
+  const cienciaHtml = `<h2>Ciência</h2><table><thead><tr><th>Participante</th><th>E-mail</th><th>Data e hora</th></tr></thead><tbody>${[
+    ['Colaborador', av.colaborador?.nome, av.colaborador?.email, av.ciencia_colaborador_em],
+    ['Gestor', av.gestor?.nome, av.gestor?.email, av.ciencia_gestor_em],
+    ['RH', av.ciencia_rh_nome, av.ciencia_rh_email, av.ciencia_rh_em],
+  ].map(([papel, nome, email, data]) => `<tr><td><strong>${esc(papel)}</strong><br>${esc(nome || 'Não identificado')}</td><td>${esc(email || '—')}</td><td>${esc(dataHora(data as string | null | undefined))}</td></tr>`).join('')}</tbody></table>`;
   const paginas = [
     pagina(1, 'Resultados do período', perguntas('resultados', ['entregas', 'impacto', 'metas_atingidas', 'metas_nao_atingidas', 'desafios', 'melhorias'])),
     pagina(2, 'Avaliação das competências', notasHtml),
@@ -40,7 +46,7 @@ function relatorioHtml(av: any, notas: any[], plano: any[]) {
     pagina(5, 'Feedback do colaborador ao gestor', perguntas('feedback_colaborador', ['suporte_gestor', 'gestor_faria_diferente', 'sobre_lideranca'])),
     pagina(6, 'Plano de desenvolvimento', planoHtml),
     pagina(7, 'Resumo da avaliação', perguntas('resumo', ['fortalezas', 'oportunidades', 'prioridade_desenvolvimento', 'treinamentos_recomendados'])),
-    pagina(8, 'Parecer final', `<section><h3>Parecer do gestor e colaborador</h3><p>${esc(parecer || 'Não informado.').replace(/\n/g, '<br>')}</p></section><h2>Resultado final</h2><p><strong>Pontuação geral:</strong> ${esc(av.pontuacao_geral ?? '—')} / 5<br><strong>Percentual:</strong> ${esc(av.percentual ?? '—')}%<br><strong>Classificação:</strong> ${esc(av.classificacao || '—')}</p>`),
+    pagina(8, 'Parecer final', `<section><h3>Parecer do gestor e colaborador</h3><p>${esc(parecer || 'Não informado.').replace(/\n/g, '<br>')}</p></section><h2>Resultado final</h2><p><strong>Pontuação geral:</strong> ${esc(av.pontuacao_geral ?? '—')} / 5<br><strong>Percentual:</strong> ${esc(av.percentual ?? '—')}%<br><strong>Classificação:</strong> ${esc(av.classificacao || '—')}</p>${cienciaHtml}`),
   ];
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
     @page { size:A4; } *{box-sizing:border-box} body{margin:0;font-family:Arial,sans-serif;color:#25212a;font-size:11px;line-height:1.45} .pagina + .pagina{break-before:page;page-break-before:always} header{border-bottom:3px solid #5a0048;padding-bottom:14px;margin-bottom:22px} header span{color:#755a70;font-size:10px;text-transform:uppercase;font-weight:bold} h1{color:#5a0048;margin:4px 0 5px;font-size:24px} h2{color:#5a0048;margin:26px 0 10px;font-size:17px} h3{color:#5a0048;margin:16px 0 4px;font-size:12px} p{margin:0 0 8px}.meta{color:#655b67}table{width:100%;border-collapse:collapse;margin:10px 0 18px}thead{display:table-header-group}tr{break-inside:avoid;page-break-inside:avoid}th{background:#5a0048;color:#fff;text-align:left}th,td{padding:7px;border:1px solid #ded7df;vertical-align:top}tr:nth-child(even){background:#faf7fa}section{break-inside:avoid}
@@ -61,7 +67,7 @@ Deno.serve(async (req) => {
     if (!avaliacao_id) return json({ error: 'Avaliação não informada.' }, 400);
 
     const admin = createClient(url, service);
-    const { data: av } = await admin.from('avaliacoes').select('id,status,dados,pontuacao_geral,percentual,classificacao,colaborador_id,gestor_id,colaborador:colaborador_id(nome,email),gestor:gestor_id(nome,email),ciclo:ciclo_id(nome)').eq('id', avaliacao_id).single();
+    const { data: av } = await admin.from('avaliacoes').select('id,status,dados,pontuacao_geral,percentual,classificacao,ciencia_colaborador_em,ciencia_gestor_em,ciencia_rh_em,ciencia_rh_nome,ciencia_rh_email,colaborador_id,gestor_id,colaborador:colaborador_id(nome,email),gestor:gestor_id(nome,email),ciclo:ciclo_id(nome)').eq('id', avaliacao_id).single();
     if (!av || av.status !== 'concluida') return json({ error: 'Somente avaliações concluídas podem ser enviadas.' }, 400);
     const { data: perfil } = await admin.from('perfis').select('papel').eq('id', user.id).single();
     const autorizado = user.id === av.gestor_id || ['rh', 'admin'].includes(perfil?.papel);

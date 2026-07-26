@@ -101,7 +101,12 @@ async function concluirAvaliacaoAgora() {
 
 async function registrarCiencia(papel) {
   try {
-    await atualizarAvaliacao({ ['ciencia_' + papel + '_em']: new Date().toISOString() });
+    const patch = { ['ciencia_' + papel + '_em']: new Date().toISOString() };
+    if (papel === 'rh') {
+      patch.ciencia_rh_nome = G.perfil?.nome || null;
+      patch.ciencia_rh_email = G.perfil?.email || null;
+    }
+    await atualizarAvaliacao(patch);
     showToast('Ciência registrada.');
     renderEtapaAtiva();
   } catch (err) {
