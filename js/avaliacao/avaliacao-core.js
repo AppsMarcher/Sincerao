@@ -144,6 +144,22 @@ async function atualizarAvaliacaoComConcorrencia(patch) {
     return rows?.[0] || null;
   }
 
+  // A policy de leitura não entrega a avaliação original ao colaborador na
+  // Fase 2. A RPC faz a gravação e devolve somente os campos permitidos.
+  if (colaboradorEmAutoavaliacao()) {
+    const salvo = await sbRpc('salvar_autoavaliacao_para_fluxo', {
+      p_avaliacao_id: av.id,
+      p_versao: Number(av.versao) || 1,
+      p_dados: patch.dados || av.dados || {},
+      p_etapa_atual: patch.etapa_atual ?? av.etapa_atual,
+      p_enviar_para_alinhamento: patch.status === 'aguardando_alinhamento',
+      p_alinhamento_em: patch.alinhamento_em || null,
+    });
+    if (!salvo) throw new Error('Não foi possível salvar a autoavaliação.');
+    Object.assign(av, salvo);
+    return salvo;
+  }
+
   for (let tentativa = 0; tentativa < 4; tentativa++) {
     const versaoEsperada = Number(av.versao) || 1;
     const salvo = await sbFetch('/avaliacoes?id=eq.' + av.id + '&versao=eq.' + versaoEsperada, {
