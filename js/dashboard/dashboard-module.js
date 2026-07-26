@@ -14,10 +14,14 @@ document.addEventListener('click', (e) => {
 async function abrirDashboard() {
   goTo('screen-dashboard');
   await carregarNotificacoes();
-  const rows = (await sbFetch(
-    '/avaliacoes_resumo?order=created_at.desc'
-  )) || [];
-  G.avaliacoes = rows;
+  const [rows, emPreparacao, aguardandoConsenso] = await Promise.all([
+    sbFetch('/avaliacoes_resumo?order=created_at.desc'),
+    sbFetch('/minhas_avaliacoes_em_preparacao?order=data_inicio.desc'),
+    sbFetch('/minhas_avaliacoes_aguardando_consenso'),
+  ]);
+  G.avaliacoes = rows || [];
+  G.avaliacoesEmPreparacao = emPreparacao || [];
+  G.avaliacoesAguardandoConsenso = aguardandoConsenso || [];
   renderDashboard();
 }
 
@@ -36,13 +40,22 @@ function renderDashboard() {
   const comoColaborador = G.avaliacoes.filter((a) => a.colaborador_id === meuId);
   const comoGestor = G.avaliacoes.filter((a) => a.gestor_id === meuId);
 
-  document.getElementById('dash-minhas').innerHTML =
-    linhasAvaliacaoHtml(comoColaborador, 'colaborador') || '<p class="empty">Nenhuma avaliação sua no momento.</p>';
+  const avisoPreparacao = G.avaliacoesEmPreparacao.length
+    ? G.avaliacoesEmPreparacao.map((a) => `<div class="aviso-avaliacao-preparacao"><strong>Avaliação em preparação</strong><div>Sua avaliação${a.ciclo_nome ? ' do ciclo ' + escHtml(a.ciclo_nome) : ''} está em preparação pelo gestor. Você receberá uma notificação quando a autoavaliação estiver disponível.</div></div>`).join('')
+    : '';
+  const avisoConsenso = G.avaliacoesAguardandoConsenso.length
+    ? G.avaliacoesAguardandoConsenso.map((a) => `<div class="aviso-avaliacao-consenso"><strong>Autoavaliação enviada</strong><div>Sua autoavaliação${a.ciclo_nome ? ' do ciclo ' + escHtml(a.ciclo_nome) : ''} foi recebida. Aguarde o gestor para realizarem juntos a etapa de consenso e o plano de desenvolvimento.</div></div>`).join('')
+    : '';
+  document.getElementById('dash-minhas').innerHTML = avisoPreparacao + avisoConsenso + (linhasAvaliacaoHtml(comoColaborador, 'colaborador') || (!(avisoPreparacao || avisoConsenso) ? '<p class="empty">Nenhuma avaliação sua no momento.</p>' : ''));
 
   const secaoGestor = document.getElementById('dash-equipe-wrap');
   if (comoGestor.length) {
     secaoGestor.style.display = '';
-    document.getElementById('dash-equipe').innerHTML = linhasAvaliacaoHtml(comoGestor, 'gestor');
+    const aguardandoColaborador = comoGestor.filter((a) => a.status === 'aguardando_autoavaliacao');
+    const avisoGestor = aguardandoColaborador.length
+      ? `<div class="aviso-avaliacao-gestor"><strong>${aguardandoColaborador.length === 1 ? 'Autoavaliação pendente' : 'Autoavaliações pendentes'}</strong><div>${aguardandoColaborador.length === 1 ? escHtml(aguardandoColaborador[0].colaborador?.nome || 'Um colaborador') + ' ainda não concluiu a autoavaliação.' : `${aguardandoColaborador.length} colaboradores ainda não concluíram a autoavaliação.`} Você será avisado quando ela for devolvida para a etapa de consenso.</div></div>`
+      : '';
+    document.getElementById('dash-equipe').innerHTML = avisoGestor + linhasAvaliacaoHtml(comoGestor, 'gestor');
   } else {
     secaoGestor.style.display = 'none';
   }

@@ -197,7 +197,7 @@ function irParaEtapa(id) {
 
 function etapasDisponiveis(av) {
   if (av.status === 'concluida') return ETAPAS.map((e) => e.id);
-  if (av.status === 'rascunho') return ['resultados', 'competencias', 'feedback_gestor'];
+  if (av.status === 'rascunho') return meuPapelNaAvaliacao(av) === 'gestor' || meuPapelNaAvaliacao(av) === 'rh' ? ['resultados', 'competencias', 'feedback_gestor'] : [];
   if (av.status === 'aguardando_autoavaliacao') return meuPapelNaAvaliacao(av) === 'colaborador' ? ['autoavaliacao', 'feedback_colaborador'] : [];
   return ['plano_desenvolvimento', 'resumo', 'parecer_final'];
 }
