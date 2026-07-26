@@ -1,4 +1,9 @@
 /* Telas de autenticação */
+html:has(#screen-login.active),
+body:has(#screen-login.active) {
+  background: #09031d;
+}
+
 .tela-auth {
   display: none;
   min-height: 100vh;
