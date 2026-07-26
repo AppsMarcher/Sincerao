@@ -19,7 +19,19 @@ function renderEtapaCompetencias() {
 }
 
 async function avancarCompetencias() {
-  try { await salvarEtapaEAvancar(); showToast('Etapa de competências concluída.'); }
+  const linhas = [...document.querySelectorAll('.competencia-row')];
+  if (linhas.some((linha) => !linha.querySelector('select').value)) {
+    showToast('Selecione uma nota para todas as competências antes de avançar.');
+    return;
+  }
+  try {
+    for (const linha of linhas) {
+      const salvo = await salvarNotaCompetencia(linha.dataset.competencia, true);
+      if (!salvo) return;
+    }
+    await salvarEtapaEAvancar();
+    showToast('Etapa de competências concluída.');
+  }
   catch { showToast('Não foi possível avançar nesta etapa.'); }
 }
 
@@ -57,12 +69,17 @@ function salvarRascunhoNota(competenciaId) {
   });
 }
 
-async function salvarNotaCompetencia(competenciaId) {
+async function salvarNotaCompetencia(competenciaId, silencioso = false) {
   const row = document.querySelector(`.competencia-row[data-competencia="${competenciaId}"]`);
   const nota = Number(row.querySelector('select').value) || null;
   const comentario = row.querySelector('textarea').value;
   const av = G.avaliacaoAtual;
   const existente = av.notas.find((n) => n.competencia_id === competenciaId);
+
+  if (!nota) {
+    showToast('Selecione uma nota antes de salvar esta competência.');
+    return false;
+  }
 
   try {
     let salvo;
@@ -75,7 +92,7 @@ async function salvarNotaCompetencia(competenciaId) {
         const remoto = await sbFetch('/avaliacao_notas?id=eq.' + existente.id);
         av.notas = av.notas.filter((n) => n.id !== existente.id).concat(remoto || []);
         showToast('Conflito: esta competência foi alterada em outra sessão. Revise e clique em Salvar novamente.');
-        return;
+        return false;
       }
     } else {
       salvo = await sbFetch('/avaliacao_notas', {
@@ -85,14 +102,16 @@ async function salvarNotaCompetencia(competenciaId) {
     }
     av.notas = av.notas.filter((n) => n.competencia_id !== competenciaId).concat(salvo || []);
     limparRascunhoEtapa(av.id, 'nota_' + competenciaId);
-    showToast('Nota salva no banco.');
+    if (!silencioso) showToast('Nota salva no banco.');
+    return true;
   } catch (err) {
     if (String(err?.message || '').includes('duplicate')) {
       const remoto = await sbFetch('/avaliacao_notas?avaliacao_id=eq.' + av.id + '&competencia_id=eq.' + competenciaId);
       av.notas = av.notas.filter((n) => n.competencia_id !== competenciaId).concat(remoto || []);
       showToast('Conflito: outra sessão criou esta nota primeiro. Revise e salve novamente.');
-      return;
+      return false;
     }
     showToast('Não foi possível salvar a nota. O conteúdo permanece na tela.');
+    return false;
   }
 }

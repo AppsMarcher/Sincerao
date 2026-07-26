@@ -117,6 +117,7 @@
   font-size: 13px;
 }
 .plano-competencias-vazia { margin: 10px 0 0; }
+.plano-acoes { margin-top: var(--space-4); }
 
 .resultado-final {
   display: flex;

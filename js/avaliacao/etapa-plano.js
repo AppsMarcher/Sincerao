@@ -1,7 +1,6 @@
 // avaliacao/etapa-plano.js — etapa 6: plano de desenvolvimento (tabela multi-linha, preenchida em conjunto)
 
 const _filasGravacaoPlano = new Map();
-let _competenciasPlanoVisiveis = false;
 
 function enfileirarGravacaoPlano(id, tarefa) {
   const anterior = _filasGravacaoPlano.get(id) || Promise.resolve();
@@ -17,15 +16,11 @@ function renderEtapaPlano() {
   const editavel = podeEditarEtapa(av, 'plano_desenvolvimento');
   const linhas = av.plano || [];
   const competencias = av.competenciasCargo || [];
-  const tituloToggle = _competenciasPlanoVisiveis ? 'Ocultar competências' : `Listar competências (${competencias.length})`;
   document.getElementById('etapa-conteudo').innerHTML = `
     <h3>Plano de Desenvolvimento</h3>
-    <div class="plano-competencias">
-      <button type="button" class="btn-link plano-competencias-toggle" onclick="alternarCompetenciasPlano()" aria-expanded="${_competenciasPlanoVisiveis}">
-        ${tituloToggle}
-      </button>
-      ${_competenciasPlanoVisiveis ? renderListaCompetenciasPlano(competencias) : ''}
-    </div>
+    <datalist id="plano-competencias-opcoes">
+      ${competencias.map((competencia) => `<option value="${escHtml(competencia.nome)}"></option>`).join('')}
+    </datalist>
     <div class="tabela-scroll">
     <table class="tabela-plano">
       <thead><tr><th>Competência</th><th>Ação</th><th>Prazo</th><th>Responsável</th><th>Indicador de Sucesso</th><th>Acompanhamento</th><th></th></tr></thead>
@@ -34,22 +29,8 @@ function renderEtapaPlano() {
       </tbody>
     </table>
     </div>
-    ${editavel ? '<div class="etapa-acoes"><button class="btn-link" onclick="adicionarLinhaPlano()">+ Adicionar linha</button><button class="btn-primary" onclick="avancarPlano()">Salvar e avançar</button></div>' : ''}
+    ${editavel ? '<div class="etapa-acoes plano-acoes"><button class="btn-link" onclick="adicionarLinhaPlano()">+ Adicionar linha</button><button class="btn-primary" onclick="avancarPlano()">Salvar e avançar</button></div>' : ''}
   `;
-}
-
-function alternarCompetenciasPlano() {
-  _competenciasPlanoVisiveis = !_competenciasPlanoVisiveis;
-  renderEtapaPlano();
-}
-
-function renderListaCompetenciasPlano(competencias) {
-  if (!competencias.length) {
-    return '<p class="muted plano-competencias-vazia">Não há competências vinculadas ao cargo deste colaborador.</p>';
-  }
-  return `<div class="plano-competencias-lista" aria-label="Competências do cargo">
-    ${competencias.map((competencia) => `<span class="plano-competencia-item">${escHtml(competencia.nome)}</span>`).join('')}
-  </div>`;
 }
 
 async function avancarPlano() {
@@ -58,13 +39,13 @@ async function avancarPlano() {
 }
 
 function linhaPlanoHtml(l, editavel) {
-  const campo = (key, tipo = 'text') => {
+  const campo = (key, tipo = 'text', atributos = '') => {
     const rascunho = editavel ? lerRascunhoEtapa(G.avaliacaoAtual.id, `plano_${l.id}_${key}`) : null;
     const valor = rascunho?.valores?.valor ?? l[key] ?? '';
-    return `<input type="${tipo}" value="${escHtml(valor)}" ${editavel ? `oninput="salvarRascunhoPlano('${l.id}','${key}', this.value)"` : 'disabled'} onblur="salvarLinhaPlano('${l.id}','${key}', this.value)">`;
+    return `<input type="${tipo}" value="${escHtml(valor)}" ${atributos} ${editavel ? `oninput="salvarRascunhoPlano('${l.id}','${key}', this.value)"` : 'disabled'} onblur="salvarLinhaPlano('${l.id}','${key}', this.value)">`;
   };
   return `<tr data-linha="${l.id}">
-    <td data-label="Competência">${campo('competencia')}</td>
+    <td data-label="Competência">${campo('competencia', 'text', 'list="plano-competencias-opcoes" placeholder="Selecione ou digite"')}</td>
     <td data-label="Ação">${campo('acao')}</td>
     <td data-label="Prazo">${campo('prazo', 'date')}</td>
     <td data-label="Responsável">${campo('responsavel')}</td>

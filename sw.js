@@ -1,10 +1,10 @@
-const CACHE = 'sincerao-pwa-v12';
+const CACHE = 'sincerao-pwa-v14';
 const APP_SHELL = [
   '/', '/index.html', '/manifest.webmanifest', '/supabase-config.js',
   '/css/base.css', '/css/login.css', '/css/dashboard.css', '/css/perfil.css', '/css/avaliacao.css', '/css/admin.css', '/css/responsive.css',
   '/js/core/constants.js', '/js/core/supabase-client.js', '/js/core/state.js', '/js/core/utils.js',
   '/js/dashboard/dashboard-module.js', '/js/gestao/gestao-module.js', '/js/perfil/perfil-module.js',
-  '/js/avaliacao/avaliacao-core.js', '/js/avaliacao/etapa-texto.js', '/js/avaliacao/etapa-competencias.js', '/js/avaliacao/etapa-plano.js', '/js/avaliacao/etapa-parecer.js',
+  '/js/avaliacao/avaliacao-core.js', '/js/avaliacao/etapa-texto.js', '/js/avaliacao/etapa-competencias.js?v=13', '/js/avaliacao/etapa-plano.js?v=15', '/js/avaliacao/etapa-parecer.js',
   '/js/admin/cargos-module.js', '/js/admin/setores-module.js', '/js/admin/competencias-module.js', '/js/admin/vinculo-module.js', '/js/admin/ciclos-module.js', '/js/admin/colaboradores-module.js', '/js/admin/auditoria-module.js', '/js/admin/admin-shell.js', '/js/auth/auth-module.js',
   '/assets/logo-b.png', '/assets/icon-192.png', '/assets/favicon-32.png'
 ];
