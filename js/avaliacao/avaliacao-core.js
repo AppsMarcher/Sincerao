@@ -61,16 +61,8 @@ async function abrirAvaliacao(id) {
 }
 
 function renderBotoesTransicao() {
-  const av = G.avaliacaoAtual;
-  const papel = meuPapelNaAvaliacao(av);
   const el = document.getElementById('avaliacao-transicao');
-  if (av.status === 'rascunho' && G.etapaAtiva === 'feedback_gestor' && (papel === 'gestor' || papel === 'rh')) {
-    el.innerHTML = '<button class="btn-primary" onclick="confirmarTransicaoFase(\'fase_1\')">Enviar Fase 1 ao colaborador</button>';
-  } else if (av.status === 'aguardando_autoavaliacao' && G.etapaAtiva === 'feedback_colaborador' && (papel === 'colaborador' || papel === 'rh')) {
-    el.innerHTML = '<button class="btn-primary" onclick="confirmarTransicaoFase(\'fase_2\')">Devolver ao gestor</button>';
-  } else {
-    el.innerHTML = '';
-  }
+  el.innerHTML = '';
 }
 
 function valoresIguais(a, b) {
