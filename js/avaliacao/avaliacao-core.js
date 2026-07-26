@@ -64,9 +64,9 @@ function renderBotoesTransicao() {
   const av = G.avaliacaoAtual;
   const papel = meuPapelNaAvaliacao(av);
   const el = document.getElementById('avaliacao-transicao');
-  if (av.status === 'rascunho' && (papel === 'gestor' || papel === 'rh')) {
+  if (av.status === 'rascunho' && G.etapaAtiva === 'feedback_gestor' && (papel === 'gestor' || papel === 'rh')) {
     el.innerHTML = '<button class="btn-primary" onclick="confirmarTransicaoFase(\'fase_1\')">Enviar Fase 1 ao colaborador</button>';
-  } else if (av.status === 'aguardando_autoavaliacao' && (papel === 'colaborador' || papel === 'rh')) {
+  } else if (av.status === 'aguardando_autoavaliacao' && G.etapaAtiva === 'feedback_colaborador' && (papel === 'colaborador' || papel === 'rh')) {
     el.innerHTML = '<button class="btn-primary" onclick="confirmarTransicaoFase(\'fase_2\')">Devolver ao gestor</button>';
   } else {
     el.innerHTML = '';
@@ -235,6 +235,7 @@ async function dispararEmailFluxo(evento) { try { await sbInvokeFunction('notifi
 // expõe uma função render* própria; este dispatcher só decide qual chamar.
 function renderEtapaAtiva() {
   renderNavEtapas();
+  renderBotoesTransicao();
   const id = G.etapaAtiva;
   if (!ETAPAS.some((etapa) => etapa.id === id)) {
     document.getElementById('etapa-conteudo').innerHTML = '<p class="empty">Esta etapa não está disponível para o seu perfil no momento.</p>';
