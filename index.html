@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#5a0048">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
 <title>Sincerão — Marcher Brasil</title>
 <link rel="icon" type="image/png" href="assets/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
@@ -483,5 +487,10 @@
 <script src="js/admin/admin-shell.js?v=14"></script>
 
 <script src="js/auth/auth-module.js?v=11"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch((erro) => console.warn('PWA indisponível:', erro)));
+  }
+</script>
 </body>
 </html>
