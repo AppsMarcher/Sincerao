@@ -47,6 +47,10 @@ async function abrirAvaliacao(id) {
   av.plano = plano || [];
   av.competenciasCargo = (cargoComp || []).map((cc) => cc.competencia);
   G.avaliacaoAtual = av;
+  document.getElementById('screen-avaliacao').classList.toggle(
+    'avaliacao-colaborador-mobile',
+    meuPapelNaAvaliacao(av) === 'colaborador' && av.status === 'aguardando_autoavaliacao'
+  );
   const ciclo = av.ciclo || (await sbFetch('/ciclos_avaliacao?id=eq.' + av.ciclo_id + '&select=nome'))?.[0];
   av.ciclo = ciclo;
   G.etapaAtiva = ETAPAS.find((e) => e.n === av.etapa_atual)?.id || etapaInicialDisponivel(av);

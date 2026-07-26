@@ -59,4 +59,76 @@
   .adm-tab-panel { overflow-x: auto; }
 
   .resultado-final { flex-direction: column; gap: var(--space-2); }
+
+  /* Fase 2 é a experiência prioritária no celular: cada controle recebe área
+     de toque generosa, sem navegação horizontal nem botões espremidos. */
+  #screen-avaliacao.avaliacao-colaborador-mobile .topbar {
+    padding: var(--space-3);
+    row-gap: var(--space-3);
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile .topbar-contexto-avaliacao {
+    align-items: flex-start;
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile .topbar-contexto-avaliacao .topbar-titulo {
+    align-items: flex-start;
+    text-align: left;
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile .topbar-titulo h2 {
+    font-size: 17px;
+    line-height: 1.25;
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile .etapas-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    overflow: visible;
+    padding: var(--space-3);
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-btn {
+    min-width: 0;
+    min-height: 46px;
+    padding: 9px 8px;
+    white-space: normal;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-btn.active {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    font-size: 12px;
+    transform: none;
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile #etapa-conteudo {
+    padding: var(--space-4) var(--space-3) calc(var(--space-5) + env(safe-area-inset-bottom));
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile #etapa-conteudo h3 {
+    margin-top: 0;
+    font-size: 21px;
+    line-height: 1.2;
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile .campo > span {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile textarea,
+  #screen-avaliacao.avaliacao-colaborador-mobile select {
+    font-size: 16px;
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile textarea {
+    min-height: 132px;
+    padding: 13px;
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-acoes {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-acoes .btn-link,
+  #screen-avaliacao.avaliacao-colaborador-mobile .etapa-acoes .btn-primary,
+  #screen-avaliacao.avaliacao-colaborador-mobile #form-etapa .btn-primary {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
 }

@@ -41,7 +41,7 @@ function renderGrupoCompetencias(titulo, lista, notasPorCompetencia, editavel) {
           ${[1, 2, 3, 4, 5].map((v) => `<option value="${v}" ${Number(valorNota) === v ? 'selected' : ''}>${v}</option>`).join('')}
         </select>
         <textarea placeholder="Comentários" ${editavel ? `oninput="salvarRascunhoNota('${c.id}')"` : 'disabled'}>${escHtml(valorComentario)}</textarea>
-        ${editavel ? `<button class="btn-link" onclick="salvarNotaCompetencia('${c.id}')">Salvar</button>` : ''}
+        ${editavel ? `<button class="btn-link" onclick="salvarNotaCompetencia('${c.id}')">Salvar sem avançar</button>` : ''}
       </div>`;
       })
       .join('')}
