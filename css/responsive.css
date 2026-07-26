@@ -217,4 +217,13 @@
     width: 100%;
     min-height: 44px;
   }
+
+  /* Chat do Tawk.to em tela cheia nasce em top:0 e fica atrás da status bar
+     no PWA standalone do iOS, escondendo o próprio cabeçalho (com o botão de
+     fechar) atrás dela. body.tawk-aberto é ligado via Tawk_API em index.html. */
+  body.tawk-aberto iframe[src*="tawk.to"] {
+    top: env(safe-area-inset-top) !important;
+    height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    bottom: env(safe-area-inset-bottom) !important;
+  }
 }
