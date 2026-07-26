@@ -84,8 +84,39 @@ function toggleExportarAvaliacao(evento) {
 }
 
 function imprimirAvaliacao() {
+  const av = G.avaliacaoAtual;
   fecharExportarAvaliacao();
-  window.print();
+  if (!av) return;
+
+  const dados = av.dados || {};
+  const texto = (etapaId) => (CAMPOS_ETAPA[etapaId] || []).map(([chave, pergunta]) => {
+    const resposta = dados[etapaId]?.[chave];
+    return `<section><h3>${escHtml(pergunta)}</h3><p>${escHtml(resposta || 'Não informado.').replace(/\n/g, '<br>')}</p></section>`;
+  }).join('') || '<p>Não há respostas registradas nesta etapa.</p>';
+  const nomeCompetencia = (nota) => nota.competencia?.nome || av.competenciasCargo?.find((competencia) => competencia.id === nota.competencia_id)?.nome || '—';
+  const notas = (av.notas || []).length
+    ? `<table><thead><tr><th>Competência</th><th>Nota</th><th>Comentários</th></tr></thead><tbody>${av.notas.map((nota) => `<tr><td>${escHtml(nomeCompetencia(nota))}</td><td>${escHtml(nota.nota ?? '—')}</td><td>${escHtml(nota.comentario || '—')}</td></tr>`).join('')}</tbody></table>`
+    : '<p>Não há competências avaliadas.</p>';
+  const plano = (av.plano || []).length
+    ? `<table><thead><tr><th>Competência</th><th>Ação</th><th>Prazo</th><th>Responsável</th><th>Indicador de sucesso</th><th>Acompanhamento</th></tr></thead><tbody>${av.plano.map((linha) => `<tr><td>${escHtml(linha.competencia || '—')}</td><td>${escHtml(linha.acao || '—')}</td><td>${escHtml(linha.prazo || '—')}</td><td>${escHtml(linha.responsavel || '—')}</td><td>${escHtml(linha.indicador_sucesso || '—')}</td><td>${escHtml(linha.acompanhamento || '—')}</td></tr>`).join('')}</tbody></table>`
+    : '<p>Não há plano de desenvolvimento registrado.</p>';
+  const parecer = dados.parecer?.parecer_consenso || [dados.parecer?.parecer_gestor, dados.parecer?.parecer_colaborador].filter(Boolean).join('\n\n') || 'Não informado.';
+  const pagina = (numero, titulo, conteudo) => `<article class="pagina"><header><span>Etapa ${numero} de 8</span><h1>${escHtml(titulo)}</h1><p><strong>Colaborador:</strong> ${escHtml(av.colaborador?.nome || '—')} &nbsp;|&nbsp; <strong>Gestor:</strong> ${escHtml(av.gestor?.nome || '—')}<br><strong>Ciclo:</strong> ${escHtml(av.ciclo?.nome || '—')}</p></header>${conteudo}</article>`;
+  const paginas = [
+    pagina(1, 'Resultados do período', texto('resultados')),
+    pagina(2, 'Avaliação das competências', notas),
+    pagina(3, 'Feedback do gestor', texto('feedback_gestor')),
+    pagina(4, 'Autoavaliação', texto('autoavaliacao')),
+    pagina(5, 'Feedback do colaborador ao gestor', texto('feedback_colaborador')),
+    pagina(6, 'Plano de desenvolvimento', plano),
+    pagina(7, 'Resumo da avaliação', texto('resumo')),
+    pagina(8, 'Parecer final', `<section><h3>Parecer do gestor e colaborador</h3><p>${escHtml(parecer).replace(/\n/g, '<br>')}</p></section><h2>Resultado final</h2><p><strong>Pontuação geral:</strong> ${escHtml(av.pontuacao_geral ?? '—')} / 5<br><strong>Percentual:</strong> ${escHtml(av.percentual ?? '—')}%<br><strong>Classificação:</strong> ${escHtml(av.classificacao || '—')}</p>`),
+  ];
+  const janela = window.open('', '_blank');
+  if (!janela) { showToast('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.'); return; }
+  janela.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Avaliação de desempenho</title><style>@page{size:A4;margin:14mm}*{box-sizing:border-box}body{margin:0;font:11px/1.45 Arial,sans-serif;color:#25212a}.pagina+.pagina{break-before:page;page-break-before:always}header{border-bottom:3px solid #5a0048;padding-bottom:14px;margin-bottom:22px}header span{color:#755a70;font-size:10px;font-weight:bold;text-transform:uppercase}h1{margin:4px 0 5px;color:#5a0048;font-size:24px}h2{margin:26px 0 10px;color:#5a0048;font-size:17px}h3{margin:16px 0 4px;color:#5a0048;font-size:12px}p{margin:0 0 8px}table{width:100%;margin:10px 0 18px;border-collapse:collapse}thead{display:table-header-group}tr{break-inside:avoid;page-break-inside:avoid}th{background:#5a0048;color:#fff;text-align:left}th,td{padding:7px;border:1px solid #ded7df;vertical-align:top}tr:nth-child(even){background:#faf7fa}section{break-inside:avoid}</style></head><body>${paginas.join('')}</body></html>`);
+  janela.document.close();
+  janela.addEventListener('load', () => { janela.focus(); janela.print(); });
 }
 
 async function enviarAvaliacaoPorEmail() {
