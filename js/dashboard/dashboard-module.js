@@ -28,7 +28,7 @@ async function abrirDashboard() {
 async function carregarNotificacoes() {
   const el = document.getElementById('dash-notificacoes');
   try {
-    const notificacoes = await sbFetch('/notificacoes?order=created_at.desc&limit=10');
+    const notificacoes = await sbFetch('/notificacoes?destinatario_id=eq.' + G.perfil.id + '&order=created_at.desc&limit=10');
     el.innerHTML = notificacoes?.length ? notificacoes.map((n) => `<div class="notificacao-item"><div><strong>${escHtml(n.titulo)}</strong><div class="muted">${escHtml(n.mensagem)}</div><small>${new Date(n.created_at).toLocaleString('pt-BR')}</small></div>${n.lida_em ? '' : '<span class="badge badge-atencao">Nova</span>'}</div>`).join('') : '<p class="empty">Nenhuma notificação por enquanto.</p>';
     const naoLidas = (notificacoes || []).filter((n) => !n.lida_em);
     if (naoLidas.length) sbFetch('/notificacoes?id=in.(' + naoLidas.map((n) => n.id).join(',') + ')', { method: 'PATCH', body: JSON.stringify({ lida_em: new Date().toISOString() }) }).catch(() => {});
