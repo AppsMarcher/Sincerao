@@ -42,8 +42,7 @@ async function abrirDashboard() {
 async function carregarNotificacoes() {
   const el = document.getElementById('dash-notificacoes');
   const botaoLimpar = document.getElementById('btn-limpar-notificacoes');
-  const podeLimpar = ehGestor();
-  botaoLimpar.style.display = podeLimpar ? '' : 'none';
+  botaoLimpar.style.display = '';
   try {
     const notificacoes = await sbFetch('/notificacoes?destinatario_id=eq.' + G.perfil.id + '&order=created_at.desc&limit=10');
     botaoLimpar.disabled = !notificacoes?.length;
@@ -59,8 +58,7 @@ async function carregarNotificacoes() {
   } catch { el.innerHTML = '<p class="empty">As notificações estarão disponíveis após aplicar a atualização do banco.</p>'; }
 }
 
-async function limparNotificacoesGestor() {
-  if (!ehGestor()) return;
+async function limparNotificacoes() {
   const modal = document.getElementById('modal-confirmar-fluxo');
   document.getElementById('confirmar-fluxo-titulo').textContent = 'Limpar notificações?';
   document.getElementById('confirmar-fluxo-texto').textContent = 'Todas as suas notificações serão removidas. Essa ação não pode ser desfeita.';
