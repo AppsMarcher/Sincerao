@@ -11,27 +11,13 @@ function renderDadosPerfil() {
   document.getElementById('perfil-dados').innerHTML = `
     <dl class="dados-lista">
       <dt>Nome</dt>
-      <dd>
-        <form id="form-nome" class="form-inline-editar">
-          <input type="text" id="perfil-nome-input" value="${escHtml(p.nome)}" required>
-          <button type="submit" class="btn-link">Salvar</button>
-        </form>
-      </dd>
+      <dd>${escHtml(p.nome)}</dd>
       <dt>E-mail</dt><dd>${escHtml(p.email)}</dd>
       <dt>Cargo</dt><dd>${escHtml(p.cargo?.nome || '—')}</dd>
       <dt>Setor</dt><dd>${escHtml(p.cargo?.setor?.nome || '—')}</dd>
       <dt>Gestor</dt><dd>${escHtml(p.gestor?.nome || '—')}</dd>
     </dl>
   `;
-  document.getElementById('form-nome').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const novoNome = document.getElementById('perfil-nome-input').value.trim();
-    if (!novoNome) { showToast('Informe um nome.'); return; }
-    await sbFetch('/perfis?id=eq.' + p.id, { method: 'PATCH', body: JSON.stringify({ nome: novoNome }) });
-    p.nome = novoNome;
-    document.querySelectorAll('.nav-nome-usuario').forEach((el) => { el.textContent = novoNome; });
-    showToast('Nome atualizado.');
-  });
 }
 
 async function renderHistoricoAvaliacoes() {
