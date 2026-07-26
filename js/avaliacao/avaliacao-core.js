@@ -109,7 +109,7 @@ const RELATORIO_ESTILO = `
   h1,h2,h3{font-family:'Space Grotesk','DM Sans',Arial,sans-serif;margin:0}
   p{margin:0 0 8px}
 
-  .capa{min-height:248mm;border-radius:20px;background:linear-gradient(135deg,#5a0048 0%,#3d0030 100%);color:#fff;padding:38px 34px;display:flex;flex-direction:column}
+  .capa{min-height:248mm;border-radius:20px;background:#5a0048;color:#fff;padding:38px 34px;display:flex;flex-direction:column}
   .capa-topo{display:flex;justify-content:space-between;align-items:center}
   .capa-topo img{height:26px}
   .capa-topo span{font-size:9.5px;color:rgba(255,255,255,.65)}
@@ -122,7 +122,7 @@ const RELATORIO_ESTILO = `
   .capa-stats .stat .label{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.65);font-weight:700;margin-bottom:8px}
   .capa-stats .stat .value{font-size:22px;font-weight:700;font-family:'Space Grotesk'}
 
-  .banda{background:linear-gradient(135deg,#5a0048 0%,#3d0030 100%);color:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px}
+  .banda{background:#5a0048;color:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px}
   .banda-topo{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
   .banda-topo img{height:20px}
   .etapa-pill{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.16);padding:5px 12px;border-radius:100px}
