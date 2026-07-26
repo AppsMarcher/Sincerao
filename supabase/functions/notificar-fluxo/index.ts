@@ -16,8 +16,32 @@ Deno.serve(async (req) => {
     const userClient = createClient(url, anon, { global: { headers: { Authorization: req.headers.get('Authorization') || '' } } });
     const { data: { user } } = await userClient.auth.getUser();
     if (!user) return json({ error: 'Não autenticado.' }, 401);
-    const { avaliacao_id, evento } = await req.json();
+    const { avaliacao_id, ciclo_id, evento } = await req.json();
     const admin = createClient(url, service);
+    if (evento === 'ciclo_iniciado') {
+      const { data: perfil } = await admin.from('perfis').select('papel').eq('id', user.id).single();
+      if (!['rh', 'admin'].includes(perfil?.papel)) return json({ error: 'Abertura do ciclo não autorizada.' }, 403);
+
+      const { data: ciclo } = await admin.from('ciclos_avaliacao').select('nome,data_inicio,data_fim').eq('id', ciclo_id).single();
+      if (!ciclo) return json({ error: 'Ciclo não encontrado.' }, 404);
+
+      const { data: avaliacoes } = await admin.from('avaliacoes').select('colaborador_id,gestor_id').eq('ciclo_id', ciclo_id);
+      const envolvidos = Array.from(new Set((avaliacoes || []).flatMap((avaliacao) => [avaliacao.colaborador_id, avaliacao.gestor_id])));
+      const { data: pessoas } = envolvidos.length
+        ? await admin.from('perfis').select('email').in('id', envolvidos)
+        : { data: [] };
+      const destinatarios = Array.from(new Set((pessoas || []).map((pessoa) => pessoa.email).filter(Boolean)));
+      if (!destinatarios.length) return json({ error: 'Não há envolvidos com e-mail cadastrado neste ciclo.' }, 400);
+
+      const key = Deno.env.get('RESEND_API_KEY');
+      if (!key) return json({ ok: true, email: 'não configurado' });
+      const titulo = `Ciclo de avaliação iniciado: ${ciclo.nome}`;
+      const mensagem = `O ciclo <strong>${ciclo.nome}</strong> foi iniciado. As avaliações serão conduzidas entre gestores e colaboradores envolvidos, de ${ciclo.data_inicio.split('-').reverse().join('/')} a ${ciclo.data_fim.split('-').reverse().join('/')}.`;
+      const response = await fetch('https://api.resend.com/emails', { method:'POST', headers:{ Authorization:`Bearer ${key}`,'Content-Type':'application/json' }, body:JSON.stringify({ from:Deno.env.get('RESEND_FROM') || 'Sincerão <no-reply@marcher.com.br>', to: destinatarios, subject:titulo, html:emailHtml(titulo,mensagem) }) });
+      if (!response.ok) return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
+      return json({ ok:true });
+    }
+
     const { data: av } = await admin.from('avaliacoes').select('gestor_id,colaborador_id,status, colaborador:colaborador_id(nome), gestor:gestor_id(nome)').eq('id', avaliacao_id).single();
     if (!av || !['fase_1_enviada','fase_2_devolvida','avaliacao_concluida'].includes(evento)) return json({ error: 'Evento inválido.' }, 400);
     const permitido = (evento === 'fase_1_enviada' && user.id === av.gestor_id && av.status === 'aguardando_autoavaliacao') ||

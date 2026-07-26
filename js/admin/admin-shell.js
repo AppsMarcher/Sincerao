@@ -78,16 +78,27 @@ async function confirmarCriacaoAvaliacoes() {
   const cicloId = modal.dataset.cicloId;
   const ids = Array.from(modal.querySelectorAll('input[type=checkbox]:checked')).map((i) => i.value);
   if (!ids.length) { showToast('Selecione ao menos um colaborador.'); return; }
+  let avaliacoesCriadas = 0;
   for (const colaboradorId of ids) {
     const colaborador = G.colaboradores.find((c) => c.id === colaboradorId);
     if (!colaborador?.gestor_id) continue;
     await sbFetch('/avaliacoes', {
       method: 'POST',
       body: JSON.stringify({ ciclo_id: cicloId, colaborador_id: colaboradorId, gestor_id: colaborador.gestor_id }),
-    }).catch((e) => console.warn('Avaliação já existe ou erro:', e));
+    }).then(() => { avaliacoesCriadas += 1; }).catch((e) => console.warn('Avaliação já existe ou erro:', e));
   }
   fecharModalCriarAvaliacoes();
-  showToast('Avaliações criadas para o ciclo.');
+  if (!avaliacoesCriadas) {
+    showToast('Nenhuma nova avaliação foi criada para o ciclo.');
+    return;
+  }
+  try {
+    await sbInvokeFunction('notificar-fluxo', { ciclo_id: cicloId, evento: 'ciclo_iniciado' });
+  } catch {
+    showToast('Avaliações criadas, mas não foi possível enviar o e-mail de início do ciclo.');
+    return;
+  }
+  showToast('Avaliações criadas e e-mail de início do ciclo enviado aos envolvidos.');
 }
 
 document.addEventListener('keydown', (event) => {
