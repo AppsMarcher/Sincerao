@@ -1,5 +1,14 @@
 /* avaliacao.css — wizard das 8 etapas, competências, plano de desenvolvimento, parecer/ciência */
 
+/* As etapas da avaliação aproveitam melhor a tela em desktop, sem alterar a
+   experiência compacta do celular. */
+@media (min-width: 641px) {
+  #screen-avaliacao #etapa-conteudo {
+    width: 85%;
+    max-width: none;
+  }
+}
+
 .etapas-nav {
   display: flex;
   flex-wrap: nowrap;
