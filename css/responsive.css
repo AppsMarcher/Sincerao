@@ -69,19 +69,48 @@
   /* Fases 2 e 3 são a experiência prioritária no celular: cada controle
      recebe área de toque generosa, sem botões espremidos. */
   #screen-avaliacao.avaliacao-mobile-prioritaria .topbar {
-    padding: var(--space-3);
-    row-gap: var(--space-3);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    padding: 8px var(--space-3);
+    column-gap: var(--space-2);
+    row-gap: var(--space-2);
   }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .topbar > .btn-link:first-child {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 40px;
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .topbar-marca {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .logo-topbar-interna { width: 92px; }
   #screen-avaliacao.avaliacao-mobile-prioritaria .topbar-contexto-avaliacao {
-    align-items: flex-start;
+    display: contents;
   }
   #screen-avaliacao.avaliacao-mobile-prioritaria .topbar-contexto-avaliacao .topbar-titulo {
-    align-items: flex-start;
-    text-align: left;
+    display: none;
   }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .topbar-titulo h2 {
-    font-size: 17px;
-    line-height: 1.25;
+  #screen-avaliacao.avaliacao-mobile-prioritaria .topbar-actions-interna {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .nav-nome-usuario { display: none; }
+  #screen-avaliacao.avaliacao-mobile-prioritaria .topbar-actions .btn-link {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 8px;
+  }
+  #screen-avaliacao.avaliacao-mobile-prioritaria #avaliacao-transicao:not(:empty) {
+    display: flex;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
   }
   #screen-avaliacao.avaliacao-mobile-prioritaria .etapas-nav {
     display: grid;
