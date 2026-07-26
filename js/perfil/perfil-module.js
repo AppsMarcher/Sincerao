@@ -29,7 +29,7 @@ function renderDadosPerfil() {
     if (!novoNome) { showToast('Informe um nome.'); return; }
     await sbFetch('/perfis?id=eq.' + p.id, { method: 'PATCH', body: JSON.stringify({ nome: novoNome }) });
     p.nome = novoNome;
-    document.getElementById('nav-nome-usuario').textContent = novoNome;
+    document.querySelectorAll('.nav-nome-usuario').forEach((el) => { el.textContent = novoNome; });
     showToast('Nome atualizado.');
   });
 }

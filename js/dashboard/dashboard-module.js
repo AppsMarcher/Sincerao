@@ -1,14 +1,16 @@
 // dashboard/dashboard-module.js — lista de avaliações visíveis ao usuário logado
 
-function toggleNavMenu() {
-  document.getElementById('nav-menu').classList.toggle('open');
+function toggleNavMenu(botao) {
+  const menu = botao.parentElement.querySelector('.nav-menu');
+  document.querySelectorAll('.nav-menu').forEach((item) => {
+    if (item !== menu) item.classList.remove('open');
+  });
+  menu?.classList.toggle('open');
 }
 
 document.addEventListener('click', (e) => {
-  const menu = document.getElementById('nav-menu');
-  if (!menu || !menu.classList.contains('open')) return;
-  if (e.target.closest('#nav-menu') || e.target.closest('.nav-hamburguer')) return;
-  menu.classList.remove('open');
+  if (e.target.closest('.nav-menu') || e.target.closest('.nav-hamburguer')) return;
+  document.querySelectorAll('.nav-menu.open').forEach((menu) => menu.classList.remove('open'));
 });
 
 async function abrirDashboard() {

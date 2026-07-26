@@ -136,6 +136,7 @@ a { color: var(--primary); }
 
 .topbar-actions { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; position: relative; }
 .topbar-actions .btn-link { min-height: 44px; padding: 8px 12px; }
+.topbar-actions-interna { justify-self: end; }
 
 .nav-hamburguer { display: inline-flex; }
 .nav-menu {

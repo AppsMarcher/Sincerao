@@ -59,9 +59,9 @@ async function solicitarRecuperacaoSenha() {
 }
 
 async function entrarNoApp(perfil) {
-  document.getElementById('nav-nome-usuario').textContent = perfil.nome;
-  document.getElementById('nav-admin').style.display = ehRhOuAdmin() ? '' : 'none';
-  document.getElementById('nav-gestao').style.display = podeVerGestao() ? '' : 'none';
+  document.querySelectorAll('.nav-nome-usuario').forEach((el) => { el.textContent = perfil.nome; });
+  document.querySelectorAll('.nav-admin').forEach((el) => { el.style.display = ehRhOuAdmin() ? '' : 'none'; });
+  document.querySelectorAll('.nav-gestao').forEach((el) => { el.style.display = podeVerGestao() ? '' : 'none'; });
   await abrirDashboard();
 }
 
