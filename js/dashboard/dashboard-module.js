@@ -43,7 +43,13 @@ async function carregarNotificacoes() {
   const el = document.getElementById('dash-notificacoes');
   try {
     const notificacoes = await sbFetch('/notificacoes?destinatario_id=eq.' + G.perfil.id + '&order=created_at.desc&limit=10');
-    el.innerHTML = notificacoes?.length ? notificacoes.map((n) => `<div class="notificacao-item"><div><strong>${escHtml(n.titulo)}</strong><div class="muted">${escHtml(n.mensagem)}</div><small>${new Date(n.created_at).toLocaleString('pt-BR')}</small></div>${n.lida_em ? '' : '<span class="notificacao-nao-lida" role="img" aria-label="Notificação nova" title="Notificação nova"></span>'}</div>`).join('') : '<p class="empty">Nenhuma notificação por enquanto.</p>';
+    el.innerHTML = notificacoes?.length ? notificacoes.map((n) => {
+      const data = new Date(n.created_at);
+      const dataHora = data.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+      const dataHoraSemSegundos = data.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) + ' ' + data.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+      const mensagem = escHtml(n.mensagem).replace(/Enviada em \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}/, 'Enviada em ' + dataHoraSemSegundos);
+      return `<div class="notificacao-item"><div><strong>${escHtml(n.titulo)}</strong><div class="muted">${mensagem}</div><small>${dataHora}</small></div>${n.lida_em ? '' : '<span class="notificacao-nao-lida" role="img" aria-label="Notificação nova" title="Notificação nova"></span>'}</div>`;
+    }).join('') : '<p class="empty">Nenhuma notificação por enquanto.</p>';
     const naoLidas = (notificacoes || []).filter((n) => !n.lida_em);
     if (naoLidas.length) sbFetch('/notificacoes?id=in.(' + naoLidas.map((n) => n.id).join(',') + ')', { method: 'PATCH', body: JSON.stringify({ lida_em: new Date().toISOString() }) }).catch(() => {});
   } catch { el.innerHTML = '<p class="empty">As notificações estarão disponíveis após aplicar a atualização do banco.</p>'; }
