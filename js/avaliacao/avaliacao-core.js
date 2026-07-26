@@ -77,6 +77,16 @@ function valoresIguais(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
+function mensagemErroAvaliacao(erro, padrao) {
+  const bruto = String(erro?.message || '');
+  try {
+    const detalhe = JSON.parse(bruto);
+    return detalhe.message || detalhe.error || detalhe.details || padrao;
+  } catch {
+    return bruto || padrao;
+  }
+}
+
 function mesclarPatchAvaliacao(base, remoto, patch) {
   const resultado = { ...patch };
 

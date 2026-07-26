@@ -83,7 +83,11 @@ function renderEtapaTexto(etapaId) {
     document.getElementById('btn-salvar-avancar').addEventListener('click', async () => {
       const novosDados = { ...av.dados, [etapaId]: Object.fromEntries(new FormData(form).entries()) };
       try { await salvarEtapaEAvancar({ dados: novosDados }); limparRascunhoEtapa(av.id, etapaId); showToast('Etapa salva.'); }
-      catch (err) { if (!String(err?.message || '').includes('Conflito')) showToast('Não foi possível salvar esta etapa.'); }
+      catch (err) {
+        if (!String(err?.message || '').includes('Conflito')) {
+          showToast(mensagemErroAvaliacao(err, 'Não foi possível salvar esta etapa.'));
+        }
+      }
     });
   }
 }
