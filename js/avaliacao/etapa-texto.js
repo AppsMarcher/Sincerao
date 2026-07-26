@@ -33,14 +33,19 @@ function limparRascunhoEtapa(avaliacaoId, etapaId) {
 
 function renderEtapaTexto(etapaId) {
   const av = G.avaliacaoAtual;
+  const etapa = ETAPAS.find((item) => item.id === etapaId);
   const campos = CAMPOS_ETAPA[etapaId];
+  if (!etapa || !campos) {
+    document.getElementById('etapa-conteudo').innerHTML = '<p class="empty">Esta etapa não está disponível para o seu perfil no momento.</p>';
+    return;
+  }
   const dados = av.dados[etapaId] || {};
   const editavel = podeEditarEtapa(av, etapaId);
   const rascunho = editavel ? lerRascunhoEtapa(av.id, etapaId) : null;
   const valoresExibidos = rascunho?.valores || dados;
   const container = document.getElementById('etapa-conteudo');
   container.innerHTML = `
-    <h3>${escHtml(ETAPAS.find((e) => e.id === etapaId).label)}</h3>
+    <h3>${escHtml(etapa.label)}</h3>
     ${rascunho ? '<p class="muted">Rascunho local recuperado deste navegador. Salve a etapa para confirmar no banco.</p>' : ''}
     <form id="form-etapa">
       ${campos

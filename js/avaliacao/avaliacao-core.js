@@ -236,6 +236,10 @@ async function dispararEmailFluxo(evento) { try { await sbInvokeFunction('notifi
 function renderEtapaAtiva() {
   renderNavEtapas();
   const id = G.etapaAtiva;
+  if (!ETAPAS.some((etapa) => etapa.id === id)) {
+    document.getElementById('etapa-conteudo').innerHTML = '<p class="empty">Esta etapa não está disponível para o seu perfil no momento.</p>';
+    return;
+  }
   if (id === 'competencias') renderEtapaCompetencias();
   else if (id === 'plano_desenvolvimento') renderEtapaPlano();
   else if (id === 'parecer_final') renderEtapaParecer();
