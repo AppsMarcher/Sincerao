@@ -1,6 +1,5 @@
--- Durante a Fase 2, a policy de leitura oculta a linha original do
--- colaborador para não expor anotações e notas do gestor. Esta RPC permite
--- salvar somente os campos próprios da autoavaliação e devolve a visão segura.
+-- Reaplica a RPC da Fase 2 em bancos que já receberam a migração 024.
+-- A gravação deve alterar somente os dois grupos que pertencem ao colaborador.
 
 create or replace function salvar_autoavaliacao_para_fluxo(
   p_avaliacao_id uuid,
@@ -19,18 +18,13 @@ declare
   salvo avaliacoes%rowtype;
 begin
   update avaliacoes
-  -- A visão entregue ao colaborador na Fase 2 contém somente estes dois
-  -- blocos. Mesclá-los evita apagar as respostas e anotações da Fase 1.
   set dados = dados || jsonb_build_object(
         'autoavaliacao', coalesce(p_dados->'autoavaliacao', '{}'::jsonb),
         'feedback_colaborador', coalesce(p_dados->'feedback_colaborador', '{}'::jsonb)
       ),
       etapa_atual = p_etapa_atual,
       status = case when p_enviar_para_alinhamento then 'aguardando_alinhamento' else status end,
-      alinhamento_em = case
-        when p_enviar_para_alinhamento then coalesce(p_alinhamento_em, now())
-        else alinhamento_em
-      end
+      alinhamento_em = case when p_enviar_para_alinhamento then coalesce(p_alinhamento_em, now()) else alinhamento_em end
   where id = p_avaliacao_id
     and versao = p_versao
     and colaborador_id = auth.uid()
@@ -42,17 +36,11 @@ begin
     raise exception 'A avaliação foi alterada, não está disponível ou o ciclo foi encerrado.';
   end if;
 
-  if p_enviar_para_alinhamento then
-    return to_jsonb(salvo);
-  end if;
+  if p_enviar_para_alinhamento then return to_jsonb(salvo); end if;
 
   return jsonb_build_object(
-    'id', salvo.id,
-    'ciclo_id', salvo.ciclo_id,
-    'colaborador_id', salvo.colaborador_id,
-    'gestor_id', salvo.gestor_id,
-    'status', salvo.status,
-    'etapa_atual', salvo.etapa_atual,
+    'id', salvo.id, 'ciclo_id', salvo.ciclo_id, 'colaborador_id', salvo.colaborador_id,
+    'gestor_id', salvo.gestor_id, 'status', salvo.status, 'etapa_atual', salvo.etapa_atual,
     'versao', salvo.versao,
     'dados', jsonb_build_object(
       'autoavaliacao', coalesce(salvo.dados->'autoavaliacao', '{}'::jsonb),
