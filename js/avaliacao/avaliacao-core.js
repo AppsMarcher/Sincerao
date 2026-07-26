@@ -138,6 +138,19 @@ function atualizarAvaliacao(patch) {
 async function atualizarAvaliacaoComConcorrencia(patch) {
   const av = G.avaliacaoAtual;
   let patchAtual = patch;
+  const colaboradorEmAutoavaliacao = () =>
+    av.colaborador_id === G.perfil.id && av.status === 'aguardando_autoavaliacao';
+
+  async function carregarRemoto() {
+    // Durante a autoavaliação, a linha original é deliberadamente invisível ao
+    // colaborador para não expor anotações do gestor. A RPC devolve apenas os
+    // campos seguros e também permite confirmar a versão após o PATCH.
+    if (colaboradorEmAutoavaliacao()) {
+      return sbRpc('obter_avaliacao_para_fluxo', { p_avaliacao_id: av.id });
+    }
+    const rows = await sbFetch('/avaliacoes?id=eq.' + av.id + '&select=*');
+    return rows?.[0] || null;
+  }
 
   for (let tentativa = 0; tentativa < 4; tentativa++) {
     const versaoEsperada = Number(av.versao) || 1;
@@ -151,9 +164,15 @@ async function atualizarAvaliacaoComConcorrencia(patch) {
       return salvo[0];
     }
 
-    const rows = await sbFetch('/avaliacoes?id=eq.' + av.id + '&select=*');
-    const remoto = rows?.[0];
+    const remoto = await carregarRemoto();
     if (!remoto) throw new Error('A avaliação não está mais disponível.');
+
+    // O RLS não devolve representação da linha ao colaborador nesta fase,
+    // mesmo quando o PATCH foi aceito. A versão maior confirma o salvamento.
+    if (Number(remoto.versao) > versaoEsperada) {
+      Object.assign(av, remoto);
+      return remoto;
+    }
 
     const patchMesclado = mesclarPatchAvaliacao(av, remoto, patchAtual);
     Object.assign(av, remoto);
