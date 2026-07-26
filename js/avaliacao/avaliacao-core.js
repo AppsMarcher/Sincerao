@@ -18,7 +18,7 @@ function podeEditarEtapa(av, etapaId) {
     return papel === 'colaborador' && status === 'aguardando_autoavaliacao';
   }
   if (etapaId === 'plano_desenvolvimento' || etapaId === 'resumo') {
-    return (papel === 'gestor' || papel === 'colaborador') && status === 'aguardando_alinhamento';
+    return papel === 'gestor' && status === 'aguardando_alinhamento';
   }
   return false;
 }
@@ -33,6 +33,10 @@ async function abrirAvaliacao(id) {
   if (!av) av = await sbRpc('obter_avaliacao_para_fluxo', { p_avaliacao_id: id });
   if (!av) {
     showToast('Essa avaliação não está disponível — o ciclo pode estar fora do período de vigência.');
+    return;
+  }
+  if (av.status === 'aguardando_alinhamento' && av.colaborador_id === G.perfil.id && !ehRhOuAdmin()) {
+    showToast('Sua autoavaliação já foi enviada. Aguarde o gestor concluir o consenso.');
     return;
   }
   goTo('screen-avaliacao');
@@ -242,6 +246,11 @@ function etapasDisponiveis(av) {
   if (av.status === 'concluida') return ETAPAS.map((e) => e.id);
   if (av.status === 'rascunho') return meuPapelNaAvaliacao(av) === 'gestor' || meuPapelNaAvaliacao(av) === 'rh' ? ['resultados', 'competencias', 'feedback_gestor'] : [];
   if (av.status === 'aguardando_autoavaliacao') return meuPapelNaAvaliacao(av) === 'colaborador' ? ['autoavaliacao', 'feedback_colaborador'] : [];
+  if (av.status === 'aguardando_alinhamento') {
+    return ['gestor', 'rh'].includes(meuPapelNaAvaliacao(av))
+      ? ['plano_desenvolvimento', 'resumo', 'parecer_final']
+      : [];
+  }
   return ['plano_desenvolvimento', 'resumo', 'parecer_final'];
 }
 function etapaInicialDisponivel(av) { return etapasDisponiveis(av)[0] || 'resultados'; }

@@ -46,7 +46,7 @@ function renderDashboard() {
     ? G.avaliacoesEmPreparacao.map((a) => `<div class="aviso-avaliacao-preparacao"><strong>Avaliação em preparação</strong><div>Sua avaliação${a.ciclo_nome ? ' do ciclo ' + escHtml(a.ciclo_nome) : ''} está em preparação pelo gestor. Você receberá uma notificação quando a autoavaliação estiver disponível.</div></div>`).join('')
     : '';
   const avisoConsenso = G.avaliacoesAguardandoConsenso.length
-    ? G.avaliacoesAguardandoConsenso.map((a) => `<div class="aviso-avaliacao-consenso"><strong>Autoavaliação enviada</strong><div>Sua autoavaliação${a.ciclo_nome ? ' do ciclo ' + escHtml(a.ciclo_nome) : ''} foi recebida. Aguarde o gestor para realizarem juntos a etapa de consenso e o plano de desenvolvimento.</div></div>`).join('')
+    ? G.avaliacoesAguardandoConsenso.map((a) => `<div class="aviso-avaliacao-consenso"><strong>Autoavaliação enviada</strong><div>Sua autoavaliação${a.ciclo_nome ? ' do ciclo ' + escHtml(a.ciclo_nome) : ''} foi recebida. O gestor realizará o consenso e registrará o plano, o resumo e o parecer final.</div></div>`).join('')
     : '';
   document.getElementById('dash-minhas').innerHTML = avisoPreparacao + avisoConsenso + (linhasAvaliacaoHtml(comoColaborador, 'colaborador') || (!(avisoPreparacao || avisoConsenso) ? '<p class="empty">Nenhuma avaliação sua no momento.</p>' : ''));
 

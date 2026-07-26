@@ -4,30 +4,23 @@ function renderEtapaParecer() {
   const av = G.avaliacaoAtual;
   const dados = av.dados.parecer || {};
   const papel = meuPapelNaAvaliacao(av);
-  const podeGestor = (papel === 'gestor' || papel === 'rh') && av.status === 'aguardando_alinhamento';
-  const podeColaborador = (papel === 'colaborador' || papel === 'rh') && av.status === 'aguardando_alinhamento';
+  const podeEditar = (papel === 'gestor' || papel === 'rh') && av.status === 'aguardando_alinhamento';
   const concluida = av.status === 'concluida';
-  const rascunhoGestor = podeGestor ? lerRascunhoEtapa(av.id, 'parecer_gestor') : null;
-  const rascunhoColaborador = podeColaborador ? lerRascunhoEtapa(av.id, 'parecer_colaborador') : null;
+  const rascunho = podeEditar ? lerRascunhoEtapa(av.id, 'parecer_consenso') : null;
+  const parecerLegado = [dados.parecer_gestor, dados.parecer_colaborador].filter(Boolean).join('\n\n');
+  const valor = rascunho?.valores?.valor ?? dados.parecer_consenso ?? parecerLegado;
   document.getElementById('etapa-conteudo').innerHTML = `
     <h3>Parecer Final</h3>
-    ${(rascunhoGestor || rascunhoColaborador) ? '<p class="muted">Rascunho local recuperado. Salve o parecer para confirmar no banco.</p>' : ''}
-    <label class="campo"><span>Parecer do Gestor</span><textarea id="parecer-gestor" ${podeGestor ? '' : 'disabled'}>${escHtml(rascunhoGestor?.valores?.valor ?? dados.parecer_gestor ?? '')}</textarea></label>
-    ${podeGestor ? '<div class="etapa-acoes"><button class="btn-link" onclick="salvarParecer(\'parecer_gestor\')">Salvar parecer do gestor</button></div>' : ''}
-    <label class="campo"><span>Parecer do Colaborador</span><textarea id="parecer-colaborador" ${podeColaborador ? '' : 'disabled'}>${escHtml(rascunhoColaborador?.valores?.valor ?? dados.parecer_colaborador ?? '')}</textarea></label>
-    ${podeColaborador ? '<div class="etapa-acoes"><button class="btn-link" onclick="salvarParecer(\'parecer_colaborador\')">Salvar parecer do colaborador</button></div>' : ''}
+    ${rascunho ? '<p class="muted">Rascunho local recuperado. Salve para concluir a avaliação.</p>' : ''}
+    <label class="campo"><span>Parecer do Gestor e Colaborador</span><textarea id="parecer-consenso" ${podeEditar ? '' : 'disabled'}>${escHtml(valor)}</textarea></label>
+    ${podeEditar ? '<div class="etapa-acoes"><button class="btn-primary" onclick="salvarParecerConsenso()">Salvar e concluir avaliação</button></div>' : ''}
     ${concluida ? renderResultadoFinal(av) : ''}
-    ${av.status === 'aguardando_alinhamento' ? '<p class="muted">A avaliação será concluída quando os dois pareceres forem salvos.</p>' : ''}
+    ${av.status === 'aguardando_alinhamento' ? '<p class="muted">Registre aqui o parecer definido no consenso para concluir a avaliação.</p>' : ''}
     ${concluida ? renderCiencia(av, papel) : ''}
   `;
-  if (podeGestor) {
-    document.getElementById('parecer-gestor').addEventListener('input', (e) => {
-      salvarRascunhoEtapa(av.id, 'parecer_gestor', { valor: e.target.value });
-    });
-  }
-  if (podeColaborador) {
-    document.getElementById('parecer-colaborador').addEventListener('input', (e) => {
-      salvarRascunhoEtapa(av.id, 'parecer_colaborador', { valor: e.target.value });
+  if (podeEditar) {
+    document.getElementById('parecer-consenso').addEventListener('input', (e) => {
+      salvarRascunhoEtapa(av.id, 'parecer_consenso', { valor: e.target.value });
     });
   }
 }
@@ -55,19 +48,21 @@ function renderCiencia(av, meuPapel) {
   </div>`;
 }
 
-async function salvarParecer(campo) {
+async function salvarParecerConsenso() {
   const av = G.avaliacaoAtual;
-  const valor = document.getElementById(campo === 'parecer_gestor' ? 'parecer-gestor' : 'parecer-colaborador').value;
-  const novosDados = { ...av.dados, parecer: { ...(av.dados.parecer || {}), [campo]: valor } };
+  const valor = document.getElementById('parecer-consenso').value.trim();
+  if (!valor) { showToast('Preencha o parecer final antes de concluir.'); return; }
+  const novosDados = { ...av.dados, parecer: { ...(av.dados.parecer || {}), parecer_consenso: valor } };
   try {
-    await atualizarAvaliacao({ dados: novosDados });
-    limparRascunhoEtapa(av.id, campo);
-    showToast('Parecer salvo no banco.');
-    const parecer = G.avaliacaoAtual.dados.parecer || {};
-    if (String(parecer.parecer_gestor || '').trim() && String(parecer.parecer_colaborador || '').trim()) confirmarTransicaoFase('concluir');
+    await atualizarAvaliacao({ dados: novosDados, status: 'concluida', concluida_em: new Date().toISOString() });
+    limparRascunhoEtapa(av.id, 'parecer_consenso');
+    showToast('Parecer salvo e avaliação concluída.');
+    document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
+    renderEtapaAtiva();
+    dispararEmailFluxo('avaliacao_concluida');
   } catch (err) {
     if (!String(err?.message || '').includes('Conflito')) {
-      showToast('Não foi possível salvar. O parecer continua guardado neste navegador.');
+      showToast(mensagemErroAvaliacao(err, 'Não foi possível concluir. O parecer continua guardado neste navegador.'));
     }
   }
 }
