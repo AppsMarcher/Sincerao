@@ -7,6 +7,12 @@
     width: 85%;
     max-width: none;
   }
+
+  .competencia-row select,
+  .competencia-row textarea,
+  .competencia-row .btn-link {
+    font-size: 13px;
+  }
 }
 
 .etapas-nav {
