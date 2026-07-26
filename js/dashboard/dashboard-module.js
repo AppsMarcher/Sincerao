@@ -41,8 +41,12 @@ async function abrirDashboard() {
 
 async function carregarNotificacoes() {
   const el = document.getElementById('dash-notificacoes');
+  const botaoLimpar = document.getElementById('btn-limpar-notificacoes');
+  const podeLimpar = ehGestor();
+  botaoLimpar.style.display = podeLimpar ? '' : 'none';
   try {
     const notificacoes = await sbFetch('/notificacoes?destinatario_id=eq.' + G.perfil.id + '&order=created_at.desc&limit=10');
+    botaoLimpar.disabled = !notificacoes?.length;
     el.innerHTML = notificacoes?.length ? notificacoes.map((n) => {
       const data = new Date(n.created_at);
       const dataHora = data.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -53,6 +57,22 @@ async function carregarNotificacoes() {
     const naoLidas = (notificacoes || []).filter((n) => !n.lida_em);
     if (naoLidas.length) sbFetch('/notificacoes?id=in.(' + naoLidas.map((n) => n.id).join(',') + ')', { method: 'PATCH', body: JSON.stringify({ lida_em: new Date().toISOString() }) }).catch(() => {});
   } catch { el.innerHTML = '<p class="empty">As notificações estarão disponíveis após aplicar a atualização do banco.</p>'; }
+}
+
+async function limparNotificacoesGestor() {
+  if (!ehGestor()) return;
+  if (!confirm('Limpar todas as suas notificações? Essa ação não pode ser desfeita.')) return;
+
+  const botaoLimpar = document.getElementById('btn-limpar-notificacoes');
+  botaoLimpar.disabled = true;
+  try {
+    await sbFetch('/notificacoes?destinatario_id=eq.' + G.perfil.id, { method: 'DELETE' });
+    document.getElementById('dash-notificacoes').innerHTML = '<p class="empty">Nenhuma notificação por enquanto.</p>';
+    showToast('Notificações removidas.');
+  } catch {
+    botaoLimpar.disabled = false;
+    showToast('Não foi possível limpar as notificações.');
+  }
 }
 
 function renderDashboard() {
