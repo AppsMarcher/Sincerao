@@ -58,7 +58,7 @@ function renderAdmColaboradores() {
   const opcoesGestor = (c) =>
     '<option value="">—</option>' +
     G.colaboradores.filter((g) => g.id !== c.id).map((g) => `<option value="${g.id}" ${c.gestor_id === g.id ? 'selected' : ''}>${escHtml(g.nome)}</option>`).join('');
-  const opcoesPapel = (c) => ['colaborador', 'gestor', 'rh', 'admin'].map((p) => `<option value="${p}" ${c.papel === p ? 'selected' : ''}>${p}</option>`).join('');
+  const opcoesPapel = (c) => ['colaborador', 'gestor', 'rh', 'admin', 'diretoria'].map((p) => `<option value="${p}" ${c.papel === p ? 'selected' : ''}>${p}</option>`).join('');
 
   const termo = _buscaColaboradores.trim().toLowerCase();
   let lista = !termo
@@ -234,7 +234,7 @@ function fecharModalImportarColaboradores() {
   document.getElementById('modal-importar-colaboradores').classList.remove('open');
 }
 
-const PAPEIS_VALIDOS = ['colaborador', 'gestor', 'rh', 'admin'];
+const PAPEIS_VALIDOS = ['colaborador', 'gestor', 'rh', 'admin', 'diretoria'];
 
 function parseLinhaImportacao(linha) {
   const campos = (linha.includes('\t') ? linha.split('\t') : linha.split(',')).map((c) => c.trim());

@@ -14,7 +14,13 @@ function renderEtapaCompetencias() {
     <details><summary>Escala de notas</summary>${escalaHtml}</details>
     ${renderGrupoCompetencias('Competências comportamentais', grupos.comportamental, notasPorCompetencia, editavel)}
     ${renderGrupoCompetencias('Competências técnicas', grupos.tecnica, notasPorCompetencia, editavel)}
+    ${editavel ? '<div class="etapa-acoes"><button class="btn-primary" onclick="avancarCompetencias()">Salvar e avançar</button></div>' : ''}
   `;
+}
+
+async function avancarCompetencias() {
+  try { await salvarEtapaEAvancar(); showToast('Etapa de competências concluída.'); }
+  catch { showToast('Não foi possível avançar nesta etapa.'); }
 }
 
 function renderGrupoCompetencias(titulo, lista, notasPorCompetencia, editavel) {

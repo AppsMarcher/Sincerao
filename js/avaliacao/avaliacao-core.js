@@ -24,10 +24,13 @@ function podeEditarEtapa(av, etapaId) {
 }
 
 async function abrirAvaliacao(id) {
-  const rows = await sbFetch(
+  let rows = await sbFetch(
     '/avaliacoes?id=eq.' + id + '&select=*,colaborador:colaborador_id(id,nome,cargo_id),gestor:gestor_id(id,nome),ciclo:ciclo_id(nome)'
   );
-  const av = rows[0];
+  let av = rows[0];
+  // Na Fase 2 o banco bloqueia a linha original para o colaborador, pois ela
+  // contém o parecer e as notas do gestor. A RPC retorna só seus campos.
+  if (!av) av = await sbRpc('obter_avaliacao_para_fluxo', { p_avaliacao_id: id });
   if (!av) {
     showToast('Essa avaliação não está disponível — o ciclo pode estar fora do período de vigência.');
     return;
@@ -44,7 +47,9 @@ async function abrirAvaliacao(id) {
   av.plano = plano || [];
   av.competenciasCargo = (cargoComp || []).map((cc) => cc.competencia);
   G.avaliacaoAtual = av;
-  G.etapaAtiva = 'resultados';
+  const ciclo = av.ciclo || (await sbFetch('/ciclos_avaliacao?id=eq.' + av.ciclo_id + '&select=nome'))?.[0];
+  av.ciclo = ciclo;
+  G.etapaAtiva = ETAPAS.find((e) => e.n === av.etapa_atual)?.id || etapaInicialDisponivel(av);
   document.getElementById('avaliacao-titulo').textContent = `Avaliação de ${av.colaborador?.nome || ''} — ${av.ciclo?.nome || ''}`;
   document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
   renderBotoesTransicao();
@@ -56,9 +61,9 @@ function renderBotoesTransicao() {
   const papel = meuPapelNaAvaliacao(av);
   const el = document.getElementById('avaliacao-transicao');
   if (av.status === 'rascunho' && (papel === 'gestor' || papel === 'rh')) {
-    el.innerHTML = '<button class="btn-primary" onclick="liberarParaAutoavaliacao()">Liberar para autoavaliação</button>';
+    el.innerHTML = '<button class="btn-primary" onclick="confirmarTransicaoFase(\'fase_1\')">Enviar Fase 1 ao colaborador</button>';
   } else if (av.status === 'aguardando_autoavaliacao' && (papel === 'colaborador' || papel === 'rh')) {
-    el.innerHTML = '<button class="btn-primary" onclick="enviarParaAlinhamento()">Enviar para alinhamento</button>';
+    el.innerHTML = '<button class="btn-primary" onclick="confirmarTransicaoFase(\'fase_2\')">Devolver ao gestor</button>';
   } else {
     el.innerHTML = '';
   }
@@ -155,6 +160,7 @@ async function liberarParaAutoavaliacao() {
     document.getElementById('avaliacao-status').textContent = statusLabel(G.avaliacaoAtual.status);
     renderBotoesTransicao();
     renderEtapaAtiva();
+    dispararEmailFluxo('fase_1_enviada');
     showToast('Liberado para autoavaliação do colaborador.');
   } catch (err) {
     if (!String(err?.message || '').includes('Conflito')) showToast('Não foi possível liberar a autoavaliação.');
@@ -167,6 +173,7 @@ async function enviarParaAlinhamento() {
     document.getElementById('avaliacao-status').textContent = statusLabel(G.avaliacaoAtual.status);
     renderBotoesTransicao();
     renderEtapaAtiva();
+    dispararEmailFluxo('fase_2_devolvida');
     showToast('Enviado para alinhamento.');
   } catch (err) {
     if (!String(err?.message || '').includes('Conflito')) showToast('Não foi possível enviar para alinhamento.');
@@ -175,15 +182,50 @@ async function enviarParaAlinhamento() {
 
 function renderNavEtapas() {
   const el = document.getElementById('etapas-nav');
-  el.innerHTML = ETAPAS.map(
+  const permitidas = etapasDisponiveis(G.avaliacaoAtual);
+  if (!permitidas.includes(G.etapaAtiva)) G.etapaAtiva = permitidas[0];
+  el.innerHTML = ETAPAS.filter((e) => permitidas.includes(e.id)).map(
     (e) => `<button class="etapa-btn ${G.etapaAtiva === e.id ? 'active' : ''}" onclick="irParaEtapa('${e.id}')">${e.n}. ${escHtml(e.label)}</button>`
   ).join('');
 }
 
 function irParaEtapa(id) {
+  if (!etapasDisponiveis(G.avaliacaoAtual).includes(id)) return;
   G.etapaAtiva = id;
   renderEtapaAtiva();
 }
+
+function etapasDisponiveis(av) {
+  if (av.status === 'concluida') return ETAPAS.map((e) => e.id);
+  if (av.status === 'rascunho') return ['resultados', 'competencias', 'feedback_gestor'];
+  if (av.status === 'aguardando_autoavaliacao') return meuPapelNaAvaliacao(av) === 'colaborador' ? ['autoavaliacao', 'feedback_colaborador'] : [];
+  return ['plano_desenvolvimento', 'resumo', 'parecer_final'];
+}
+function etapaInicialDisponivel(av) { return etapasDisponiveis(av)[0] || 'resultados'; }
+function proximaEtapaAtual() {
+  const etapas = etapasDisponiveis(G.avaliacaoAtual); const i = etapas.indexOf(G.etapaAtiva);
+  return etapas[i + 1] || null;
+}
+async function salvarEtapaEAvancar(patch = {}) {
+  await atualizarAvaliacao({ ...patch, etapa_atual: ETAPAS.find((e) => e.id === (proximaEtapaAtual() || G.etapaAtiva)).n });
+  const proxima = proximaEtapaAtual();
+  if (proxima) { G.etapaAtiva = proxima; renderEtapaAtiva(); return; }
+  confirmarTransicaoFase(G.avaliacaoAtual.status === 'rascunho' ? 'fase_1' : 'fase_2');
+}
+function confirmarTransicaoFase(tipo) {
+  const dados = tipo === 'fase_1'
+    ? ['Enviar avaliação ao colaborador?', 'Após o envio, as etapas da Fase 1 ficarão bloqueadas para edição.', liberarParaAutoavaliacao]
+    : tipo === 'fase_2'
+      ? ['Devolver avaliação ao gestor?', 'Após o envio, as respostas da Fase 2 ficarão bloqueadas para edição.', enviarParaAlinhamento]
+      : ['Concluir avaliação?', 'Os dois pareceres foram salvos e a avaliação ficará bloqueada.', concluirAvaliacaoAgora];
+  const modal = document.getElementById('modal-confirmar-fluxo');
+  document.getElementById('confirmar-fluxo-titulo').textContent = dados[0];
+  document.getElementById('confirmar-fluxo-texto').textContent = dados[1];
+  modal._acaoConfirmada = dados[2]; modal.classList.add('open');
+}
+function fecharModalConfirmarFluxo() { document.getElementById('modal-confirmar-fluxo').classList.remove('open'); }
+async function executarConfirmacaoFluxo() { const modal = document.getElementById('modal-confirmar-fluxo'); fecharModalConfirmarFluxo(); await modal._acaoConfirmada?.(); }
+async function dispararEmailFluxo(evento) { try { await sbInvokeFunction('notificar-fluxo', { avaliacao_id: G.avaliacaoAtual.id, evento }); } catch { showToast('Notificação criada; não foi possível enviar o e-mail.'); } }
 
 // Cada módulo de etapa (etapa-texto, etapa-competencias, etapa-plano, etapa-parecer)
 // expõe uma função render* própria; este dispatcher só decide qual chamar.

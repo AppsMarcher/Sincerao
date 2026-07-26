@@ -13,11 +13,22 @@ document.addEventListener('click', (e) => {
 
 async function abrirDashboard() {
   goTo('screen-dashboard');
+  await carregarNotificacoes();
   const rows = (await sbFetch(
-    '/avaliacoes?select=*,colaborador:colaborador_id(nome),gestor:gestor_id(nome),ciclo:ciclo_id(nome)&order=created_at.desc'
+    '/avaliacoes_resumo?order=created_at.desc'
   )) || [];
   G.avaliacoes = rows;
   renderDashboard();
+}
+
+async function carregarNotificacoes() {
+  const el = document.getElementById('dash-notificacoes');
+  try {
+    const notificacoes = await sbFetch('/notificacoes?order=created_at.desc&limit=10');
+    el.innerHTML = notificacoes?.length ? notificacoes.map((n) => `<div class="notificacao-item"><div><strong>${escHtml(n.titulo)}</strong><div class="muted">${escHtml(n.mensagem)}</div><small>${new Date(n.created_at).toLocaleString('pt-BR')}</small></div>${n.lida_em ? '' : '<span class="badge badge-atencao">Nova</span>'}</div>`).join('') : '<p class="empty">Nenhuma notificação por enquanto.</p>';
+    const naoLidas = (notificacoes || []).filter((n) => !n.lida_em);
+    if (naoLidas.length) sbFetch('/notificacoes?id=in.(' + naoLidas.map((n) => n.id).join(',') + ')', { method: 'PATCH', body: JSON.stringify({ lida_em: new Date().toISOString() }) }).catch(() => {});
+  } catch { el.innerHTML = '<p class="empty">As notificações estarão disponíveis após aplicar a atualização do banco.</p>'; }
 }
 
 function renderDashboard() {

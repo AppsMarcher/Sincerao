@@ -30,6 +30,7 @@ function ehGestor() {
 function ehRhOuAdmin() {
   return !!G.perfil && ['rh', 'admin'].includes(G.perfil.papel);
 }
+function podeVerGestao() { return !!G.perfil && ['rh', 'admin', 'diretoria'].includes(G.perfil.papel); }
 
 async function iniciarApp() {
   const perfil = await carregarPerfilLogado();
@@ -60,6 +61,7 @@ async function solicitarRecuperacaoSenha() {
 async function entrarNoApp(perfil) {
   document.getElementById('nav-nome-usuario').textContent = perfil.nome;
   document.getElementById('nav-admin').style.display = ehRhOuAdmin() ? '' : 'none';
+  document.getElementById('nav-gestao').style.display = podeVerGestao() ? '' : 'none';
   await abrirDashboard();
 }
 

@@ -17,7 +17,7 @@ function renderEtapaParecer() {
     <label class="campo"><span>Parecer do Colaborador</span><textarea id="parecer-colaborador" ${podeColaborador ? '' : 'disabled'}>${escHtml(rascunhoColaborador?.valores?.valor ?? dados.parecer_colaborador ?? '')}</textarea></label>
     ${podeColaborador ? '<button class="btn-link" onclick="salvarParecer(\'parecer_colaborador\')">Salvar parecer do colaborador</button>' : ''}
     ${concluida ? renderResultadoFinal(av) : ''}
-    ${(papel === 'gestor' || papel === 'rh') && av.status === 'aguardando_alinhamento' ? '<button class="btn-primary" onclick="concluirAvaliacao()">Concluir avaliação</button>' : ''}
+    ${av.status === 'aguardando_alinhamento' ? '<p class="muted">A avaliação será concluída quando os dois pareceres forem salvos.</p>' : ''}
     ${concluida ? renderCiencia(av, papel) : ''}
   `;
   if (podeGestor) {
@@ -63,6 +63,8 @@ async function salvarParecer(campo) {
     await atualizarAvaliacao({ dados: novosDados });
     limparRascunhoEtapa(av.id, campo);
     showToast('Parecer salvo no banco.');
+    const parecer = G.avaliacaoAtual.dados.parecer || {};
+    if (String(parecer.parecer_gestor || '').trim() && String(parecer.parecer_colaborador || '').trim()) confirmarTransicaoFase('concluir');
   } catch (err) {
     if (!String(err?.message || '').includes('Conflito')) {
       showToast('Não foi possível salvar. O parecer continua guardado neste navegador.');
@@ -70,7 +72,7 @@ async function salvarParecer(campo) {
   }
 }
 
-async function concluirAvaliacao() {
+async function concluirAvaliacaoAgora() {
   const av = G.avaliacaoAtual;
   const notas = (av.notas || []).map((n) => n.nota).filter((n) => n != null);
   const { pontuacaoGeral, percentual, classificacao } = calcularPontuacao(notas);
@@ -90,6 +92,7 @@ async function concluirAvaliacao() {
     document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
     renderBotoesTransicao();
     renderEtapaAtiva();
+    dispararEmailFluxo('avaliacao_concluida');
   } catch (err) {
     if (!String(err?.message || '').includes('Conflito')) showToast('Não foi possível concluir a avaliação.');
   }

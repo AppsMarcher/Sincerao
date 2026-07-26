@@ -14,6 +14,13 @@
 }
 .card-avaliacao:last-child { border-bottom: none; }
 .card-avaliacao:hover { background: var(--panel-alt); padding-left: 12px; padding-right: 12px; }
+.notificacao-item { display:flex; justify-content:space-between; gap:var(--space-3); padding:12px 0; border-bottom:1px solid var(--line); }
+.notificacao-item:last-child { border-bottom:none; }
+.notificacao-item small { display:block; margin-top:4px; color:var(--text-faint); }
+.gestao-kpis { display:grid; grid-template-columns:repeat(4,minmax(130px,1fr)); gap:var(--space-3); margin-bottom:var(--space-4); }
+.gestao-kpis article { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:var(--space-4); }
+.gestao-kpis span { display:block; color:var(--text-soft); font-size:13px; }
+.gestao-kpis strong { font-size:26px; color:var(--primary); }
 
 .card-avaliacao-badges { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
 .badge-atencao { background: rgba(217, 119, 6, 0.12); color: var(--amber); }

@@ -57,3 +57,7 @@ async function sbInvokeFunction(name, payload = {}) {
   if (!r.ok) throw new Error(data?.error || 'Erro ao chamar ' + name);
   return data;
 }
+
+async function sbRpc(name, payload = {}) {
+  return sbFetch('/rpc/' + name, { method: 'POST', body: JSON.stringify(payload) });
+}

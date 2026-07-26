@@ -1,4 +1,6 @@
-supabase/functions/
+supabase/functions/*
+!supabase/functions/notificar-fluxo/
+!supabase/functions/notificar-fluxo/index.ts
 Sincerão_Logo.png
 Sincerão_LogoB.png
 *.docx

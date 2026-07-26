@@ -25,8 +25,13 @@ function renderEtapaPlano() {
       </tbody>
     </table>
     </div>
-    ${editavel ? '<button class="btn-link" onclick="adicionarLinhaPlano()">+ Adicionar linha</button>' : ''}
+    ${editavel ? '<div class="etapa-acoes"><button class="btn-link" onclick="adicionarLinhaPlano()">+ Adicionar linha</button><button class="btn-primary" onclick="avancarPlano()">Salvar e avançar</button></div>' : ''}
   `;
+}
+
+async function avancarPlano() {
+  try { await salvarEtapaEAvancar(); showToast('Plano salvo.'); }
+  catch { showToast('Não foi possível avançar no plano.'); }
 }
 
 function linhaPlanoHtml(l, editavel) {

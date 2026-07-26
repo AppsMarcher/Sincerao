@@ -53,7 +53,7 @@ function renderEtapaTexto(etapaId) {
       `
         )
         .join('')}
-      ${editavel ? '<button type="submit" class="btn-primary">Salvar etapa</button>' : '<p class="muted">Etapa somente leitura no momento.</p>'}
+      ${editavel ? '<div class="etapa-acoes"><button type="submit" class="btn-link">Salvar sem avançar</button><button type="button" class="btn-primary" id="btn-salvar-avancar">Salvar e avançar</button></div>' : '<p class="muted">Etapa somente leitura no momento.</p>'}
     </form>
   `;
   if (editavel) {
@@ -74,6 +74,11 @@ function renderEtapaTexto(etapaId) {
           showToast('Não foi possível salvar. O rascunho continua guardado neste navegador.');
         }
       }
+    });
+    document.getElementById('btn-salvar-avancar').addEventListener('click', async () => {
+      const novosDados = { ...av.dados, [etapaId]: Object.fromEntries(new FormData(form).entries()) };
+      try { await salvarEtapaEAvancar({ dados: novosDados }); limparRascunhoEtapa(av.id, etapaId); showToast('Etapa salva.'); }
+      catch (err) { if (!String(err?.message || '').includes('Conflito')) showToast('Não foi possível salvar esta etapa.'); }
     });
   }
 }
