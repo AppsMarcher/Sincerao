@@ -62,9 +62,51 @@ async function abrirAvaliacao(id) {
   G.etapaAtiva = ETAPAS.find((e) => e.n === av.etapa_atual)?.id || etapaInicialDisponivel(av);
   document.getElementById('avaliacao-titulo').textContent = `Avaliação de ${av.colaborador?.nome || ''} — ${av.ciclo?.nome || ''}`;
   document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
+  const exportar = document.getElementById('avaliacao-exportar');
+  exportar.style.display = av.status === 'concluida' && ['gestor', 'rh'].includes(meuPapelNaAvaliacao(av)) ? '' : 'none';
+  exportar.classList.remove('open');
   renderBotoesTransicao();
   renderEtapaAtiva();
 }
+
+function fecharExportarAvaliacao() {
+  const exportar = document.getElementById('avaliacao-exportar');
+  exportar?.classList.remove('open');
+  exportar?.querySelector('.avaliacao-exportar-toggle')?.setAttribute('aria-expanded', 'false');
+}
+
+function toggleExportarAvaliacao(evento) {
+  evento.stopPropagation();
+  const exportar = document.getElementById('avaliacao-exportar');
+  const aberto = !exportar.classList.contains('open');
+  exportar.classList.toggle('open', aberto);
+  exportar.querySelector('.avaliacao-exportar-toggle')?.setAttribute('aria-expanded', String(aberto));
+}
+
+function imprimirAvaliacao() {
+  fecharExportarAvaliacao();
+  window.print();
+}
+
+async function enviarAvaliacaoPorEmail() {
+  const av = G.avaliacaoAtual;
+  fecharExportarAvaliacao();
+  if (!av || av.status !== 'concluida' || !['gestor', 'rh'].includes(meuPapelNaAvaliacao(av))) {
+    showToast('Apenas avaliações concluídas podem ser enviadas.');
+    return;
+  }
+  if (!confirm(`Enviar a avaliação concluída para ${av.colaborador?.nome || 'o colaborador'} e ${av.gestor?.nome || 'o gestor'}? Eles receberão o PDF por e-mail.`)) return;
+  try {
+    await sbInvokeFunction('enviar-avaliacao', { avaliacao_id: av.id });
+    showToast('Avaliação enviada por e-mail aos envolvidos.');
+  } catch (e) {
+    showToast(mensagemErroAvaliacao(e, 'Não foi possível enviar a avaliação por e-mail.'));
+  }
+}
+
+document.addEventListener('click', (evento) => {
+  if (!evento.target.closest('.avaliacao-exportar')) fecharExportarAvaliacao();
+});
 
 function renderBotoesTransicao() {
   const el = document.getElementById('avaliacao-transicao');

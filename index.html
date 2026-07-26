@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="css/login.css?v=17">
 <link rel="stylesheet" href="css/dashboard.css?v=11">
 <link rel="stylesheet" href="css/perfil.css?v=10">
-<link rel="stylesheet" href="css/avaliacao.css?v=11">
+<link rel="stylesheet" href="css/avaliacao.css?v=12">
 <link rel="stylesheet" href="css/admin.css?v=16">
 <link rel="stylesheet" href="css/responsive.css?v=14">
 </head>
@@ -221,6 +221,16 @@
         <span class="badge" id="avaliacao-status"></span>
       </div>
       <div id="avaliacao-transicao"></div>
+      <div class="avaliacao-exportar" id="avaliacao-exportar" style="display:none">
+        <button type="button" class="btn-link avaliacao-exportar-toggle" onclick="toggleExportarAvaliacao(event)" aria-haspopup="true" aria-expanded="false">
+          <svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Exportar
+        </button>
+        <div class="avaliacao-exportar-menu" role="menu">
+          <button type="button" onclick="imprimirAvaliacao()" role="menuitem"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Imprimir</button>
+          <button type="button" onclick="enviarAvaliacaoPorEmail()" role="menuitem"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg> Enviar por e-mail</button>
+        </div>
+      </div>
       <div class="topbar-actions topbar-actions-interna">
         <span class="nav-nome-usuario"></span>
         <button class="btn-link nav-hamburguer" onclick="toggleNavMenu(this)" aria-label="Abrir menu"><svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
@@ -482,7 +492,7 @@
 <script src="js/gestao/gestao-module.js?v=1"></script>
 <script src="js/perfil/perfil-module.js?v=11"></script>
 
-  <script src="js/avaliacao/avaliacao-core.js?v=14"></script>
+  <script src="js/avaliacao/avaliacao-core.js?v=15"></script>
   <script src="js/avaliacao/etapa-texto.js?v=13"></script>
 <script src="js/avaliacao/etapa-competencias.js?v=13"></script>
 <script src="js/avaliacao/etapa-plano.js?v=15"></script>
