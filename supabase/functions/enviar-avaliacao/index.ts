@@ -38,34 +38,22 @@ const LOGO_URL = 'https://sincerao.marcher.com.br/assets/logo-b.png';
 
 // Espelha CAMPOS_ETAPA de js/core/constants.js — duplicado de propósito, igual o
 // restante desta function, porque o deploy é manual e colado direto no painel.
+// id 'resumo' mantido de propósito (era "Resumo da Avaliação") -- só o label
+// mudou pra "Plano de Desenvolvimento" em js/core/constants.js.
 const CAMPOS_ETAPA: Record<string, [string, string][]> = {
   resultados: [
     ['entregas', 'Quais foram as principais entregas realizadas pelo colaborador?'],
-    ['impacto', 'Quais resultados geraram impacto para a equipe ou empresa?'],
-    ['metas_atingidas', 'Quais metas foram alcançadas?'],
-    ['metas_nao_atingidas', 'Houve alguma meta que não foi atingida? Se sim, por quê?'],
     ['desafios', 'Quais desafios foram enfrentados?'],
     ['melhorias', 'Quais melhorias ou iniciativas partiram deste colaborador?'],
   ],
   feedback_gestor: [
     ['reconhecer', 'Quais comportamentos devem ser reconhecidos? Cite exemplos.'],
     ['desenvolver', 'Quais comportamentos precisam ser desenvolvidos? Cite exemplos.'],
-    ['evoluiu', 'O colaborador evoluiu em relação ao último ciclo?'],
-    ['expectativas', 'Quais expectativas existem para o próximo período?'],
   ],
   autoavaliacao: [
-    ['como_avalia', 'Como você avalia seu desempenho?'],
     ['orgulho', 'Do que você mais se orgulha?'],
     ['dificuldades', 'Quais dificuldades enfrentou?'],
-    ['faria_diferente', 'O que faria diferente?'],
     ['competencias_desenvolver', 'Quais competências gostaria de desenvolver?'],
-    ['apoio_empresa', 'Que apoio espera da empresa?'],
-    ['apoio_gestor', 'Que apoio espera do gestor?'],
-  ],
-  feedback_colaborador: [
-    ['suporte_gestor', 'O gestor forneceu o suporte necessário durante o período?'],
-    ['gestor_faria_diferente', 'O que poderia fazer de forma diferente para apoiar seu desenvolvimento?'],
-    ['sobre_lideranca', 'Há algo que gostaria de compartilhar sobre a liderança?'],
   ],
   resumo: [
     ['fortalezas', 'Principais fortalezas'],
@@ -142,7 +130,7 @@ const ESTILO = `
   .rodape-pagina{margin-top:24px;padding-top:10px;border-top:1px solid #ede8ee;font-size:8.5px;color:#a49da8;text-align:center}
 `;
 
-function relatorioHtml(av: any, notas: any[], plano: any[]) {
+function relatorioHtml(av: any, notas: any[]) {
   const dados = av.dados || {};
   const perguntas = (grupo: string) => {
     const respostas = dados[grupo] || {};
@@ -153,13 +141,10 @@ function relatorioHtml(av: any, notas: any[], plano: any[]) {
     return itens || '<p class="vazio">Não há respostas registradas nesta etapa.</p>';
   };
   const meta = `<div class="meta"><span>Colaborador <strong>${esc(av.colaborador?.nome)}</strong></span><span>Gestor <strong>${esc(av.gestor?.nome)}</strong></span><span>Ciclo <strong>${esc(av.ciclo?.nome || '—')}</strong></span></div>`;
-  const pagina = (numero: number, titulo: string, conteudo: string) => `<article class="pagina"><header class="banda"><div class="banda-topo"><img src="${LOGO_URL}" alt="Sincerão"><span class="etapa-pill">Etapa ${numero} de 8</span></div><h1>${esc(titulo)}</h1>${meta}</header>${conteudo}<div class="rodape-pagina">Sincerão · Avaliação de Desempenho · Documento confidencial</div></article>`;
+  const pagina = (numero: number, titulo: string, conteudo: string) => `<article class="pagina"><header class="banda"><div class="banda-topo"><img src="${LOGO_URL}" alt="Sincerão"><span class="etapa-pill">Etapa ${numero} de 6</span></div><h1>${esc(titulo)}</h1>${meta}</header>${conteudo}<div class="rodape-pagina">Sincerão · Avaliação de Desempenho · Documento confidencial</div></article>`;
   const notasHtml = notas.length
     ? `<table><thead><tr><th>Competência</th><th>Nota</th><th>Comentários</th></tr></thead><tbody>${notas.map((nota) => `<tr><td>${esc(nota.competencia?.nome || '—')}</td><td><span class="nota-badge" style="background:${corNota(nota.nota)}">${esc(nota.nota ?? '—')}</span></td><td>${esc(nota.comentario || '—')}</td></tr>`).join('')}</tbody></table>`
     : '<p class="vazio">Não há competências avaliadas.</p>';
-  const planoHtml = plano.length
-    ? `<table><thead><tr><th>Competência</th><th>Ação</th><th>Prazo</th><th>Responsável</th><th>Indicador de sucesso</th><th>Acompanhamento</th></tr></thead><tbody>${plano.map((linha) => `<tr><td>${esc(linha.competencia)}</td><td>${esc(linha.acao)}</td><td>${esc(linha.prazo)}</td><td>${esc(linha.responsavel)}</td><td>${esc(linha.indicador_sucesso)}</td><td>${esc(linha.acompanhamento)}</td></tr>`).join('')}</tbody></table>`
-    : '<p class="vazio">Não há plano de desenvolvimento registrado.</p>';
   const parecer = dados.parecer?.parecer_consenso || [dados.parecer?.parecer_gestor, dados.parecer?.parecer_colaborador].filter(Boolean).join('\n\n');
   const dataHora = (data: string | null | undefined) => data ? new Date(data).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : 'Pendente';
   const cienciaHtml = `<h2>Ciência</h2><table><thead><tr><th>Participante</th><th>E-mail</th><th>Data e hora</th></tr></thead><tbody>${[
@@ -176,10 +161,8 @@ function relatorioHtml(av: any, notas: any[], plano: any[]) {
     pagina(2, 'Avaliação das competências', notasHtml),
     pagina(3, 'Feedback do gestor', perguntas('feedback_gestor')),
     pagina(4, 'Autoavaliação', perguntas('autoavaliacao')),
-    pagina(5, 'Feedback do colaborador ao gestor', perguntas('feedback_colaborador')),
-    pagina(6, 'Plano de desenvolvimento', planoHtml),
-    pagina(7, 'Resumo da avaliação', perguntas('resumo')),
-    pagina(8, 'Parecer final', `<div class="pergunta"><h3>Parecer do gestor e colaborador</h3><p>${esc(parecer || 'Não informado.').replace(/\n/g, '<br>')}</p></div><h2>Resultado final</h2><div class="stats-final"><div class="stat"><div class="label">Pontuação geral</div><div class="value">${esc(av.pontuacao_geral ?? '—')}/5</div></div><div class="stat"><div class="label">Percentual</div><div class="value">${esc(av.percentual ?? '—')}%</div></div><div class="stat"><div class="label">Classificação</div><div class="value" style="color:${corClassificacao(av.classificacao)}">${esc(av.classificacao || '—')}</div></div></div>${cienciaHtml}`),
+    pagina(5, 'Plano de desenvolvimento', perguntas('resumo')),
+    pagina(6, 'Parecer final', `<div class="pergunta"><h3>Parecer do gestor e colaborador</h3><p>${esc(parecer || 'Não informado.').replace(/\n/g, '<br>')}</p></div><h2>Resultado final</h2><div class="stats-final"><div class="stat"><div class="label">Pontuação geral</div><div class="value">${esc(av.pontuacao_geral ?? '—')}/5</div></div><div class="stat"><div class="label">Percentual</div><div class="value">${esc(av.percentual ?? '—')}%</div></div><div class="stat"><div class="label">Classificação</div><div class="value" style="color:${corClassificacao(av.classificacao)}">${esc(av.classificacao || '—')}</div></div></div>${cienciaHtml}`),
   ];
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -211,17 +194,14 @@ Deno.serve(async (req) => {
     const autorizado = user.id === av.gestor_id || user.id === av.colaborador_id || ['rh', 'admin'].includes(perfil?.papel);
     if (!autorizado) return json({ error: 'Você não tem permissão para enviar esta avaliação.' }, 403);
 
-    const [notasResult, planoResult] = await Promise.all([
-      admin.from('avaliacao_notas').select('nota,comentario,competencia:competencia_id(nome)').eq('avaliacao_id', av.id),
-      admin.from('avaliacao_plano_desenvolvimento').select('competencia,acao,prazo,responsavel,indicador_sucesso,acompanhamento').eq('avaliacao_id', av.id).order('ordem'),
-    ]);
+    const notasResult = await admin.from('avaliacao_notas').select('nota,comentario,competencia:competencia_id(nome)').eq('avaliacao_id', av.id);
     const token = Deno.env.get('BROWSERLESS_API_TOKEN');
     if (!token) return json({ error: 'Geração de PDF não configurada (BROWSERLESS_API_TOKEN ausente).' }, 500);
     const pdf = await fetch(`https://production-sfo.browserless.io/pdf?token=${token}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        html: relatorioHtml(av, notasResult.data || [], planoResult.data || []),
+        html: relatorioHtml(av, notasResult.data || []),
         options: {
           printBackground: true,
           format: 'A4',

@@ -1,0 +1,11 @@
+-- Restruturação do questionário (pedido explícito, app ainda em testes --
+-- dados atuais podem ser descartados): etapa "Feedback do Colaborador ao
+-- Gestor" e a etapa "Plano de Desenvolvimento" (a tabela de ações/prazo)
+-- saem do fluxo. A etapa "Resumo da Avaliação" é renomeada pra "Plano de
+-- Desenvolvimento" no app (js/core/constants.js), mas continua sendo a mesma
+-- etapa de texto livre (dados.resumo) -- nenhuma mudança de schema pra ela.
+--
+-- dados.feedback_colaborador (dentro do jsonb avaliacoes.dados) não tem
+-- coluna própria pra dropar -- fica órfão e inerte dentro do jsonb, sem
+-- nenhuma tela/relatório lendo essa chave daqui pra frente.
+drop table if exists avaliacao_plano_desenvolvimento cascade;

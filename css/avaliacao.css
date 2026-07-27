@@ -1,4 +1,4 @@
-/* avaliacao.css — wizard das 8 etapas, competências, plano de desenvolvimento, parecer/ciência */
+/* avaliacao.css — wizard das 6 etapas, competências, parecer/ciência */
 
 #screen-avaliacao {
   background: linear-gradient(135deg, #edf4ff 0%, #f4effc 52%, #eee7fa 100%);
@@ -112,32 +112,6 @@
 .competencia-row .btn-link.btn-link--salvo { color: var(--green); }
 
 .tabela-scroll { overflow-x: auto; }
-.tabela-plano { width: 100%; border-collapse: collapse; min-width: 720px; }
-.tabela-plano th, .tabela-plano td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
-.tabela-plano input { min-width: 100px; }
-
-.plano-competencias { margin: 0 0 14px; }
-.plano-competencias-toggle { min-height: 36px; }
-.plano-competencias-lista {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-  padding: 12px;
-  background: var(--panel-alt);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-.plano-competencia-item {
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  color: var(--text-soft);
-  font-size: 13px;
-}
-.plano-competencias-vazia { margin: 10px 0 0; }
-.plano-acoes { margin-top: var(--space-4); }
 
 .resultado-final {
   display: flex;

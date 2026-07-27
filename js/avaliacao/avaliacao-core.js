@@ -21,10 +21,10 @@ function podeEditarEtapa(av, etapaId) {
   if (['resultados', 'competencias', 'feedback_gestor'].includes(etapaId)) {
     return (papel === 'gestor' || papel === 'rh') && status === 'rascunho';
   }
-  if (['autoavaliacao', 'feedback_colaborador'].includes(etapaId)) {
+  if (etapaId === 'autoavaliacao') {
     return papel === 'colaborador' && status === 'aguardando_autoavaliacao';
   }
-  if (etapaId === 'plano_desenvolvimento' || etapaId === 'resumo') {
+  if (etapaId === 'resumo') {
     return (papel === 'gestor' || papel === 'rh') && status === 'aguardando_alinhamento';
   }
   return false;
@@ -47,15 +47,13 @@ async function abrirAvaliacao(id) {
     return;
   }
   goTo('screen-avaliacao');
-  const [notas, plano, cargoComp] = await Promise.all([
+  const [notas, cargoComp] = await Promise.all([
     sbFetch('/avaliacao_notas?avaliacao_id=eq.' + id),
-    sbFetch('/avaliacao_plano_desenvolvimento?avaliacao_id=eq.' + id + '&order=ordem.asc'),
     av.colaborador?.cargo_id
       ? sbFetch('/cargo_competencias?cargo_id=eq.' + av.colaborador.cargo_id + '&select=competencia:competencia_id(id,nome,tipo,definicao)')
       : Promise.resolve([]),
   ]);
   av.notas = notas || [];
-  av.plano = plano || [];
   av.competenciasCargo = (cargoComp || []).map((cc) => cc.competencia);
   G.avaliacaoAtual = av;
   document.getElementById('screen-avaliacao').classList.toggle(
@@ -68,15 +66,15 @@ async function abrirAvaliacao(id) {
   av.ciclo = ciclo;
   // Cada fase em digitação (rascunho/gestor, aguardando_autoavaliacao/colaborador,
   // aguardando_alinhamento/consenso) abre na primeira etapa DELA, não na última.
-  // aguardando_alinhamento fixa em 'plano_desenvolvimento' mesmo quando reaberta
-  // mostra as 8 etapas pra contexto (etapasDisponiveis()[0] viraria 'resultados',
-  // que é só leitura nesse caso -- a primeira etapa realmente editável da fase 3
-  // continua sendo plano_desenvolvimento). Fora essas fases (ex: concluida, só
-  // consulta), mantém o comportamento de abrir na última etapa disponível.
+  // aguardando_alinhamento fixa em 'resumo' (label "Plano de Desenvolvimento")
+  // mesmo quando reaberta mostra as 6 etapas pra contexto (etapasDisponiveis()[0]
+  // viraria 'resultados', que é só leitura nesse caso -- a primeira etapa
+  // realmente editável da fase 3 continua sendo essa). Fora essas fases (ex:
+  // concluida, só consulta), mantém o comportamento de abrir na última etapa disponível.
   const ETAPA_INICIAL_POR_FASE = {
     rascunho: 'resultados',
     aguardando_autoavaliacao: 'autoavaliacao',
-    aguardando_alinhamento: 'plano_desenvolvimento',
+    aguardando_alinhamento: 'resumo',
   };
   // Só arquivada (concluida + as duas ciências) abre na capa -- concluida sem
   // ciência de alguém ainda cai direto no Parecer Final, onde a ciência é
@@ -187,9 +185,6 @@ function imprimirAvaliacao() {
   const notas = (av.notas || []).length
     ? `<table><thead><tr><th>Competência</th><th>Nota</th><th>Comentários</th></tr></thead><tbody>${av.notas.map((nota) => `<tr><td>${escHtml(nomeCompetencia(nota))}</td><td><span class="nota-badge" style="background:${relatorioCorNota(nota.nota)}">${escHtml(nota.nota ?? '—')}</span></td><td>${escHtml(nota.comentario || '—')}</td></tr>`).join('')}</tbody></table>`
     : '<p class="vazio">Não há competências avaliadas.</p>';
-  const plano = (av.plano || []).length
-    ? `<table><thead><tr><th>Competência</th><th>Ação</th><th>Prazo</th><th>Responsável</th><th>Indicador de sucesso</th><th>Acompanhamento</th></tr></thead><tbody>${av.plano.map((linha) => `<tr><td>${escHtml(linha.competencia || '—')}</td><td>${escHtml(linha.acao || '—')}</td><td>${escHtml(linha.prazo || '—')}</td><td>${escHtml(linha.responsavel || '—')}</td><td>${escHtml(linha.indicador_sucesso || '—')}</td><td>${escHtml(linha.acompanhamento || '—')}</td></tr>`).join('')}</tbody></table>`
-    : '<p class="vazio">Não há plano de desenvolvimento registrado.</p>';
   const parecer = dados.parecer?.parecer_consenso || [dados.parecer?.parecer_gestor, dados.parecer?.parecer_colaborador].filter(Boolean).join('\n\n') || 'Não informado.';
   const dataHora = (data) => data ? new Date(data).toLocaleString('pt-BR') : 'Pendente';
   const ciencia = `<h2>Ciência</h2><table><thead><tr><th>Participante</th><th>E-mail</th><th>Data e hora</th></tr></thead><tbody>${[
@@ -197,16 +192,14 @@ function imprimirAvaliacao() {
     ['Gestor', av.gestor?.nome, av.gestor?.email, av.ciencia_gestor_em],
   ].map(([papel, nome, email, data]) => `<tr><td><strong>${escHtml(papel)}</strong><br>${escHtml(nome || 'Não identificado')}</td><td>${escHtml(email || '—')}</td><td>${escHtml(dataHora(data))}</td></tr>`).join('')}</tbody></table>`;
   const meta = `<div class="meta"><span>Colaborador <strong>${escHtml(av.colaborador?.nome || '—')}</strong></span><span>Gestor <strong>${escHtml(av.gestor?.nome || '—')}</strong></span><span>Ciclo <strong>${escHtml(av.ciclo?.nome || '—')}</strong></span></div>`;
-  const pagina = (numero, titulo, conteudo) => `<article class="pagina"><header class="banda"><div class="banda-topo"><img src="${RELATORIO_LOGO_URL}" alt="Sincerão"><span class="etapa-pill">Etapa ${numero} de 8</span></div><h1>${escHtml(titulo)}</h1>${meta}</header>${conteudo}<div class="rodape-pagina">Sincerão · Avaliação de Desempenho · Documento confidencial</div></article>`;
+  const pagina = (numero, titulo, conteudo) => `<article class="pagina"><header class="banda"><div class="banda-topo"><img src="${RELATORIO_LOGO_URL}" alt="Sincerão"><span class="etapa-pill">Etapa ${numero} de 6</span></div><h1>${escHtml(titulo)}</h1>${meta}</header>${conteudo}<div class="rodape-pagina">Sincerão · Avaliação de Desempenho · Documento confidencial</div></article>`;
   const paginas = [
     pagina(1, 'Resultados do período', texto('resultados')),
     pagina(2, 'Avaliação das competências', notas),
     pagina(3, 'Feedback do gestor', texto('feedback_gestor')),
     pagina(4, 'Autoavaliação', texto('autoavaliacao')),
-    pagina(5, 'Feedback do colaborador ao gestor', texto('feedback_colaborador')),
-    pagina(6, 'Plano de desenvolvimento', plano),
-    pagina(7, 'Resumo da avaliação', texto('resumo')),
-    pagina(8, 'Parecer final', `<div class="pergunta"><h3>Parecer do gestor e colaborador</h3><p>${escHtml(parecer).replace(/\n/g, '<br>')}</p></div><h2>Resultado final</h2><div class="stats-final"><div class="stat"><div class="label">Pontuação geral</div><div class="value">${escHtml(av.pontuacao_geral ?? '—')}/5</div></div><div class="stat"><div class="label">Percentual</div><div class="value">${escHtml(av.percentual ?? '—')}%</div></div><div class="stat"><div class="label">Classificação</div><div class="value" style="color:${relatorioCorClassificacao(av.classificacao)}">${escHtml(av.classificacao || '—')}</div></div></div>${ciencia}`),
+    pagina(5, 'Plano de desenvolvimento', texto('resumo')),
+    pagina(6, 'Parecer final', `<div class="pergunta"><h3>Parecer do gestor e colaborador</h3><p>${escHtml(parecer).replace(/\n/g, '<br>')}</p></div><h2>Resultado final</h2><div class="stats-final"><div class="stat"><div class="label">Pontuação geral</div><div class="value">${escHtml(av.pontuacao_geral ?? '—')}/5</div></div><div class="stat"><div class="label">Percentual</div><div class="value">${escHtml(av.percentual ?? '—')}%</div></div><div class="stat"><div class="label">Classificação</div><div class="value" style="color:${relatorioCorClassificacao(av.classificacao)}">${escHtml(av.classificacao || '—')}</div></div></div>${ciencia}`),
   ];
   const geradoEm = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   const capa = `<article class="pagina"><div class="capa"><div class="capa-topo"><img src="${RELATORIO_LOGO_URL}" alt="Sincerão"><span>Gerado em ${escHtml(geradoEm)}</span></div><div class="capa-meio"><div class="capa-eyebrow">Relatório de Avaliação de Desempenho</div><h1>${escHtml(av.colaborador?.nome || '—')}</h1><div class="capa-sub">Gestor: ${escHtml(av.gestor?.nome || '—')} &nbsp;·&nbsp; Ciclo: ${escHtml(av.ciclo?.nome || '—')}</div></div><div class="capa-stats"><div class="stat"><div class="label">Pontuação geral</div><div class="value">${escHtml(av.pontuacao_geral ?? '—')}/5</div></div><div class="stat"><div class="label">Percentual</div><div class="value">${escHtml(av.percentual ?? '—')}%</div></div><div class="stat"><div class="label">Classificação</div><div class="value">${escHtml(av.classificacao || '—')}</div></div></div></div></article>`;
@@ -490,7 +483,7 @@ function renderCapaAvaliacao() {
   document.getElementById('etapa-conteudo').innerHTML = `
     <section class="card capa-avaliacao">
       <h3>Avaliação concluída</h3>
-      <p class="muted">Colaborador e gestor já deram ciência do consenso. Os 8 passos continuam disponíveis pra consulta.</p>
+      <p class="muted">Colaborador e gestor já deram ciência do consenso. Os 6 passos continuam disponíveis pra consulta.</p>
       <dl class="dados-lista">
         <dt>Ciclo</dt><dd>${escHtml(av.ciclo?.nome || '—')}</dd>
         <dt>Colaborador</dt><dd>${escHtml(av.colaborador?.nome || '—')}</dd>
@@ -519,10 +512,6 @@ function etapaEstaGravada(av, etapaId) {
       return !!nota?.nota && respostaValida(nota.comentario);
     });
   }
-  if (etapaId === 'plano_desenvolvimento') {
-    const linhas = (av.plano || []).filter(linhaPlanoPreenchida);
-    return !linhas.length || linhas.every(linhaPlanoCompleta);
-  }
   const campos = CAMPOS_ETAPA[etapaId];
   if (!campos) return true;
   return campos.every(([campo]) => respostaValida(av.dados?.[etapaId]?.[campo]));
@@ -538,14 +527,14 @@ function maiorEtapaAlcancavel(av) {
 function etapasDisponiveis(av) {
   if (av.status === 'concluida') return ETAPAS.map((e) => e.id);
   if (av.status === 'rascunho') return meuPapelNaAvaliacao(av) === 'gestor' || meuPapelNaAvaliacao(av) === 'rh' ? ['resultados', 'competencias', 'feedback_gestor'] : [];
-  if (av.status === 'aguardando_autoavaliacao') return meuPapelNaAvaliacao(av) === 'colaborador' ? ['autoavaliacao', 'feedback_colaborador'] : [];
+  if (av.status === 'aguardando_autoavaliacao') return meuPapelNaAvaliacao(av) === 'colaborador' ? ['autoavaliacao'] : [];
   if (av.status === 'aguardando_alinhamento') {
     if (!['gestor', 'rh'].includes(meuPapelNaAvaliacao(av))) return [];
-    // Avaliação reaberta (já foi concluída uma vez): continua mostrando as 8
-    // etapas pra revisão, mesmo com só Plano/Resumo/Parecer editáveis.
-    return av.dados?.reabertura ? ETAPAS.map((e) => e.id) : ['plano_desenvolvimento', 'resumo', 'parecer_final'];
+    // Avaliação reaberta (já foi concluída uma vez): continua mostrando as 6
+    // etapas pra revisão, mesmo com só Plano de Desenvolvimento/Parecer editáveis.
+    return av.dados?.reabertura ? ETAPAS.map((e) => e.id) : ['resumo', 'parecer_final'];
   }
-  return ['plano_desenvolvimento', 'resumo', 'parecer_final'];
+  return ['resumo', 'parecer_final'];
 }
 // Ao abrir uma avaliação, sempre cai na última etapa disponível (não na
 // etapa_atual salva) — etapa_atual só avança pelo fluxo "avançar" sequencial e
@@ -576,7 +565,7 @@ function fecharModalConfirmarFluxo() { document.getElementById('modal-confirmar-
 async function executarConfirmacaoFluxo() { const modal = document.getElementById('modal-confirmar-fluxo'); fecharModalConfirmarFluxo(); await modal._acaoConfirmada?.(); }
 async function dispararEmailFluxo(evento) { try { await sbInvokeFunction('notificar-fluxo', { avaliacao_id: G.avaliacaoAtual.id, evento }); } catch { showToast('Notificação criada; não foi possível enviar o e-mail.'); } }
 
-// Cada módulo de etapa (etapa-texto, etapa-competencias, etapa-plano, etapa-parecer)
+// Cada módulo de etapa (etapa-texto, etapa-competencias, etapa-parecer)
 // expõe uma função render* própria; este dispatcher só decide qual chamar.
 // O botão Exportar só faz sentido na última etapa (Parecer Final), com a
 // avaliação concluída — nas demais abas fica escondido.
@@ -600,7 +589,6 @@ function renderEtapaAtiva() {
     return;
   }
   if (id === 'competencias') renderEtapaCompetencias();
-  else if (id === 'plano_desenvolvimento') renderEtapaPlano();
   else if (id === 'parecer_final') renderEtapaParecer();
   else renderEtapaTexto(id);
 }

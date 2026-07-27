@@ -173,56 +173,6 @@
     justify-content: center;
   }
 
-  /* Etapa 6: no telefone cada linha do plano vira um cartão de campos,
-     preservando contexto sem exigir rolagem horizontal. */
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-scroll { overflow: visible; }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .plano-competencias-toggle {
-    width: 100%;
-    min-height: 44px;
-  }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .plano-competencias-lista {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano,
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano tbody,
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano tr,
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td {
-    display: block;
-    width: 100%;
-  }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano { min-width: 0; }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano thead { display: none; }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano tr {
-    margin-bottom: var(--space-3);
-    padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--panel);
-  }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td {
-    padding: 0 0 var(--space-2);
-    border: 0;
-  }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td::before {
-    content: attr(data-label);
-    display: block;
-    margin-bottom: 4px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-soft);
-  }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano input {
-    width: 100%;
-    min-width: 0;
-    min-height: 44px;
-  }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td:last-child { padding-bottom: 0; }
-  #screen-avaliacao.avaliacao-mobile-prioritaria .tabela-plano td:last-child .btn-link {
-    width: 100%;
-    min-height: 44px;
-  }
-
   /* Chat do Tawk.to em tela cheia nasce em top:0 e fica atrás da status bar
      no PWA standalone do iOS, escondendo o próprio cabeçalho (com o botão de
      fechar) atrás dela. body.tawk-aberto é ligado via Tawk_API em index.html. */

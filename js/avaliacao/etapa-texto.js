@@ -1,4 +1,4 @@
-// avaliacao/etapa-texto.js — etapas de perguntas abertas (resultados, feedback_gestor, autoavaliacao, feedback_colaborador, resumo)
+// avaliacao/etapa-texto.js — etapas de perguntas abertas (resultados, feedback_gestor, autoavaliacao, resumo)
 
 function chaveRascunhoEtapa(avaliacaoId, etapaId) {
   return `sincerao_rascunho_v1:${G.perfil?.id || 'anon'}:${avaliacaoId}:${etapaId}`;
