@@ -49,16 +49,18 @@ Deno.serve(async (req) => {
     }
 
     const { data: av } = await admin.from('avaliacoes').select('gestor_id,colaborador_id,status, colaborador:colaborador_id(nome), gestor:gestor_id(nome)').eq('id', avaliacao_id).single();
-    if (!av || !['fase_1_enviada','fase_2_devolvida','avaliacao_concluida'].includes(evento)) return json({ error: 'Evento inválido.' }, 400);
+    if (!av || !['fase_1_enviada','fase_2_devolvida','consenso_aguardando_ciencia','avaliacao_concluida'].includes(evento)) return json({ error: 'Evento inválido.' }, 400);
     const permitido = (evento === 'fase_1_enviada' && user.id === av.gestor_id && av.status === 'aguardando_autoavaliacao') ||
       (evento === 'fase_2_devolvida' && user.id === av.colaborador_id && av.status === 'aguardando_alinhamento') ||
-      (evento === 'avaliacao_concluida' && user.id === av.gestor_id && av.status === 'concluida');
+      (evento === 'consenso_aguardando_ciencia' && user.id === av.gestor_id && av.status === 'aguardando_ciencia') ||
+      (evento === 'avaliacao_concluida' && [av.gestor_id, av.colaborador_id].includes(user.id) && av.status === 'concluida');
     if (!permitido) return json({ error: 'Transição não autorizada.' }, 403);
     const { data: pessoas } = await admin.from('perfis').select('email,nome').in('id',[av.gestor_id,av.colaborador_id]);
     const textos: Record<string, [string,string]> = {
       fase_1_enviada: ['Fase 1 concluída','A avaliação foi enviada para a autoavaliação do colaborador.'],
       fase_2_devolvida: ['Fase 2 concluída','A autoavaliação foi devolvida e o plano de desenvolvimento está disponível.'],
-      avaliacao_concluida: ['Avaliação concluída','Os dois pareceres foram registrados e a avaliação foi encerrada.']
+      consenso_aguardando_ciencia: ['Consenso salvo — ciência pendente','O consenso foi salvo. Gestor e colaborador devem acessar a avaliação e declarar ciência para que ela seja concluída.'],
+      avaliacao_concluida: ['Avaliação concluída','Gestor e colaborador declararam ciência do consenso e a avaliação foi encerrada.']
     };
     const key = Deno.env.get('RESEND_API_KEY');
     if (!key) return json({ ok: true, email: 'não configurado' });

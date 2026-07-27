@@ -60,7 +60,7 @@ async function abrirAvaliacao(id) {
     'avaliacao-mobile-prioritaria',
     // As fases 2 e 3 são preenchidas pelo colaborador e/ou pelo gestor e
     // precisam da mesma experiência de toque no celular.
-    ['aguardando_autoavaliacao', 'aguardando_alinhamento'].includes(av.status)
+    ['aguardando_autoavaliacao', 'aguardando_alinhamento', 'aguardando_ciencia'].includes(av.status)
   );
   const ciclo = av.ciclo || (await sbFetch('/ciclos_avaliacao?id=eq.' + av.ciclo_id + '&select=nome'))?.[0];
   av.ciclo = ciclo;
@@ -75,10 +75,10 @@ async function abrirAvaliacao(id) {
     rascunho: 'resultados',
     aguardando_autoavaliacao: 'autoavaliacao',
     aguardando_alinhamento: 'resumo',
+    aguardando_ciencia: 'parecer_final',
   };
-  // Só arquivada (concluida + as duas ciências) abre na capa -- concluida sem
-  // ciência de alguém ainda cai direto no Parecer Final, onde a ciência é
-  // declarada, igual sempre funcionou.
+  // Enquanto aguarda as ciências, abre no Parecer Final. O status concluída
+  // só existe depois dos dois aceites e, portanto, abre direto na capa.
   G.etapaAtiva = avaliacaoArquivada(av) ? 'capa' : ETAPA_INICIAL_POR_FASE[av.status] || etapaFinalDisponivel(av);
   document.getElementById('avaliacao-titulo').textContent = `Avaliação de ${av.colaborador?.nome || ''} — ${av.ciclo?.nome || ''}`;
   document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
@@ -439,12 +439,10 @@ async function enviarParaAlinhamento() {
   }
 }
 
-// Avaliação concluída E com as duas ciências (colaborador/gestor) já dadas --
-// só nesse ponto ela "arquiva" e abre na capa em vez de cair direto no
-// Parecer Final. Concluída sem alguma ciência continua caindo lá, que é onde
-// a ciência é declarada (ver renderCiencia em etapa-parecer.js).
+// A avaliação só recebe o status concluída depois das duas ciências. Enquanto
+// aguarda os aceites, abre direto no Parecer Final; concluída abre na capa.
 function avaliacaoArquivada(av) {
-  return av.status === 'concluida' && !!av.ciencia_colaborador_em && !!av.ciencia_gestor_em;
+  return av.status === 'concluida';
 }
 
 function renderNavEtapas() {
@@ -533,7 +531,7 @@ function maiorEtapaAlcancavel(av) {
 }
 
 function etapasDisponiveis(av) {
-  if (av.status === 'concluida') return ETAPAS.map((e) => e.id);
+  if (['aguardando_ciencia', 'concluida'].includes(av.status)) return ETAPAS.map((e) => e.id);
   if (av.status === 'rascunho') return meuPapelNaAvaliacao(av) === 'gestor' || meuPapelNaAvaliacao(av) === 'rh' ? ['resultados', 'competencias', 'feedback_gestor'] : [];
   if (av.status === 'aguardando_autoavaliacao') return meuPapelNaAvaliacao(av) === 'colaborador' ? ['autoavaliacao'] : [];
   if (av.status === 'aguardando_alinhamento') {
@@ -563,7 +561,7 @@ function confirmarTransicaoFase(tipo) {
     ? ['Enviar avaliação ao colaborador?', 'Após o envio, as etapas da Fase 1 ficarão bloqueadas para edição.', liberarParaAutoavaliacao]
     : tipo === 'fase_2'
       ? ['Devolver avaliação ao gestor?', 'Após o envio, as respostas da Fase 2 ficarão bloqueadas para edição.', enviarParaAlinhamento]
-      : ['Concluir avaliação?', 'Os dois pareceres foram salvos e a avaliação ficará bloqueada.', concluirAvaliacaoAgora];
+      : ['Salvar consenso e solicitar ciência?', 'Depois de salvo, gestor e colaborador precisarão declarar ciência.', concluirAvaliacaoAgora];
   abrirConfirmacao({ titulo: dados[0], texto: dados[1], acao: dados[2] });
 }
 async function dispararEmailFluxo(evento) { try { await sbInvokeFunction('notificar-fluxo', { avaliacao_id: G.avaliacaoAtual.id, evento }); } catch { showToast('Notificação criada; não foi possível enviar o e-mail.'); } }

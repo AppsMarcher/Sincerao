@@ -120,6 +120,7 @@ function statusLabel(status) {
     rascunho: 'Avaliação do Gestor',
     aguardando_autoavaliacao: 'Aguardando autoavaliação',
     aguardando_alinhamento: 'Aguardando alinhamento',
+    aguardando_ciencia: 'Aguardando aceite/ciência',
     concluida: 'Concluída',
   }[status] || status;
 }

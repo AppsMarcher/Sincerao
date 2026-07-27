@@ -117,31 +117,29 @@ function renderDashboard() {
 }
 
 // Toda situação em que é a vez de quem está vendo esta lista agir --
-// colaborador: preencher a autoavaliação, ou já concluída e ainda sem dar
-// ciência. Gestor: rascunho ainda não enviado, autoavaliação pendente, consenso
-// aguardando ele, ou já concluída e ainda sem dar ciência. RH nunca "trava" o
+// colaborador: preencher a autoavaliação ou dar ciência do consenso. Gestor:
+// rascunho ainda não enviado, autoavaliação pendente, consenso aguardando ele
+// ou sua ciência ainda pendente. RH nunca "trava" o
 // fluxo, então nunca pisca.
 function precisaAcao(a, papelVisao) {
   if (papelVisao === 'colaborador') {
-    return a.status === 'aguardando_autoavaliacao' || (a.status === 'concluida' && !a.ciencia_colaborador_em);
+    return a.status === 'aguardando_autoavaliacao' || (a.status === 'aguardando_ciencia' && !a.ciencia_colaborador_em);
   }
   if (papelVisao === 'gestor') {
     return a.status === 'rascunho'
       || a.status === 'aguardando_autoavaliacao'
       || a.status === 'aguardando_alinhamento'
-      || (a.status === 'concluida' && !a.ciencia_gestor_em);
+      || (a.status === 'aguardando_ciencia' && !a.ciencia_gestor_em);
   }
   return false;
 }
 
-// Concluída é um status único no banco, mas cada lado dá ciência em momentos
-// diferentes -- pra quem ainda não deu a própria, mostra "Aguardando ciência"
-// em vez de "Concluída" (some assim que a pessoa declara a ciência dela; RH
-// não tem ciência própria, sempre vê "Concluída" normal).
+// Durante o status intermediário, destaca que a própria ciência ainda falta.
+// Depois da segunda ciência, o banco muda o status para concluída.
 function labelStatusCard(a, papelVisao) {
   const faltaMinhaCiencia =
     (papelVisao === 'colaborador' && !a.ciencia_colaborador_em) || (papelVisao === 'gestor' && !a.ciencia_gestor_em);
-  if (a.status === 'concluida' && faltaMinhaCiencia) return 'Aguardando ciência';
+  if (a.status === 'aguardando_ciencia' && faltaMinhaCiencia) return 'Aguardando aceite/ciência';
   return statusLabel(a.status);
 }
 
