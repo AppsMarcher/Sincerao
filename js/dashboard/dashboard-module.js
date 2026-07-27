@@ -51,7 +51,7 @@ async function carregarNotificacoes() {
       const dataHora = data.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
       const dataHoraSemSegundos = data.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) + ' ' + data.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
       const mensagem = escHtml(n.mensagem).replace(/Enviada em \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}/, 'Enviada em ' + dataHoraSemSegundos);
-      return `<div class="notificacao-item"><div><strong>${escHtml(n.titulo)}</strong><div class="muted">${mensagem}</div><small>${dataHora}</small></div>${n.lida_em ? '' : '<span class="notificacao-nao-lida" role="img" aria-label="Notificação nova" title="Notificação nova"></span>'}</div>`;
+      return `<div class="notificacao-item${n.lida_em ? '' : ' notificacao-item--nao-lida'}"><div><strong>${escHtml(n.titulo)}</strong><div class="muted">${mensagem}</div><small>${dataHora}</small></div>${n.lida_em ? '' : '<span class="notificacao-badge-nova">Nova</span>'}</div>`;
     }).join('') : '<p class="empty">Nenhuma notificação por enquanto.</p>';
     const naoLidas = (notificacoes || []).filter((n) => !n.lida_em);
     if (naoLidas.length) sbFetch('/notificacoes?id=in.(' + naoLidas.map((n) => n.id).join(',') + ')', { method: 'PATCH', body: JSON.stringify({ lida_em: new Date().toISOString() }) }).catch(() => {});

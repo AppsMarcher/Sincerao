@@ -17,7 +17,10 @@
 .notificacao-item { display:flex; justify-content:space-between; gap:var(--space-3); padding:12px 0; border-bottom:1px solid var(--line); }
 .notificacao-item:last-child { border-bottom:none; }
 .notificacao-item small { display:block; margin-top:4px; color:var(--text-faint); }
-.notificacao-nao-lida { width:10px; height:10px; margin:10px 10px 0 0; flex:0 0 10px; border-radius:50%; background:var(--primary); box-shadow:0 0 0 4px var(--primary-soft); }
+/* Pill com texto em vez de um pontinho de cor -- sinalização mais visível e
+   que não depende só de percepção de cor pra identificar notificação nova. */
+.notificacao-item--nao-lida { background:var(--primary-soft); border-left:3px solid var(--primary); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding-left:12px; }
+.notificacao-badge-nova { flex:0 0 auto; align-self:flex-start; margin-top:2px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#fff; background:var(--primary); padding:4px 10px; border-radius:100px; white-space:nowrap; }
 .cabecalho-notificacoes { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); margin-bottom:var(--space-2); }
 .cabecalho-notificacoes h3 { margin:0; }
 .btn-limpar-notificacoes { color:var(--text-soft); }
