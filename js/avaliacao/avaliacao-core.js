@@ -59,7 +59,7 @@ async function abrirAvaliacao(id) {
   );
   const ciclo = av.ciclo || (await sbFetch('/ciclos_avaliacao?id=eq.' + av.ciclo_id + '&select=nome'))?.[0];
   av.ciclo = ciclo;
-  G.etapaAtiva = ETAPAS.find((e) => e.n === av.etapa_atual)?.id || etapaInicialDisponivel(av);
+  G.etapaAtiva = etapaFinalDisponivel(av);
   document.getElementById('avaliacao-titulo').textContent = `Avaliação de ${av.colaborador?.nome || ''} — ${av.ciclo?.nome || ''}`;
   document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
   const exportar = document.getElementById('avaliacao-exportar');
@@ -415,6 +415,10 @@ function etapasDisponiveis(av) {
   return ['plano_desenvolvimento', 'resumo', 'parecer_final'];
 }
 function etapaInicialDisponivel(av) { return etapasDisponiveis(av)[0] || 'resultados'; }
+// Ao abrir uma avaliação, sempre cai na última etapa disponível (não na
+// etapa_atual salva) — etapa_atual só avança pelo fluxo "avançar" sequencial e
+// fica desatualizada quando a navegação é feita pelas abas.
+function etapaFinalDisponivel(av) { const etapas = etapasDisponiveis(av); return etapas[etapas.length - 1] || 'resultados'; }
 function proximaEtapaAtual() {
   const etapas = etapasDisponiveis(G.avaliacaoAtual); const i = etapas.indexOf(G.etapaAtiva);
   return etapas[i + 1] || null;
