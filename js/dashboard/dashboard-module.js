@@ -114,6 +114,20 @@ function renderDashboard() {
   }
 }
 
+// Toda situação em que é a vez de quem está vendo esta lista agir --
+// colaborador: preencher a autoavaliação, ou já concluída e ainda sem dar
+// ciência. Gestor: rascunho ainda não enviado, consenso aguardando ele, ou já
+// concluída e ainda sem dar ciência. RH nunca "trava" o fluxo, então nunca pisca.
+function precisaAcao(a, papelVisao) {
+  if (papelVisao === 'colaborador') {
+    return a.status === 'aguardando_autoavaliacao' || (a.status === 'concluida' && !a.ciencia_colaborador_em);
+  }
+  if (papelVisao === 'gestor') {
+    return a.status === 'rascunho' || a.status === 'aguardando_alinhamento' || (a.status === 'concluida' && !a.ciencia_gestor_em);
+  }
+  return false;
+}
+
 function linhasAvaliacaoHtml(lista, papelVisao) {
   return lista
     .map((a) => {
@@ -122,10 +136,7 @@ function linhasAvaliacaoHtml(lista, papelVisao) {
         papelVisao === 'rh'
           ? `${escHtml(a.ciclo?.nome || '')} · Gestor: ${escHtml(a.gestor?.nome || '')}`
           : `${escHtml(a.ciclo?.nome || '')}${papelVisao === 'gestor' ? '' : ' · Gestor: ' + escHtml(a.gestor?.nome || '')}`;
-      // Só pisca quando o status significa "é sua vez de agir" pra quem está
-      // vendo esta lista agora -- não faz sentido chamar atenção de quem não
-      // precisa fazer nada (ex: gestor olhando a autoavaliação do colaborador).
-      const piscar = papelVisao === 'colaborador' && a.status === 'aguardando_autoavaliacao';
+      const piscar = precisaAcao(a, papelVisao);
       return `
     <div class="card-avaliacao" onclick="abrirAvaliacao('${a.id}')">
       <div>
