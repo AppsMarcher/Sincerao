@@ -95,9 +95,17 @@ async function toggleCompetenciaAtiva(id, novoValor) {
   await carregarCompetencias();
 }
 
-async function excluirCompetencia(id) {
+function excluirCompetencia(id) {
   const competencia = G.competencias.find((c) => c.id === id);
-  if (!confirm(`Excluir a competência "${competencia?.nome || ''}"? Essa ação não pode ser desfeita.`)) return;
+  const modal = document.getElementById('modal-confirmar-fluxo');
+  document.getElementById('confirmar-fluxo-titulo').textContent = 'Excluir competência?';
+  document.getElementById('confirmar-fluxo-texto').textContent =
+    `A competência "${competencia?.nome || ''}" será excluída permanentemente. Essa ação não pode ser desfeita.`;
+  modal._acaoConfirmada = () => executarExclusaoCompetencia(id);
+  modal.classList.add('open');
+}
+
+async function executarExclusaoCompetencia(id) {
   try {
     await sbFetch('/competencias?id=eq.' + id, { method: 'DELETE' });
   } catch (e) {
