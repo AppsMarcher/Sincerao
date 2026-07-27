@@ -78,7 +78,10 @@ async function abrirAvaliacao(id) {
     aguardando_autoavaliacao: 'autoavaliacao',
     aguardando_alinhamento: 'plano_desenvolvimento',
   };
-  G.etapaAtiva = ETAPA_INICIAL_POR_FASE[av.status] || etapaFinalDisponivel(av);
+  // Só arquivada (concluida + as duas ciências) abre na capa -- concluida sem
+  // ciência de alguém ainda cai direto no Parecer Final, onde a ciência é
+  // declarada, igual sempre funcionou.
+  G.etapaAtiva = avaliacaoArquivada(av) ? 'capa' : ETAPA_INICIAL_POR_FASE[av.status] || etapaFinalDisponivel(av);
   document.getElementById('avaliacao-titulo').textContent = `Avaliação de ${av.colaborador?.nome || ''} — ${av.ciclo?.nome || ''}`;
   document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
   document.getElementById('avaliacao-exportar').classList.remove('open');
@@ -243,6 +246,37 @@ document.addEventListener('click', (evento) => {
   if (!evento.target.closest('.avaliacao-exportar')) fecharExportarAvaliacao();
 });
 
+// Chamado direto do card do dashboard (sem precisar abrir a avaliação) e da
+// capa da avaliação concluída. Usa fetch cru em vez de sbInvokeFunction
+// porque a resposta aqui é o PDF binário, não JSON.
+async function baixarPdfAvaliacao(avaliacaoId) {
+  try {
+    const token = await getSupabaseAccessToken();
+    const r = await fetch(SUPABASE_URL + '/functions/v1/enviar-avaliacao', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ avaliacao_id: avaliacaoId, modo: 'download' }),
+    });
+    if (!r.ok) {
+      let mensagem = 'Não foi possível gerar o PDF.';
+      try { mensagem = (JSON.parse(await r.text()))?.error || mensagem; } catch {}
+      throw new Error(mensagem);
+    }
+    const blob = await r.blob();
+    const nomeArquivo = /filename="?([^"]+)"?/.exec(r.headers.get('Content-Disposition') || '')?.[1] || 'avaliacao.pdf';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nomeArquivo;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    showToast(err.message || 'Não foi possível gerar o PDF.');
+  }
+}
+
 function renderBotoesTransicao() {
   const el = document.getElementById('avaliacao-transicao');
   el.innerHTML = '';
@@ -404,12 +438,25 @@ async function enviarParaAlinhamento() {
   }
 }
 
+// Avaliação concluída E com as duas ciências (colaborador/gestor) já dadas --
+// só nesse ponto ela "arquiva" e abre na capa em vez de cair direto no
+// Parecer Final. Concluída sem alguma ciência continua caindo lá, que é onde
+// a ciência é declarada (ver renderCiencia em etapa-parecer.js).
+function avaliacaoArquivada(av) {
+  return av.status === 'concluida' && !!av.ciencia_colaborador_em && !!av.ciencia_gestor_em;
+}
+
 function renderNavEtapas() {
   const el = document.getElementById('etapas-nav');
-  const permitidas = etapasDisponiveis(G.avaliacaoAtual);
+  if (G.etapaAtiva === 'capa') { el.innerHTML = ''; return; }
+  const av = G.avaliacaoAtual;
+  const permitidas = etapasDisponiveis(av);
   if (!permitidas.includes(G.etapaAtiva)) G.etapaAtiva = permitidas[0];
-  const limite = maiorEtapaAlcancavel(G.avaliacaoAtual);
-  el.innerHTML = ETAPAS.filter((e) => permitidas.includes(e.id)).map((e) => {
+  const limite = maiorEtapaAlcancavel(av);
+  const voltarCapa = avaliacaoArquivada(av)
+    ? '<button class="btn-link etapa-btn-capa" onclick="irParaCapa()">← Capa</button>'
+    : '';
+  el.innerHTML = voltarCapa + ETAPAS.filter((e) => permitidas.includes(e.id)).map((e) => {
     const travada = permitidas.indexOf(e.id) > limite;
     return `<button class="etapa-btn ${G.etapaAtiva === e.id ? 'active' : ''}" ${
       travada ? 'disabled title="Grave a etapa anterior antes de avançar"' : `onclick="irParaEtapa('${e.id}')"`
@@ -423,6 +470,40 @@ function irParaEtapa(id) {
   if (idx === -1 || idx > maiorEtapaAlcancavel(G.avaliacaoAtual)) return;
   G.etapaAtiva = id;
   renderEtapaAtiva();
+}
+
+function irParaCapa() {
+  G.etapaAtiva = 'capa';
+  renderEtapaAtiva();
+}
+
+function entrarDetalheAvaliacao() {
+  G.etapaAtiva = 'resultados';
+  renderEtapaAtiva();
+}
+
+function renderCapaAvaliacao() {
+  const av = G.avaliacaoAtual;
+  const dataConclusao = av.concluida_em
+    ? new Date(av.concluida_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+    : '—';
+  document.getElementById('etapa-conteudo').innerHTML = `
+    <section class="card capa-avaliacao">
+      <h3>Avaliação concluída</h3>
+      <p class="muted">Colaborador e gestor já deram ciência do consenso. Os 8 passos continuam disponíveis pra consulta.</p>
+      <dl class="dados-lista">
+        <dt>Ciclo</dt><dd>${escHtml(av.ciclo?.nome || '—')}</dd>
+        <dt>Colaborador</dt><dd>${escHtml(av.colaborador?.nome || '—')}</dd>
+        <dt>Gestor</dt><dd>${escHtml(av.gestor?.nome || '—')}</dd>
+        <dt>Concluída em</dt><dd>${dataConclusao}</dd>
+      </dl>
+      ${renderResultadoFinal(av)}
+      <div class="etapa-acoes">
+        <button class="btn-link" onclick="baixarPdfAvaliacao('${av.id}')">Baixar PDF</button>
+        <button class="btn-primary" onclick="entrarDetalheAvaliacao()">Ver avaliação completa</button>
+      </div>
+    </section>
+  `;
 }
 
 // Não avança pra próxima etapa da fase sem a anterior estar gravada no banco.
@@ -513,6 +594,7 @@ function renderEtapaAtiva() {
   renderBotoesTransicao();
   atualizarExportarAvaliacao();
   const id = G.etapaAtiva;
+  if (id === 'capa') { renderCapaAvaliacao(); return; }
   if (!ETAPAS.some((etapa) => etapa.id === id)) {
     document.getElementById('etapa-conteudo').innerHTML = '<p class="empty">Esta etapa não está disponível para o seu perfil no momento.</p>';
     return;

@@ -57,6 +57,13 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Link de volta pra capa, junto das abas -- só aparece em avaliação
+   arquivada (concluída + as duas ciências). Borda separando visualmente das
+   abas de etapa, que têm um estilo de "pill" bem diferente. */
+.etapa-btn-capa { flex: 0 0 auto; font-size: 11px; padding-right: 12px; margin-right: 4px; border-right: 1px solid var(--line); }
+
+.capa-avaliacao .dados-lista { margin-top: var(--space-4); }
+
 /* Contexto da avaliação alinhado como uma coluna: título, status e ação. */
 #screen-avaliacao .topbar-contexto-avaliacao {
   flex-direction: column;

@@ -197,7 +197,7 @@ Deno.serve(async (req) => {
     const caller = createClient(url, anon, { global: { headers: { Authorization: req.headers.get('Authorization') || '' } } });
     const { data: { user } } = await caller.auth.getUser();
     if (!user) return json({ error: 'Não autenticado.' }, 401);
-    const { avaliacao_id } = await req.json();
+    const { avaliacao_id, modo } = await req.json();
     if (!avaliacao_id) return json({ error: 'Avaliação não informada.' }, 400);
 
     const admin = createClient(url, service);
@@ -215,18 +215,6 @@ Deno.serve(async (req) => {
       admin.from('avaliacao_notas').select('nota,comentario,competencia:competencia_id(nome)').eq('avaliacao_id', av.id),
       admin.from('avaliacao_plano_desenvolvimento').select('competencia,acao,prazo,responsavel,indicador_sucesso,acompanhamento').eq('avaliacao_id', av.id).order('ordem'),
     ]);
-    const destinatariosPorEmail = new Map<string, { nome: string; email: string }>();
-    for (const pessoa of [av.colaborador, av.gestor]) {
-      if (pessoa?.email) destinatariosPorEmail.set(pessoa.email.toLowerCase(), { nome: pessoa.nome, email: pessoa.email });
-    }
-    const destinatarios = Array.from(destinatariosPorEmail.values());
-    if (!destinatarios.length) return json({ error: 'Os envolvidos não possuem e-mail cadastrado.' }, 400);
-    // RH entra em cópia (papel 'rh', não 'admin') pra ter visibilidade da
-    // avaliação concluída, já que a ciência do RH deixou de ser exigida no
-    // fluxo -- não são "envolvidos" (não têm o botão personalizado "Olá, X"),
-    // então recebem num e-mail à parte, best-effort (não falha o envio principal).
-    const { data: perfisRh } = await admin.from('perfis').select('email').eq('papel', 'rh').eq('ativo', true);
-    const emailsRh = Array.from(new Set((perfisRh || []).map((p) => p.email).filter(Boolean)));
     const token = Deno.env.get('BROWSERLESS_API_TOKEN');
     if (!token) return json({ error: 'Geração de PDF não configurada (BROWSERLESS_API_TOKEN ausente).' }, 500);
     const pdf = await fetch(`https://production-sfo.browserless.io/pdf?token=${token}`, {
@@ -245,10 +233,34 @@ Deno.serve(async (req) => {
       }),
     });
     if (!pdf.ok) return json({ error: 'Não foi possível gerar o PDF da avaliação.' }, 502);
+    const nomeArquivo = `avaliacao-${String(av.colaborador?.nome || 'colaborador').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.pdf`;
+    const pdfBytes = new Uint8Array(await pdf.arrayBuffer());
+
+    // Modo "baixar" -- só gera e devolve o arquivo pro navegador, sem mandar
+    // e-mail nenhum (usado pelo botão de download no dashboard e na capa da
+    // avaliação concluída). Não exige destinatário nem RESEND_API_KEY.
+    if (modo === 'download') {
+      return new Response(pdfBytes, {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${nomeArquivo}"` },
+      });
+    }
+
+    const destinatariosPorEmail = new Map<string, { nome: string; email: string }>();
+    for (const pessoa of [av.colaborador, av.gestor]) {
+      if (pessoa?.email) destinatariosPorEmail.set(pessoa.email.toLowerCase(), { nome: pessoa.nome, email: pessoa.email });
+    }
+    const destinatarios = Array.from(destinatariosPorEmail.values());
+    if (!destinatarios.length) return json({ error: 'Os envolvidos não possuem e-mail cadastrado.' }, 400);
+    // RH entra em cópia (papel 'rh', não 'admin') pra ter visibilidade da
+    // avaliação concluída, já que a ciência do RH deixou de ser exigida no
+    // fluxo -- não são "envolvidos" (não têm o botão personalizado "Olá, X"),
+    // então recebem num e-mail à parte, best-effort (não falha o envio principal).
+    const { data: perfisRh } = await admin.from('perfis').select('email').eq('papel', 'rh').eq('ativo', true);
+    const emailsRh = Array.from(new Set((perfisRh || []).map((p) => p.email).filter(Boolean)));
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) return json({ error: 'Envio de e-mail não configurado.' }, 500);
-    const nomeArquivo = `avaliacao-${String(av.colaborador?.nome || 'colaborador').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.pdf`;
-    const pdfBase64 = bytesToBase64(new Uint8Array(await pdf.arrayBuffer()));
+    const pdfBase64 = bytesToBase64(pdfBytes);
     const corpoEmail = (nomeDestinatario: string) => `<p>Olá, ${esc(nomeDestinatario)},</p><p>Segue em anexo a avaliação de desempenho relativa ao ciclo <strong>${esc(av.ciclo?.nome || '—')}</strong> de <strong>${esc(av.colaborador?.nome)}</strong>, realizada em consenso com o gestor <strong>${esc(av.gestor?.nome)}</strong>.</p><p>Atenciosamente,<br>Sincerão Marcher</p>`;
     const envios = await Promise.all(destinatarios.map((pessoa) => fetch('https://api.resend.com/emails', {
       method: 'POST',
