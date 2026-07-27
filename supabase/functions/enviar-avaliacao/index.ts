@@ -13,7 +13,7 @@
 // Settings > Edge Functions > Secrets) ou via CLI:
 //   supabase secrets set BROWSERLESS_API_TOKEN=xxxxxxxxx
 //   supabase secrets set RESEND_API_KEY=re_xxxxxxxxx
-//   supabase secrets set RESEND_FROM="Sincerão <no-reply@marcher.com.br>"
+//   supabase secrets set RESEND_FROM="Sincerão Marcher <no-reply@marcher.com.br>"
 // BROWSERLESS_API_TOKEN vem do dashboard de conta em browserless.io (mesma
 // conta já usada pelo VectonPlan) — tem free tier limitado, verificar
 // necessidade de plano pago com o uso somado dos apps.
@@ -254,7 +254,7 @@ Deno.serve(async (req) => {
       method: 'POST',
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: Deno.env.get('RESEND_FROM') || 'Sincerão <no-reply@marcher.com.br>',
+        from: Deno.env.get('RESEND_FROM') || 'Sincerão Marcher <no-reply@marcher.com.br>',
         to: [pessoa.email],
         subject: `Avaliação concluída — ${av.colaborador?.nome || ''}`,
         html: corpoEmail(pessoa.nome),
@@ -269,7 +269,7 @@ Deno.serve(async (req) => {
         method: 'POST',
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: Deno.env.get('RESEND_FROM') || 'Sincerão <no-reply@marcher.com.br>',
+          from: Deno.env.get('RESEND_FROM') || 'Sincerão Marcher <no-reply@marcher.com.br>',
           to: emailsRh,
           subject: `Avaliação concluída — ${av.colaborador?.nome || ''}`,
           html: corpoEmailRh,
