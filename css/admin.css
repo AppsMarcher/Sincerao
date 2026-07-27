@@ -82,6 +82,13 @@
 }
 .form-novo-colaborador-compacta .btn-primary { flex: 0 0 auto; font-size: 13px; min-height: 38px; padding: 0 20px; }
 
+/* Select de "Ciclo de avaliação" (Indicadores de Gestão) pedido explicitamente
+   no mesmo tamanho compacto do form de convite acima -- mesma exceção
+   intencional à regra geral de font-size 16px dos inputs/selects. Seletor por
+   ID já tem especificidade suficiente pra vencer o "select" genérico do
+   base.css, sem precisar do hack de ID+classe usado ali em cima. */
+#gestao-ciclo { font-size: 12.5px; min-height: 38px; padding: 8px 12px; }
+
 .th-sort { cursor: pointer; user-select: none; white-space: nowrap; }
 .th-sort:hover { color: var(--primary); }
 .sort-ind { font-size: 10px; color: var(--primary); margin-left: 2px; }
