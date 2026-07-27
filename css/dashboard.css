@@ -43,3 +43,11 @@
 
 .card-avaliacao-badges { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
 .badge-atencao { background: rgba(217, 119, 6, 0.12); color: var(--amber); }
+
+/* Chama atenção pro status que exige ação de quem está vendo agora (ex: a
+   própria autoavaliação aguardando ser feita). */
+@keyframes badge-piscar { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+.badge-piscando { animation: badge-piscar 1.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .badge-piscando { animation: none; }
+}

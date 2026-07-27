@@ -122,6 +122,10 @@ function linhasAvaliacaoHtml(lista, papelVisao) {
         papelVisao === 'rh'
           ? `${escHtml(a.ciclo?.nome || '')} · Gestor: ${escHtml(a.gestor?.nome || '')}`
           : `${escHtml(a.ciclo?.nome || '')}${papelVisao === 'gestor' ? '' : ' · Gestor: ' + escHtml(a.gestor?.nome || '')}`;
+      // Só pisca quando o status significa "é sua vez de agir" pra quem está
+      // vendo esta lista agora -- não faz sentido chamar atenção de quem não
+      // precisa fazer nada (ex: gestor olhando a autoavaliação do colaborador).
+      const piscar = papelVisao === 'colaborador' && a.status === 'aguardando_autoavaliacao';
       return `
     <div class="card-avaliacao" onclick="abrirAvaliacao('${a.id}')">
       <div>
@@ -129,7 +133,7 @@ function linhasAvaliacaoHtml(lista, papelVisao) {
         <div class="muted">${subtitulo}</div>
       </div>
       <div class="card-avaliacao-badges">
-        <span class="badge">${escHtml(statusLabel(a.status))}</span>
+        <span class="badge${piscar ? ' badge-piscando' : ''}">${escHtml(statusLabel(a.status))}</span>
         ${
           papelVisao === 'rh'
             ? `
