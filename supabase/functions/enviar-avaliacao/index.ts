@@ -212,7 +212,11 @@ Deno.serve(async (req) => {
       admin.from('avaliacao_notas').select('nota,comentario,competencia:competencia_id(nome)').eq('avaliacao_id', av.id),
       admin.from('avaliacao_plano_desenvolvimento').select('competencia,acao,prazo,responsavel,indicador_sucesso,acompanhamento').eq('avaliacao_id', av.id).order('ordem'),
     ]);
-    const destinatarios = Array.from(new Set([av.colaborador?.email, av.gestor?.email].filter(Boolean)));
+    const destinatariosPorEmail = new Map<string, { nome: string; email: string }>();
+    for (const pessoa of [av.colaborador, av.gestor]) {
+      if (pessoa?.email) destinatariosPorEmail.set(pessoa.email.toLowerCase(), { nome: pessoa.nome, email: pessoa.email });
+    }
+    const destinatarios = Array.from(destinatariosPorEmail.values());
     if (!destinatarios.length) return json({ error: 'Os envolvidos não possuem e-mail cadastrado.' }, 400);
     const token = Deno.env.get('BROWSERLESS_API_TOKEN');
     if (!token) return json({ error: 'Geração de PDF não configurada (BROWSERLESS_API_TOKEN ausente).' }, 500);
@@ -235,8 +239,20 @@ Deno.serve(async (req) => {
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) return json({ error: 'Envio de e-mail não configurado.' }, 500);
     const nomeArquivo = `avaliacao-${String(av.colaborador?.nome || 'colaborador').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.pdf`;
-    const envio = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: Deno.env.get('RESEND_FROM') || 'Sincerão <no-reply@marcher.com.br>', to: destinatarios, subject: `Avaliação concluída — ${av.colaborador?.nome || ''}`, html: `<p>Olá,</p><p>Segue em anexo a avaliação de desempenho concluída de <strong>${esc(av.colaborador?.nome)}</strong>.</p><p>Atenciosamente,<br>Sincerão</p>`, attachments: [{ filename: nomeArquivo, content: bytesToBase64(new Uint8Array(await pdf.arrayBuffer())), content_type: 'application/pdf' }] }) });
-    if (!envio.ok) return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
+    const pdfBase64 = bytesToBase64(new Uint8Array(await pdf.arrayBuffer()));
+    const corpoEmail = (nomeDestinatario: string) => `<p>Olá, ${esc(nomeDestinatario)},</p><p>Segue em anexo a avaliação de desempenho relativa ao ciclo <strong>${esc(av.ciclo?.nome || '—')}</strong> de <strong>${esc(av.colaborador?.nome)}</strong>, realizada em consenso com o gestor <strong>${esc(av.gestor?.nome)}</strong>.</p><p>Atenciosamente,<br>Sincerão Marcher</p>`;
+    const envios = await Promise.all(destinatarios.map((pessoa) => fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: Deno.env.get('RESEND_FROM') || 'Sincerão <no-reply@marcher.com.br>',
+        to: [pessoa.email],
+        subject: `Avaliação concluída — ${av.colaborador?.nome || ''}`,
+        html: corpoEmail(pessoa.nome),
+        attachments: [{ filename: nomeArquivo, content: pdfBase64, content_type: 'application/pdf' }],
+      }),
+    })));
+    if (envios.some((envio) => !envio.ok)) return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
     return json({ ok: true });
   } catch (erro) { return json({ error: String(erro) }, 500); }
 });
