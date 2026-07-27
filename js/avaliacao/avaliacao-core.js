@@ -66,12 +66,19 @@ async function abrirAvaliacao(id) {
   );
   const ciclo = av.ciclo || (await sbFetch('/ciclos_avaliacao?id=eq.' + av.ciclo_id + '&select=nome'))?.[0];
   av.ciclo = ciclo;
-  // rascunho (gestor começando) e aguardando_autoavaliacao (colaborador
-  // começando) são estados "em branco" -- devem abrir na primeira etapa, não
-  // na última (que só faz sentido pra retomar algo já em andamento/revisão).
-  G.etapaAtiva = ['rascunho', 'aguardando_autoavaliacao'].includes(av.status)
-    ? etapaInicialDisponivel(av)
-    : etapaFinalDisponivel(av);
+  // Cada fase em digitação (rascunho/gestor, aguardando_autoavaliacao/colaborador,
+  // aguardando_alinhamento/consenso) abre na primeira etapa DELA, não na última.
+  // aguardando_alinhamento fixa em 'plano_desenvolvimento' mesmo quando reaberta
+  // mostra as 8 etapas pra contexto (etapasDisponiveis()[0] viraria 'resultados',
+  // que é só leitura nesse caso -- a primeira etapa realmente editável da fase 3
+  // continua sendo plano_desenvolvimento). Fora essas fases (ex: concluida, só
+  // consulta), mantém o comportamento de abrir na última etapa disponível.
+  const ETAPA_INICIAL_POR_FASE = {
+    rascunho: 'resultados',
+    aguardando_autoavaliacao: 'autoavaliacao',
+    aguardando_alinhamento: 'plano_desenvolvimento',
+  };
+  G.etapaAtiva = ETAPA_INICIAL_POR_FASE[av.status] || etapaFinalDisponivel(av);
   document.getElementById('avaliacao-titulo').textContent = `Avaliação de ${av.colaborador?.nome || ''} — ${av.ciclo?.nome || ''}`;
   document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
   document.getElementById('avaliacao-exportar').classList.remove('open');
@@ -425,7 +432,6 @@ function etapasDisponiveis(av) {
   }
   return ['plano_desenvolvimento', 'resumo', 'parecer_final'];
 }
-function etapaInicialDisponivel(av) { return etapasDisponiveis(av)[0] || 'resultados'; }
 // Ao abrir uma avaliação, sempre cai na última etapa disponível (não na
 // etapa_atual salva) — etapa_atual só avança pelo fluxo "avançar" sequencial e
 // fica desatualizada quando a navegação é feita pelas abas.
