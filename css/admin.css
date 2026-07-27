@@ -105,6 +105,18 @@
 .status-texto { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
 .status-texto--ativo { color: var(--green); }
 .status-texto--inativo { color: var(--red); }
+
+#adm-panel-competencias .btn-icon--competencia-toggle.btn-icon--ativo {
+  background: #dcfce7;
+  color: #07883e;
+}
+#adm-panel-competencias .btn-icon--competencia-toggle.btn-icon--ativo:hover {
+  background: #bbf7d0;
+  color: #056c33;
+}
+#adm-panel-competencias .btn-icon--competencia-toggle .icon {
+  stroke-width: 2.25;
+}
 .status-texto--indefinido { color: var(--text-faint); }
 
 .badge-ciclo-planejado { background: var(--panel-alt); color: var(--text-soft); }
