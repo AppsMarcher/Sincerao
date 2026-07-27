@@ -34,6 +34,31 @@ function bytesToBase64(bytes: Uint8Array) {
   return btoa(binary);
 }
 
+function emailAvaliacaoHtml(
+  av: { colaborador?: { nome?: string }; gestor?: { nome?: string }; ciclo?: { nome?: string } },
+  nomeDestinatario?: string,
+  paraRh = false,
+) {
+  const saudacao = nomeDestinatario ? `Olá, ${esc(nomeDestinatario)}!` : 'Olá!';
+  const introducao = paraRh
+    ? 'Para conhecimento do RH, a avaliação de desempenho foi concluída e o relatório em PDF segue anexo.'
+    : 'A avaliação de desempenho foi concluída e o relatório em PDF segue anexo.';
+  return `<main style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:32px;color:#1e1e1e">
+    <img src="https://sincerao.marcher.com.br/assets/logo.png" alt="Sincerão" width="176" style="display:block;width:176px;height:auto">
+    <h1 style="margin:26px 0 18px;color:#5a0048;font-size:28px;line-height:1.2">Avaliação concluída</h1>
+    <p style="margin:0 0 14px;line-height:1.6">${saudacao}</p>
+    <p style="margin:0 0 22px;line-height:1.6">${introducao}</p>
+    <p style="margin:0 0 6px;line-height:1.5">Colaborador: <strong>${esc(av.colaborador?.nome || '—')}</strong></p>
+    <p style="margin:0 0 6px;line-height:1.5">Gestor: <strong>${esc(av.gestor?.nome || '—')}</strong></p>
+    <p style="margin:0 0 6px;line-height:1.5">Ciclo: <strong>${esc(av.ciclo?.nome || '—')}</strong></p>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:26px 0 0">
+      <tr><td align="center" bgcolor="#5a0048" style="border-radius:100px">
+        <a href="https://sincerao.marcher.com.br" style="display:inline-block;padding:14px 28px;font-family:Arial,sans-serif;font-size:15px;font-weight:700;line-height:1;text-decoration:none;color:#ffffff">Abrir o Sincerão</a>
+      </td></tr>
+    </table>
+  </main>`;
+}
+
 const LOGO_URL = 'https://sincerao.marcher.com.br/assets/logo-b.png';
 
 // Espelha CAMPOS_ETAPA de js/core/constants.js — duplicado de propósito, igual o
@@ -241,7 +266,6 @@ Deno.serve(async (req) => {
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) return json({ error: 'Envio de e-mail não configurado.' }, 500);
     const pdfBase64 = bytesToBase64(pdfBytes);
-    const corpoEmail = (nomeDestinatario: string) => `<p>Olá, ${esc(nomeDestinatario)},</p><p>Segue em anexo a avaliação de desempenho relativa ao ciclo <strong>${esc(av.ciclo?.nome || '—')}</strong> de <strong>${esc(av.colaborador?.nome)}</strong>, realizada em consenso com o gestor <strong>${esc(av.gestor?.nome)}</strong>.</p><p>Atenciosamente,<br>Sincerão Marcher</p>`;
     const envios = await Promise.all(destinatarios.map((pessoa) => fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
@@ -249,14 +273,13 @@ Deno.serve(async (req) => {
         from: Deno.env.get('RESEND_FROM') || 'Sincerão Marcher <no-reply@marcher.com.br>',
         to: [pessoa.email],
         subject: `Avaliação concluída — ${av.colaborador?.nome || ''}`,
-        html: corpoEmail(pessoa.nome),
+        html: emailAvaliacaoHtml(av, pessoa.nome),
         attachments: [{ filename: nomeArquivo, content: pdfBase64, content_type: 'application/pdf' }],
       }),
     })));
     if (envios.some((envio) => !envio.ok)) return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
 
     if (emailsRh.length) {
-      const corpoEmailRh = `<p>Olá,</p><p>Segue em anexo, para conhecimento do RH, a avaliação de desempenho relativa ao ciclo <strong>${esc(av.ciclo?.nome || '—')}</strong> de <strong>${esc(av.colaborador?.nome)}</strong>, concluída em consenso com o gestor <strong>${esc(av.gestor?.nome)}</strong>.</p><p>Atenciosamente,<br>Sincerão Marcher</p>`;
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
@@ -264,7 +287,7 @@ Deno.serve(async (req) => {
           from: Deno.env.get('RESEND_FROM') || 'Sincerão Marcher <no-reply@marcher.com.br>',
           to: emailsRh,
           subject: `Avaliação concluída — ${av.colaborador?.nome || ''}`,
-          html: corpoEmailRh,
+          html: emailAvaliacaoHtml(av, undefined, true),
           attachments: [{ filename: nomeArquivo, content: pdfBase64, content_type: 'application/pdf' }],
         }),
       }).catch(() => null);
