@@ -128,6 +128,17 @@ function precisaAcao(a, papelVisao) {
   return false;
 }
 
+// Concluída é um status único no banco, mas cada lado dá ciência em momentos
+// diferentes -- pra quem ainda não deu a própria, mostra "Aguardando ciência"
+// em vez de "Concluída" (some assim que a pessoa declara a ciência dela; RH
+// não tem ciência própria, sempre vê "Concluída" normal).
+function labelStatusCard(a, papelVisao) {
+  const faltaMinhaCiencia =
+    (papelVisao === 'colaborador' && !a.ciencia_colaborador_em) || (papelVisao === 'gestor' && !a.ciencia_gestor_em);
+  if (a.status === 'concluida' && faltaMinhaCiencia) return 'Aguardando ciência';
+  return statusLabel(a.status);
+}
+
 function linhasAvaliacaoHtml(lista, papelVisao) {
   return lista
     .map((a) => {
@@ -144,7 +155,7 @@ function linhasAvaliacaoHtml(lista, papelVisao) {
         <div class="muted">${subtitulo}</div>
       </div>
       <div class="card-avaliacao-badges">
-        <span class="badge${piscar ? ' badge-piscando' : ''}">${escHtml(statusLabel(a.status))}</span>
+        <span class="badge${piscar ? ' badge-piscando' : ''}">${escHtml(labelStatusCard(a, papelVisao))}</span>
         ${
           papelVisao === 'rh'
             ? `
