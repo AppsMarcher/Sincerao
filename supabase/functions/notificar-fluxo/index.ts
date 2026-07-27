@@ -41,7 +41,10 @@ Deno.serve(async (req) => {
       const participantes = (avaliacoes || []).map((avaliacao) => `Colaborador: <strong>${escHtml(nomes.get(avaliacao.colaborador_id) || 'não informado')}</strong> · Gestor: <strong>${escHtml(nomes.get(avaliacao.gestor_id) || 'não informado')}</strong>`).join('<br>');
       const mensagem = `O ciclo <strong>${escHtml(ciclo.nome)}</strong> foi iniciado. As avaliações serão conduzidas entre gestores e colaboradores envolvidos, de ${ciclo.data_inicio.split('-').reverse().join('/')} a ${ciclo.data_fim.split('-').reverse().join('/')}.<br><br><strong>Participantes</strong><br>${participantes}`;
       const response = await fetch('https://api.resend.com/emails', { method:'POST', headers:{ Authorization:`Bearer ${key}`,'Content-Type':'application/json' }, body:JSON.stringify({ from:Deno.env.get('RESEND_FROM') || 'Sincerão Marcher <no-reply@marcher.com.br>', to: destinatarios, subject:titulo, html:emailHtml(titulo,mensagem) }) });
-      if (!response.ok) return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
+      if (!response.ok) {
+        console.error('Resend rejeitou ciclo_iniciado:', response.status, await response.text().catch(() => ''));
+        return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
+      }
       return json({ ok:true });
     }
 
@@ -62,7 +65,10 @@ Deno.serve(async (req) => {
     const [titulo,mensagem] = textos[evento];
     const envolvidos = `<br><br>Colaborador: <strong>${escHtml(av.colaborador?.nome || 'não informado')}</strong><br>Gestor: <strong>${escHtml(av.gestor?.nome || 'não informado')}</strong>`;
     const response = await fetch('https://api.resend.com/emails', { method:'POST', headers:{ Authorization:`Bearer ${key}`,'Content-Type':'application/json' }, body:JSON.stringify({ from:Deno.env.get('RESEND_FROM') || 'Sincerão Marcher <no-reply@marcher.com.br>', to:(pessoas || []).map(p=>p.email), subject:titulo, html:emailHtml(titulo,mensagem + envolvidos) }) });
-    if (!response.ok) return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
+    if (!response.ok) {
+      console.error(`Resend rejeitou ${evento}:`, response.status, await response.text().catch(() => ''));
+      return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
+    }
     return json({ ok:true });
   } catch (e) { return json({ error: String(e) }, 500); }
 });
