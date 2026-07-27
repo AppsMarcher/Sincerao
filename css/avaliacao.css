@@ -137,5 +137,8 @@
   margin: 16px 0;
 }
 
+.aviso-reabertura { margin: 0 0 var(--space-3); padding: 14px 16px; border-radius: var(--radius-sm); background: var(--panel-alt); color: var(--text); border-left: 3px solid var(--amber); }
+.aviso-reabertura strong { display: block; margin-bottom: 4px; color: var(--amber); }
+
 .ciencia-wrap { margin-top: 20px; }
 .ciencia-item { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-size: 13px; }

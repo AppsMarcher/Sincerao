@@ -272,6 +272,8 @@ input[type="checkbox"], input[type="radio"] {
   transition: background-color .15s;
 }
 .btn-link:hover { background: var(--primary-soft); }
+.btn-link--perigo { color: var(--red); }
+.btn-link--perigo:hover { background: rgba(220, 38, 38, 0.1); }
 
 .badge {
   display: inline-flex;

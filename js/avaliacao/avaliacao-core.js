@@ -407,9 +407,10 @@ function etapasDisponiveis(av) {
   if (av.status === 'rascunho') return meuPapelNaAvaliacao(av) === 'gestor' || meuPapelNaAvaliacao(av) === 'rh' ? ['resultados', 'competencias', 'feedback_gestor'] : [];
   if (av.status === 'aguardando_autoavaliacao') return meuPapelNaAvaliacao(av) === 'colaborador' ? ['autoavaliacao', 'feedback_colaborador'] : [];
   if (av.status === 'aguardando_alinhamento') {
-    return ['gestor', 'rh'].includes(meuPapelNaAvaliacao(av))
-      ? ['plano_desenvolvimento', 'resumo', 'parecer_final']
-      : [];
+    if (!['gestor', 'rh'].includes(meuPapelNaAvaliacao(av))) return [];
+    // Avaliação reaberta (já foi concluída uma vez): continua mostrando as 8
+    // etapas pra revisão, mesmo com só Plano/Resumo/Parecer editáveis.
+    return av.dados?.reabertura ? ETAPAS.map((e) => e.id) : ['plano_desenvolvimento', 'resumo', 'parecer_final'];
   }
   return ['plano_desenvolvimento', 'resumo', 'parecer_final'];
 }

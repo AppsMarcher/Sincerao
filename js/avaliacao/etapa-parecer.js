@@ -6,22 +6,76 @@ function renderEtapaParecer() {
   const papel = meuPapelNaAvaliacao(av);
   const podeEditar = (papel === 'gestor' || papel === 'rh') && av.status === 'aguardando_alinhamento';
   const concluida = av.status === 'concluida';
+  const podeReabrir = concluida && ehRhOuAdmin();
   const rascunho = podeEditar ? lerRascunhoEtapa(av.id, 'parecer_consenso') : null;
   const parecerLegado = [dados.parecer_gestor, dados.parecer_colaborador].filter(Boolean).join('\n\n');
   const valor = rascunho?.valores?.valor ?? dados.parecer_consenso ?? parecerLegado;
   document.getElementById('etapa-conteudo').innerHTML = `
     <h3>Parecer Final</h3>
+    ${renderAvisoReabertura(av)}
     ${rascunho ? '<p class="muted">Rascunho local recuperado. Salve para concluir a avaliação.</p>' : ''}
     <label class="campo"><span>Parecer do Gestor e Colaborador</span><textarea id="parecer-consenso" ${podeEditar ? '' : 'disabled'}>${escHtml(valor)}</textarea></label>
     ${podeEditar ? '<div class="etapa-acoes"><button class="btn-primary" onclick="salvarParecerConsenso()">Salvar e concluir avaliação</button></div>' : ''}
     ${concluida ? renderResultadoFinal(av) : ''}
     ${av.status === 'aguardando_alinhamento' ? '<p class="muted">Registre aqui o parecer definido no consenso para concluir a avaliação.</p>' : ''}
     ${concluida ? renderCiencia(av, papel) : ''}
+    ${podeReabrir ? '<div class="etapa-acoes"><button class="btn-link btn-link--perigo" onclick="abrirModalReabrirAvaliacao()">Reabrir avaliação</button></div>' : ''}
   `;
   if (podeEditar) {
     document.getElementById('parecer-consenso').addEventListener('input', (e) => {
       salvarRascunhoEtapa(av.id, 'parecer_consenso', { valor: e.target.value });
     });
+  }
+}
+
+function renderAvisoReabertura(av) {
+  const r = av.dados?.reabertura;
+  if (!r) return '';
+  return `<div class="aviso-reabertura"><strong>Avaliação reaberta${r.reaberto_por_nome ? ' por ' + escHtml(r.reaberto_por_nome) : ''}</strong> em ${new Date(r.reaberto_em).toLocaleString('pt-BR')}.<br>Motivo: ${escHtml(r.motivo)}</div>`;
+}
+
+function abrirModalReabrirAvaliacao() {
+  document.getElementById('reabrir-motivo').value = '';
+  document.getElementById('modal-reabrir-avaliacao').classList.add('open');
+}
+
+function fecharModalReabrirAvaliacao() {
+  document.getElementById('modal-reabrir-avaliacao').classList.remove('open');
+}
+
+async function confirmarReabrirAvaliacao() {
+  const av = G.avaliacaoAtual;
+  const motivo = document.getElementById('reabrir-motivo').value.trim();
+  if (!respostaValida(motivo)) {
+    showToast(`Descreva o motivo da reabertura (mínimo ${MIN_CHARS_RESPOSTA_AVALIACAO} caracteres).`);
+    return;
+  }
+  const novosDados = {
+    ...av.dados,
+    reabertura: {
+      motivo,
+      reaberto_por_nome: G.perfil?.nome || null,
+      reaberto_por_email: G.perfil?.email || null,
+      reaberto_em: new Date().toISOString(),
+    },
+  };
+  try {
+    await atualizarAvaliacao({
+      dados: novosDados,
+      status: 'aguardando_alinhamento',
+      ciencia_colaborador_em: null,
+      ciencia_gestor_em: null,
+      ciencia_rh_em: null,
+      ciencia_rh_nome: null,
+      ciencia_rh_email: null,
+    });
+    fecharModalReabrirAvaliacao();
+    showToast('Avaliação reaberta. Plano, Resumo e Parecer voltaram a ficar editáveis.');
+    document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
+    renderBotoesTransicao();
+    renderEtapaAtiva();
+  } catch (err) {
+    showToast(mensagemErroAvaliacao(err, 'Não foi possível reabrir a avaliação.'));
   }
 }
 

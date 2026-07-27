@@ -13,13 +13,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="css/base.css?v=22">
-<link rel="stylesheet" href="css/login.css?v=25">
-<link rel="stylesheet" href="css/dashboard.css?v=19">
-<link rel="stylesheet" href="css/perfil.css?v=18">
-<link rel="stylesheet" href="css/avaliacao.css?v=21">
-<link rel="stylesheet" href="css/admin.css?v=24">
-<link rel="stylesheet" href="css/responsive.css?v=23">
+<link rel="stylesheet" href="css/base.css?v=23">
+<link rel="stylesheet" href="css/login.css?v=26">
+<link rel="stylesheet" href="css/dashboard.css?v=20">
+<link rel="stylesheet" href="css/perfil.css?v=19">
+<link rel="stylesheet" href="css/avaliacao.css?v=22">
+<link rel="stylesheet" href="css/admin.css?v=25">
+<link rel="stylesheet" href="css/responsive.css?v=24">
 </head>
 <body>
 
@@ -461,6 +461,19 @@
   </div>
 </div>
 
+<!-- MODAL: reabrir avaliação (RH/admin) -->
+<div id="modal-reabrir-avaliacao" class="modal" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <h3>Reabrir avaliação?</h3>
+    <p class="muted">Plano de Desenvolvimento, Resumo e Parecer voltam a ficar editáveis para o gestor. As ciências já registradas serão reiniciadas — colaborador, gestor e RH precisarão confirmar ciência de novo após a conclusão.</p>
+    <label class="campo"><span>Motivo da reabertura</span><textarea id="reabrir-motivo" placeholder="Descreva o que precisa ser corrigido"></textarea></label>
+    <div class="modal-actions">
+      <button class="btn-link" onclick="fecharModalReabrirAvaliacao()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarReabrirAvaliacao()">Reabrir avaliação</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: criar avaliações de um ciclo -->
 <div id="modal-criar-avaliacoes" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-criar-avaliacoes-titulo" onclick="if (event.target === this) fecharModalCriarAvaliacoes()">
   <div class="modal-box">
@@ -484,33 +497,33 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="supabase-config.js?v=19"></script>
+<script src="supabase-config.js?v=20"></script>
 
-<script src="js/core/constants.js?v=19"></script>
-<script src="js/core/supabase-client.js?v=20"></script>
-<script src="js/core/state.js?v=19"></script>
-<script src="js/core/utils.js?v=19"></script>
+<script src="js/core/constants.js?v=20"></script>
+<script src="js/core/supabase-client.js?v=21"></script>
+<script src="js/core/state.js?v=20"></script>
+<script src="js/core/utils.js?v=20"></script>
 
-<script src="js/dashboard/dashboard-module.js?v=23"></script>
-<script src="js/gestao/gestao-module.js?v=9"></script>
-<script src="js/perfil/perfil-module.js?v=19"></script>
+<script src="js/dashboard/dashboard-module.js?v=24"></script>
+<script src="js/gestao/gestao-module.js?v=10"></script>
+<script src="js/perfil/perfil-module.js?v=20"></script>
 
-  <script src="js/avaliacao/avaliacao-core.js?v=27"></script>
-  <script src="js/avaliacao/etapa-texto.js?v=21"></script>
-<script src="js/avaliacao/etapa-competencias.js?v=21"></script>
-<script src="js/avaliacao/etapa-plano.js?v=23"></script>
-<script src="js/avaliacao/etapa-parecer.js?v=24"></script>
+  <script src="js/avaliacao/avaliacao-core.js?v=28"></script>
+  <script src="js/avaliacao/etapa-texto.js?v=22"></script>
+<script src="js/avaliacao/etapa-competencias.js?v=22"></script>
+<script src="js/avaliacao/etapa-plano.js?v=24"></script>
+<script src="js/avaliacao/etapa-parecer.js?v=25"></script>
 
-<script src="js/admin/cargos-module.js?v=19"></script>
-<script src="js/admin/setores-module.js?v=19"></script>
-<script src="js/admin/competencias-module.js?v=19"></script>
-<script src="js/admin/vinculo-module.js?v=20"></script>
-<script src="js/admin/ciclos-module.js?v=19"></script>
-<script src="js/admin/colaboradores-module.js?v=19"></script>
-<script src="js/admin/auditoria-module.js?v=20"></script>
-<script src="js/admin/admin-shell.js?v=22"></script>
+<script src="js/admin/cargos-module.js?v=20"></script>
+<script src="js/admin/setores-module.js?v=20"></script>
+<script src="js/admin/competencias-module.js?v=20"></script>
+<script src="js/admin/vinculo-module.js?v=21"></script>
+<script src="js/admin/ciclos-module.js?v=20"></script>
+<script src="js/admin/colaboradores-module.js?v=20"></script>
+<script src="js/admin/auditoria-module.js?v=21"></script>
+<script src="js/admin/admin-shell.js?v=23"></script>
 
-<script src="js/auth/auth-module.js?v=19"></script>
+<script src="js/auth/auth-module.js?v=20"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch((erro) => console.warn('PWA indisponível:', erro)));
