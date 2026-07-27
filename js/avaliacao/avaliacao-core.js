@@ -62,9 +62,7 @@ async function abrirAvaliacao(id) {
   G.etapaAtiva = etapaFinalDisponivel(av);
   document.getElementById('avaliacao-titulo').textContent = `Avaliação de ${av.colaborador?.nome || ''} — ${av.ciclo?.nome || ''}`;
   document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
-  const exportar = document.getElementById('avaliacao-exportar');
-  exportar.style.display = av.status === 'concluida' && ['gestor', 'rh'].includes(meuPapelNaAvaliacao(av)) ? '' : 'none';
-  exportar.classList.remove('open');
+  document.getElementById('avaliacao-exportar').classList.remove('open');
   renderBotoesTransicao();
   renderEtapaAtiva();
 }
@@ -446,9 +444,21 @@ async function dispararEmailFluxo(evento) { try { await sbInvokeFunction('notifi
 
 // Cada módulo de etapa (etapa-texto, etapa-competencias, etapa-plano, etapa-parecer)
 // expõe uma função render* própria; este dispatcher só decide qual chamar.
+// O botão Exportar só faz sentido na última etapa (Parecer Final), com a
+// avaliação concluída — nas demais abas fica escondido.
+function atualizarExportarAvaliacao() {
+  const av = G.avaliacaoAtual;
+  const exportar = document.getElementById('avaliacao-exportar');
+  exportar.style.display =
+    av.status === 'concluida' && G.etapaAtiva === 'parecer_final' && ['gestor', 'rh'].includes(meuPapelNaAvaliacao(av))
+      ? ''
+      : 'none';
+}
+
 function renderEtapaAtiva() {
   renderNavEtapas();
   renderBotoesTransicao();
+  atualizarExportarAvaliacao();
   const id = G.etapaAtiva;
   if (!ETAPAS.some((etapa) => etapa.id === id)) {
     document.getElementById('etapa-conteudo').innerHTML = '<p class="empty">Esta etapa não está disponível para o seu perfil no momento.</p>';

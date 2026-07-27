@@ -33,9 +33,37 @@ function renderEtapaPlano() {
   `;
 }
 
+const CAMPOS_PLANO_TEXTO = ['competencia', 'acao', 'responsavel', 'indicador_sucesso', 'acompanhamento'];
+function linhaPlanoPreenchida(l) { return CAMPOS_PLANO_TEXTO.some((campo) => (l[campo] || '').trim()) || l.prazo; }
+function linhaPlanoCompleta(l) { return CAMPOS_PLANO_TEXTO.every((campo) => respostaValida(l[campo])) && !!l.prazo; }
+
 async function avancarPlano() {
+  const linhas = G.avaliacaoAtual.plano || [];
+  const preenchidas = linhas.filter(linhaPlanoPreenchida);
+  // Única etapa com exceção à regra de preenchimento obrigatório: se não há
+  // nenhuma linha de plano, pede confirmação em vez de bloquear o avanço.
+  if (!preenchidas.length) {
+    confirmarAvancoSemPlano();
+    return;
+  }
+  if (preenchidas.some((l) => !linhaPlanoCompleta(l))) {
+    showToast(`Preencha todos os campos de cada linha do plano (mínimo ${MIN_CHARS_RESPOSTA_AVALIACAO} caracteres) ou remova a linha antes de avançar.`);
+    return;
+  }
+  await salvarAvancoPlano();
+}
+
+async function salvarAvancoPlano() {
   try { await salvarEtapaEAvancar(); showToast('Plano salvo.'); }
   catch { showToast('Não foi possível avançar no plano.'); }
+}
+
+function confirmarAvancoSemPlano() {
+  const modal = document.getElementById('modal-confirmar-fluxo');
+  document.getElementById('confirmar-fluxo-titulo').textContent = 'Avançar sem plano de desenvolvimento?';
+  document.getElementById('confirmar-fluxo-texto').textContent = 'Nenhuma linha de plano de desenvolvimento foi preenchida. Tem certeza que deseja avançar mesmo assim?';
+  modal._acaoConfirmada = salvarAvancoPlano;
+  modal.classList.add('open');
 }
 
 function linhaPlanoHtml(l, editavel) {

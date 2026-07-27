@@ -67,6 +67,14 @@ function togglePasswordVisibility(btn) {
   btn.setAttribute('aria-label', paraTexto ? 'Ocultar senha' : 'Mostrar senha');
 }
 
+// Toda resposta de texto da avaliação (perguntas abertas, comentário de
+// competência, plano de desenvolvimento, parecer final) precisa ter conteúdo
+// de verdade — não vazio e não só 1-2 letras preenchidas só pra passar.
+const MIN_CHARS_RESPOSTA_AVALIACAO = 10;
+function respostaValida(texto) {
+  return String(texto ?? '').trim().length >= MIN_CHARS_RESPOSTA_AVALIACAO;
+}
+
 function statusLabel(status) {
   return {
     rascunho: 'Rascunho (gestor)',

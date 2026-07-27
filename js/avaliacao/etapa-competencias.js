@@ -24,6 +24,10 @@ async function avancarCompetencias() {
     showToast('Selecione uma nota para todas as competências antes de avançar.');
     return;
   }
+  if (linhas.some((linha) => !respostaValida(linha.querySelector('textarea').value))) {
+    showToast(`Preencha um comentário completo (mínimo ${MIN_CHARS_RESPOSTA_AVALIACAO} caracteres) para todas as competências antes de avançar.`);
+    return;
+  }
   try {
     for (const linha of linhas) {
       const salvo = await salvarNotaCompetencia(linha.dataset.competencia, true);
@@ -78,6 +82,10 @@ async function salvarNotaCompetencia(competenciaId, silencioso = false) {
 
   if (!nota) {
     showToast('Selecione uma nota antes de salvar esta competência.');
+    return false;
+  }
+  if (!respostaValida(comentario)) {
+    showToast(`Escreva um comentário completo (mínimo ${MIN_CHARS_RESPOSTA_AVALIACAO} caracteres) antes de salvar esta competência.`);
     return false;
   }
 

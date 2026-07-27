@@ -51,7 +51,10 @@ function renderCiencia(av, meuPapel) {
 async function salvarParecerConsenso() {
   const av = G.avaliacaoAtual;
   const valor = document.getElementById('parecer-consenso').value.trim();
-  if (!valor) { showToast('Preencha o parecer final antes de concluir.'); return; }
+  if (!respostaValida(valor)) {
+    showToast(`Preencha o parecer final com um texto completo (mínimo ${MIN_CHARS_RESPOSTA_AVALIACAO} caracteres) antes de concluir.`);
+    return;
+  }
   const notas = (av.notas || []).map((n) => n.nota).filter((n) => n != null);
   const { pontuacaoGeral, percentual, classificacao } = calcularPontuacao(notas);
   if (pontuacaoGeral == null) {

@@ -69,7 +69,9 @@ function renderEtapaTexto(etapaId) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      const novosDados = { ...av.dados, [etapaId]: Object.fromEntries(fd.entries()) };
+      const valores = Object.fromEntries(fd.entries());
+      if (!validarRespostasEtapaTexto(campos, valores)) return;
+      const novosDados = { ...av.dados, [etapaId]: valores };
       try {
         await atualizarAvaliacao({ dados: novosDados });
         limparRascunhoEtapa(av.id, etapaId);
@@ -81,7 +83,9 @@ function renderEtapaTexto(etapaId) {
       }
     });
     document.getElementById('btn-salvar-avancar').addEventListener('click', async () => {
-      const novosDados = { ...av.dados, [etapaId]: Object.fromEntries(new FormData(form).entries()) };
+      const valores = Object.fromEntries(new FormData(form).entries());
+      if (!validarRespostasEtapaTexto(campos, valores)) return;
+      const novosDados = { ...av.dados, [etapaId]: valores };
       try { await salvarEtapaEAvancar({ dados: novosDados }); limparRascunhoEtapa(av.id, etapaId); showToast('Etapa salva.'); }
       catch (err) {
         if (!String(err?.message || '').includes('Conflito')) {
@@ -90,4 +94,14 @@ function renderEtapaTexto(etapaId) {
       }
     });
   }
+}
+
+function validarRespostasEtapaTexto(campos, valores) {
+  for (const [key, label] of campos) {
+    if (!respostaValida(valores[key])) {
+      showToast(`Preencha "${label}" com uma resposta completa (mínimo ${MIN_CHARS_RESPOSTA_AVALIACAO} caracteres) antes de salvar.`);
+      return false;
+    }
+  }
+  return true;
 }
