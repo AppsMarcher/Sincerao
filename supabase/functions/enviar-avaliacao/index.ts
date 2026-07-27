@@ -165,7 +165,6 @@ function relatorioHtml(av: any, notas: any[], plano: any[]) {
   const cienciaHtml = `<h2>Ciência</h2><table><thead><tr><th>Participante</th><th>E-mail</th><th>Data e hora</th></tr></thead><tbody>${[
     ['Colaborador', av.colaborador?.nome, av.colaborador?.email, av.ciencia_colaborador_em],
     ['Gestor', av.gestor?.nome, av.gestor?.email, av.ciencia_gestor_em],
-    ['RH', av.ciencia_rh_nome, av.ciencia_rh_email, av.ciencia_rh_em],
   ].map(([papel, nome, email, data]) => `<tr><td><strong>${esc(papel)}</strong><br>${esc(nome || 'Não identificado')}</td><td>${esc(email || '—')}</td><td>${esc(dataHora(data as string | null | undefined))}</td></tr>`).join('')}</tbody></table>`;
 
   const geradoEm = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -202,7 +201,7 @@ Deno.serve(async (req) => {
     if (!avaliacao_id) return json({ error: 'Avaliação não informada.' }, 400);
 
     const admin = createClient(url, service);
-    const { data: av } = await admin.from('avaliacoes').select('id,status,dados,pontuacao_geral,percentual,classificacao,ciencia_colaborador_em,ciencia_gestor_em,ciencia_rh_em,ciencia_rh_nome,ciencia_rh_email,colaborador_id,gestor_id,colaborador:colaborador_id(nome,email),gestor:gestor_id(nome,email),ciclo:ciclo_id(nome)').eq('id', avaliacao_id).single();
+    const { data: av } = await admin.from('avaliacoes').select('id,status,dados,pontuacao_geral,percentual,classificacao,ciencia_colaborador_em,ciencia_gestor_em,colaborador_id,gestor_id,colaborador:colaborador_id(nome,email),gestor:gestor_id(nome,email),ciclo:ciclo_id(nome)').eq('id', avaliacao_id).single();
     if (!av || av.status !== 'concluida') return json({ error: 'Somente avaliações concluídas podem ser enviadas.' }, 400);
     const { data: perfil } = await admin.from('perfis').select('papel').eq('id', user.id).single();
     const autorizado = user.id === av.gestor_id || ['rh', 'admin'].includes(perfil?.papel);
@@ -218,6 +217,12 @@ Deno.serve(async (req) => {
     }
     const destinatarios = Array.from(destinatariosPorEmail.values());
     if (!destinatarios.length) return json({ error: 'Os envolvidos não possuem e-mail cadastrado.' }, 400);
+    // RH entra em cópia (papel 'rh', não 'admin') pra ter visibilidade da
+    // avaliação concluída, já que a ciência do RH deixou de ser exigida no
+    // fluxo -- não são "envolvidos" (não têm o botão personalizado "Olá, X"),
+    // então recebem num e-mail à parte, best-effort (não falha o envio principal).
+    const { data: perfisRh } = await admin.from('perfis').select('email').eq('papel', 'rh').eq('ativo', true);
+    const emailsRh = Array.from(new Set((perfisRh || []).map((p) => p.email).filter(Boolean)));
     const token = Deno.env.get('BROWSERLESS_API_TOKEN');
     if (!token) return json({ error: 'Geração de PDF não configurada (BROWSERLESS_API_TOKEN ausente).' }, 500);
     const pdf = await fetch(`https://production-sfo.browserless.io/pdf?token=${token}`, {
@@ -253,6 +258,22 @@ Deno.serve(async (req) => {
       }),
     })));
     if (envios.some((envio) => !envio.ok)) return json({ error: 'Não foi possível enviar o e-mail.' }, 502);
+
+    if (emailsRh.length) {
+      const corpoEmailRh = `<p>Olá,</p><p>Segue em anexo, para conhecimento do RH, a avaliação de desempenho relativa ao ciclo <strong>${esc(av.ciclo?.nome || '—')}</strong> de <strong>${esc(av.colaborador?.nome)}</strong>, concluída em consenso com o gestor <strong>${esc(av.gestor?.nome)}</strong>.</p><p>Atenciosamente,<br>Sincerão Marcher</p>`;
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: Deno.env.get('RESEND_FROM') || 'Sincerão <no-reply@marcher.com.br>',
+          to: emailsRh,
+          subject: `Avaliação concluída — ${av.colaborador?.nome || ''}`,
+          html: corpoEmailRh,
+          attachments: [{ filename: nomeArquivo, content: pdfBase64, content_type: 'application/pdf' }],
+        }),
+      }).catch(() => null);
+    }
+
     return json({ ok: true });
   } catch (erro) { return json({ error: String(erro) }, 500); }
 });

@@ -107,10 +107,8 @@ function renderDashboard() {
   const secaoTodas = document.getElementById('dash-todas-wrap');
   if (ehRhOuAdmin()) {
     secaoTodas.style.display = '';
-    const pendentePrimeiro = (a) => (a.status === 'concluida' && !a.ciencia_rh_em ? 0 : 1);
-    const todasOrdenadas = [...G.avaliacoes].sort((a, b) => pendentePrimeiro(a) - pendentePrimeiro(b));
     document.getElementById('dash-todas').innerHTML =
-      linhasAvaliacaoHtml(todasOrdenadas, 'rh') || '<p class="empty">Nenhuma avaliação criada ainda.</p>';
+      linhasAvaliacaoHtml(G.avaliacoes, 'rh') || '<p class="empty">Nenhuma avaliação criada ainda.</p>';
   } else {
     secaoTodas.style.display = 'none';
   }
@@ -119,7 +117,6 @@ function renderDashboard() {
 function linhasAvaliacaoHtml(lista, papelVisao) {
   return lista
     .map((a) => {
-      const pendenteCiencia = a.status === 'concluida' && !a.ciencia_rh_em;
       const titulo = papelVisao === 'rh' ? a.colaborador?.nome : papelVisao === 'gestor' ? a.colaborador?.nome : a.ciclo?.nome;
       const subtitulo =
         papelVisao === 'rh'
@@ -132,7 +129,6 @@ function linhasAvaliacaoHtml(lista, papelVisao) {
         <div class="muted">${subtitulo}</div>
       </div>
       <div class="card-avaliacao-badges">
-        ${pendenteCiencia ? '<span class="badge badge-atencao">Aguardando sua ciência</span>' : ''}
         <span class="badge">${escHtml(statusLabel(a.status))}</span>
         ${
           papelVisao === 'rh'

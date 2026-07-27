@@ -192,7 +192,6 @@ function imprimirAvaliacao() {
   const ciencia = `<h2>Ciência</h2><table><thead><tr><th>Participante</th><th>E-mail</th><th>Data e hora</th></tr></thead><tbody>${[
     ['Colaborador', av.colaborador?.nome, av.colaborador?.email, av.ciencia_colaborador_em],
     ['Gestor', av.gestor?.nome, av.gestor?.email, av.ciencia_gestor_em],
-    ['RH', av.ciencia_rh_nome, av.ciencia_rh_email, av.ciencia_rh_em],
   ].map(([papel, nome, email, data]) => `<tr><td><strong>${escHtml(papel)}</strong><br>${escHtml(nome || 'Não identificado')}</td><td>${escHtml(email || '—')}</td><td>${escHtml(dataHora(data))}</td></tr>`).join('')}</tbody></table>`;
   const meta = `<div class="meta"><span>Colaborador <strong>${escHtml(av.colaborador?.nome || '—')}</strong></span><span>Gestor <strong>${escHtml(av.gestor?.nome || '—')}</strong></span><span>Ciclo <strong>${escHtml(av.ciclo?.nome || '—')}</strong></span></div>`;
   const pagina = (numero, titulo, conteudo) => `<article class="pagina"><header class="banda"><div class="banda-topo"><img src="${RELATORIO_LOGO_URL}" alt="Sincerão"><span class="etapa-pill">Etapa ${numero} de 8</span></div><h1>${escHtml(titulo)}</h1>${meta}</header>${conteudo}<div class="rodape-pagina">Sincerão · Avaliação de Desempenho · Documento confidencial</div></article>`;

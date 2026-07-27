@@ -65,9 +65,6 @@ async function confirmarReabrirAvaliacao() {
       status: 'aguardando_alinhamento',
       ciencia_colaborador_em: null,
       ciencia_gestor_em: null,
-      ciencia_rh_em: null,
-      ciencia_rh_nome: null,
-      ciencia_rh_email: null,
     });
     fecharModalReabrirAvaliacao();
     showToast('Avaliação reaberta. Plano, Resumo e Parecer voltaram a ficar editáveis.');
@@ -98,7 +95,6 @@ function renderCiencia(av, meuPapel) {
     <h4>Ciência</h4>
     ${item('colaborador', 'Colaborador', av.ciencia_colaborador_em)}
     ${item('gestor', 'Gestor', av.ciencia_gestor_em)}
-    ${item('rh', 'RH', av.ciencia_rh_em)}
   </div>`;
 }
 
@@ -159,14 +155,38 @@ async function concluirAvaliacaoAgora() {
 async function registrarCiencia(papel) {
   try {
     const patch = { ['ciencia_' + papel + '_em']: new Date().toISOString() };
-    if (papel === 'rh') {
-      patch.ciencia_rh_nome = G.perfil?.nome || null;
-      patch.ciencia_rh_email = G.perfil?.email || null;
-    }
     await atualizarAvaliacao(patch);
     showToast('Ciência registrada.');
     renderEtapaAtiva();
+    const av = G.avaliacaoAtual;
+    if (av.ciencia_colaborador_em && av.ciencia_gestor_em) await finalizarConsensoAutomatico(av);
   } catch (err) {
     if (!String(err?.message || '').includes('Conflito')) showToast('Não foi possível registrar a ciência.');
   }
+}
+
+// Dispara só pra quem registrou a 2ª ciência do par (colaborador/gestor, em
+// qualquer ordem) -- a checagem acima só dá as duas preenchidas pra quem de
+// fato completou o par, graças à fila com merge por versão de
+// atualizarAvaliacao (a mesma gravação nunca vê "as duas preenchidas" duas
+// vezes). Reenvio de e-mail continua disponível manualmente em Exportar, caso
+// o envio automático falhe.
+async function finalizarConsensoAutomatico(av) {
+  const souColaborador = meuPapelNaAvaliacao(av) === 'colaborador';
+  const outroNome = souColaborador ? (av.gestor?.nome || 'o gestor') : (av.colaborador?.nome || 'o colaborador');
+  try {
+    await sbInvokeFunction('enviar-avaliacao', { avaliacao_id: av.id });
+  } catch {
+    // Melhor esforço, igual dispararEmailFluxo -- não bloqueia a experiência.
+  }
+  abrirModalConsensoConcluido(`Você e ${outroNome} já deram ciência do consenso. A avaliação foi enviada por e-mail aos envolvidos.`);
+}
+
+function abrirModalConsensoConcluido(mensagem) {
+  document.getElementById('consenso-concluido-texto').textContent = mensagem;
+  document.getElementById('modal-consenso-concluido').classList.add('open');
+}
+
+function fecharModalConsensoConcluido() {
+  document.getElementById('modal-consenso-concluido').classList.remove('open');
 }
