@@ -218,11 +218,12 @@ function enviarAvaliacaoPorEmail() {
     showToast('Apenas avaliações concluídas podem ser enviadas.');
     return;
   }
-  const modal = document.getElementById('modal-confirmar-fluxo');
-  document.getElementById('confirmar-fluxo-titulo').textContent = 'Enviar avaliação por e-mail?';
-  document.getElementById('confirmar-fluxo-texto').textContent = `${av.colaborador?.nome || 'O colaborador'} e ${av.gestor?.nome || 'o gestor'} receberão o PDF da avaliação concluída por e-mail.`;
-  modal._acaoConfirmada = enviarAvaliacaoPorEmailConfirmado;
-  modal.classList.add('open');
+  abrirConfirmacao({
+    titulo: 'Enviar avaliação por e-mail?',
+    texto: `${av.colaborador?.nome || 'O colaborador'} e ${av.gestor?.nome || 'o gestor'} receberão o PDF da avaliação concluída por e-mail.`,
+    acao: enviarAvaliacaoPorEmailConfirmado,
+    rotuloConfirmar: 'Enviar',
+  });
 }
 
 async function enviarAvaliacaoPorEmailConfirmado() {
@@ -556,13 +557,8 @@ function confirmarTransicaoFase(tipo) {
     : tipo === 'fase_2'
       ? ['Devolver avaliação ao gestor?', 'Após o envio, as respostas da Fase 2 ficarão bloqueadas para edição.', enviarParaAlinhamento]
       : ['Concluir avaliação?', 'Os dois pareceres foram salvos e a avaliação ficará bloqueada.', concluirAvaliacaoAgora];
-  const modal = document.getElementById('modal-confirmar-fluxo');
-  document.getElementById('confirmar-fluxo-titulo').textContent = dados[0];
-  document.getElementById('confirmar-fluxo-texto').textContent = dados[1];
-  modal._acaoConfirmada = dados[2]; modal.classList.add('open');
+  abrirConfirmacao({ titulo: dados[0], texto: dados[1], acao: dados[2] });
 }
-function fecharModalConfirmarFluxo() { document.getElementById('modal-confirmar-fluxo').classList.remove('open'); }
-async function executarConfirmacaoFluxo() { const modal = document.getElementById('modal-confirmar-fluxo'); fecharModalConfirmarFluxo(); await modal._acaoConfirmada?.(); }
 async function dispararEmailFluxo(evento) { try { await sbInvokeFunction('notificar-fluxo', { avaliacao_id: G.avaliacaoAtual.id, evento }); } catch { showToast('Notificação criada; não foi possível enviar o e-mail.'); } }
 
 // Cada módulo de etapa (etapa-texto, etapa-competencias, etapa-parecer)

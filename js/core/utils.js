@@ -21,6 +21,41 @@ function showToast(m) {
   _toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
 }
 
+let _confirmacaoTrigger = null;
+function abrirConfirmacao({ titulo, texto, acao, rotuloConfirmar = 'Confirmar', perigosa = false }) {
+  const modal = document.getElementById('modal-confirmar-fluxo');
+  const botao = document.getElementById('confirmar-fluxo-botao');
+  _confirmacaoTrigger = document.activeElement;
+  document.getElementById('confirmar-fluxo-titulo').textContent = titulo;
+  document.getElementById('confirmar-fluxo-texto').textContent = texto;
+  botao.textContent = rotuloConfirmar;
+  botao.classList.toggle('btn-primary--perigo', perigosa);
+  modal._acaoConfirmada = acao;
+  modal.classList.add('open');
+  botao.focus();
+}
+
+function fecharModalConfirmarFluxo() {
+  const modal = document.getElementById('modal-confirmar-fluxo');
+  modal.classList.remove('open');
+  modal._acaoConfirmada = null;
+  if (_confirmacaoTrigger?.isConnected) _confirmacaoTrigger.focus();
+  _confirmacaoTrigger = null;
+}
+
+async function executarConfirmacaoFluxo() {
+  const modal = document.getElementById('modal-confirmar-fluxo');
+  const acao = modal._acaoConfirmada;
+  fecharModalConfirmarFluxo();
+  await acao?.();
+}
+
+document.addEventListener('keydown', (evento) => {
+  if (evento.key === 'Escape' && document.getElementById('modal-confirmar-fluxo')?.classList.contains('open')) {
+    fecharModalConfirmarFluxo();
+  }
+});
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

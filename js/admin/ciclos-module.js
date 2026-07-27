@@ -88,9 +88,18 @@ async function salvarEdicaoCiclo(id) {
   showToast('Ciclo atualizado.');
 }
 
-async function excluirCiclo(id) {
+function excluirCiclo(id) {
   const ciclo = G.ciclos.find((c) => c.id === id);
-  if (!confirm(`Excluir o ciclo "${ciclo?.nome || ''}"? Essa ação não pode ser desfeita.`)) return;
+  abrirConfirmacao({
+    titulo: 'Excluir ciclo?',
+    texto: `O ciclo "${ciclo?.nome || ''}" será excluído permanentemente. Essa ação não pode ser desfeita.`,
+    acao: () => executarExclusaoCiclo(id),
+    rotuloConfirmar: 'Excluir',
+    perigosa: true,
+  });
+}
+
+async function executarExclusaoCiclo(id) {
   try {
     await sbFetch('/ciclos_avaliacao?id=eq.' + id, { method: 'DELETE' });
   } catch (e) {

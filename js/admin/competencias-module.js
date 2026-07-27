@@ -97,12 +97,13 @@ async function toggleCompetenciaAtiva(id, novoValor) {
 
 function excluirCompetencia(id) {
   const competencia = G.competencias.find((c) => c.id === id);
-  const modal = document.getElementById('modal-confirmar-fluxo');
-  document.getElementById('confirmar-fluxo-titulo').textContent = 'Excluir competência?';
-  document.getElementById('confirmar-fluxo-texto').textContent =
-    `A competência "${competencia?.nome || ''}" será excluída permanentemente. Essa ação não pode ser desfeita.`;
-  modal._acaoConfirmada = () => executarExclusaoCompetencia(id);
-  modal.classList.add('open');
+  abrirConfirmacao({
+    titulo: 'Excluir competência?',
+    texto: `A competência "${competencia?.nome || ''}" será excluída permanentemente. Essa ação não pode ser desfeita.`,
+    acao: () => executarExclusaoCompetencia(id),
+    rotuloConfirmar: 'Excluir',
+    perigosa: true,
+  });
 }
 
 async function executarExclusaoCompetencia(id) {

@@ -93,9 +93,18 @@ async function toggleSetorAtivo(id, novoValor) {
   await carregarSetores();
 }
 
-async function excluirSetor(id) {
+function excluirSetor(id) {
   const setor = G.setores.find((s) => s.id === id);
-  if (!confirm(`Excluir o setor "${setor?.nome || ''}"? Essa ação não pode ser desfeita.`)) return;
+  abrirConfirmacao({
+    titulo: 'Excluir setor?',
+    texto: `O setor "${setor?.nome || ''}" será excluído permanentemente. Essa ação não pode ser desfeita.`,
+    acao: () => executarExclusaoSetor(id),
+    rotuloConfirmar: 'Excluir',
+    perigosa: true,
+  });
+}
+
+async function executarExclusaoSetor(id) {
   try {
     await sbFetch('/setores?id=eq.' + id, { method: 'DELETE' });
   } catch (e) {

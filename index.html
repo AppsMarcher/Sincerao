@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="css/base.css?v=24">
+<link rel="stylesheet" href="css/base.css?v=25">
 <link rel="stylesheet" href="css/login.css?v=27">
 <link rel="stylesheet" href="css/dashboard.css?v=24">
 <link rel="stylesheet" href="css/perfil.css?v=20">
@@ -25,8 +25,8 @@
 
 <div id="toast" class="toast"></div>
 
-<div id="modal-confirmar-fluxo" class="modal" role="dialog" aria-modal="true">
-  <div class="modal-box"><h3 id="confirmar-fluxo-titulo"></h3><p id="confirmar-fluxo-texto" class="muted"></p><div class="modal-actions"><button class="btn-link" onclick="fecharModalConfirmarFluxo()">Cancelar</button><button class="btn-primary" onclick="executarConfirmacaoFluxo()">Confirmar</button></div></div>
+<div id="modal-confirmar-fluxo" class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmar-fluxo-titulo" aria-describedby="confirmar-fluxo-texto" onclick="if (event.target === this) fecharModalConfirmarFluxo()">
+  <div class="modal-box"><h3 id="confirmar-fluxo-titulo"></h3><p id="confirmar-fluxo-texto" class="muted"></p><div class="modal-actions"><button type="button" class="btn-link" onclick="fecharModalConfirmarFluxo()">Cancelar</button><button type="button" id="confirmar-fluxo-botao" class="btn-primary" onclick="executarConfirmacaoFluxo()">Confirmar</button></div></div>
 </div>
 
 <div id="modal-consenso-concluido" class="modal" role="dialog" aria-modal="true">
@@ -491,23 +491,23 @@
 <script src="js/core/constants.js?v=22"></script>
 <script src="js/core/supabase-client.js?v=22"></script>
 <script src="js/core/state.js?v=21"></script>
-<script src="js/core/utils.js?v=21"></script>
+<script src="js/core/utils.js?v=22"></script>
 
-<script src="js/dashboard/dashboard-module.js?v=31"></script>
+<script src="js/dashboard/dashboard-module.js?v=32"></script>
 <script src="js/gestao/gestao-module.js?v=13"></script>
 <script src="js/perfil/perfil-module.js?v=21"></script>
 
-  <script src="js/avaliacao/avaliacao-core.js?v=37"></script>
+  <script src="js/avaliacao/avaliacao-core.js?v=38"></script>
   <script src="js/avaliacao/etapa-texto.js?v=25"></script>
 <script src="js/avaliacao/etapa-competencias.js?v=25"></script>
 <script src="js/avaliacao/etapa-parecer.js?v=27"></script>
 
-<script src="js/admin/cargos-module.js?v=21"></script>
-<script src="js/admin/setores-module.js?v=21"></script>
-<script src="js/admin/competencias-module.js?v=23"></script>
+<script src="js/admin/cargos-module.js?v=22"></script>
+<script src="js/admin/setores-module.js?v=22"></script>
+<script src="js/admin/competencias-module.js?v=24"></script>
 <script src="js/admin/vinculo-module.js?v=22"></script>
-<script src="js/admin/ciclos-module.js?v=21"></script>
-<script src="js/admin/colaboradores-module.js?v=21"></script>
+<script src="js/admin/ciclos-module.js?v=22"></script>
+<script src="js/admin/colaboradores-module.js?v=22"></script>
 <script src="js/admin/auditoria-module.js?v=22"></script>
 <script src="js/admin/admin-shell.js?v=24"></script>
 

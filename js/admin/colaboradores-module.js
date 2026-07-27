@@ -208,9 +208,18 @@ async function confirmarDefinirSenha() {
   }
 }
 
-async function excluirColaborador(id) {
+function excluirColaborador(id) {
   const colaborador = G.colaboradores.find((c) => c.id === id);
-  if (!confirm(`Excluir o colaborador "${colaborador?.nome || ''}"? A conta de login também será removida. Essa ação não pode ser desfeita.`)) return;
+  abrirConfirmacao({
+    titulo: 'Excluir colaborador?',
+    texto: `O colaborador "${colaborador?.nome || ''}" e sua conta de login serão removidos permanentemente. Essa ação não pode ser desfeita.`,
+    acao: () => executarExclusaoColaborador(id),
+    rotuloConfirmar: 'Excluir',
+    perigosa: true,
+  });
+}
+
+async function executarExclusaoColaborador(id) {
   try {
     await sbInvokeFunction('admin-colaborador', { acao: 'excluir', colaborador_id: id });
   } catch (err) {

@@ -59,11 +59,13 @@ async function carregarNotificacoes() {
 }
 
 async function limparNotificacoes() {
-  const modal = document.getElementById('modal-confirmar-fluxo');
-  document.getElementById('confirmar-fluxo-titulo').textContent = 'Limpar notificações?';
-  document.getElementById('confirmar-fluxo-texto').textContent = 'Todas as suas notificações serão removidas. Essa ação não pode ser desfeita.';
-  modal._acaoConfirmada = executarLimpezaNotificacoes;
-  modal.classList.add('open');
+  abrirConfirmacao({
+    titulo: 'Limpar notificações?',
+    texto: 'Todas as suas notificações serão removidas. Essa ação não pode ser desfeita.',
+    acao: executarLimpezaNotificacoes,
+    rotuloConfirmar: 'Limpar',
+    perigosa: true,
+  });
 }
 
 async function executarLimpezaNotificacoes() {
@@ -174,9 +176,19 @@ function linhasAvaliacaoHtml(lista, papelVisao) {
     .join('');
 }
 
-async function excluirAvaliacao(id) {
+function excluirAvaliacao(id) {
   const av = G.avaliacoes.find((a) => a.id === id);
-  if (!confirm(`Excluir a avaliação de "${av?.colaborador?.nome || ''}" (${av?.ciclo?.nome || ''})? Essa ação não pode ser desfeita.`)) return;
+  abrirConfirmacao({
+    titulo: 'Excluir avaliação?',
+    texto: `A avaliação de "${av?.colaborador?.nome || ''}" (${av?.ciclo?.nome || ''}) será excluída permanentemente. Essa ação não pode ser desfeita.`,
+    acao: () => executarExclusaoAvaliacao(id),
+    rotuloConfirmar: 'Excluir',
+    perigosa: true,
+  });
+}
+
+async function executarExclusaoAvaliacao(id) {
+  const av = G.avaliacoes.find((a) => a.id === id);
   try {
     const removido = await sbFetch('/avaliacoes?id=eq.' + id + '&versao=eq.' + (Number(av?.versao) || 1), { method: 'DELETE' });
     if (!removido?.length) {

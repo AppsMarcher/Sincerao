@@ -100,9 +100,18 @@ async function toggleCargoAtivo(id, novoValor) {
   await carregarCargos();
 }
 
-async function excluirCargo(id) {
+function excluirCargo(id) {
   const cargo = G.cargos.find((c) => c.id === id);
-  if (!confirm(`Excluir o cargo "${cargo?.nome || ''}"? Essa ação não pode ser desfeita.`)) return;
+  abrirConfirmacao({
+    titulo: 'Excluir cargo?',
+    texto: `O cargo "${cargo?.nome || ''}" será excluído permanentemente. Essa ação não pode ser desfeita.`,
+    acao: () => executarExclusaoCargo(id),
+    rotuloConfirmar: 'Excluir',
+    perigosa: true,
+  });
+}
+
+async function executarExclusaoCargo(id) {
   try {
     await sbFetch('/cargos?id=eq.' + id, { method: 'DELETE' });
   } catch (e) {
