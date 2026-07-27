@@ -1,9 +1,8 @@
-// perfil/perfil-module.js — dados do usuário logado, troca de senha e histórico de avaliações concluídas
+// perfil/perfil-module.js — dados do usuário logado e troca de senha
 
-async function abrirPerfil() {
+function abrirPerfil() {
   goTo('screen-perfil');
   renderDadosPerfil();
-  await renderHistoricoAvaliacoes();
 }
 
 function renderDadosPerfil() {
@@ -18,27 +17,6 @@ function renderDadosPerfil() {
       <dt>Gestor</dt><dd>${escHtml(p.gestor?.nome || '—')}</dd>
     </dl>
   `;
-}
-
-async function renderHistoricoAvaliacoes() {
-  const rows = (await sbFetch(
-    '/avaliacoes?colaborador_id=eq.' + G.perfil.id + '&status=eq.concluida&select=*,ciclo:ciclo_id(nome)&order=concluida_em.desc'
-  )) || [];
-  const el = document.getElementById('perfil-historico');
-  el.innerHTML =
-    rows
-      .map(
-        (a) => `
-    <div class="card-avaliacao" onclick="abrirAvaliacao('${a.id}')">
-      <div>
-        <strong>${escHtml(a.ciclo?.nome || '')}</strong>
-        <div class="muted">Concluída em ${a.concluida_em ? new Date(a.concluida_em).toLocaleDateString('pt-BR') : '—'} · Pontuação ${a.pontuacao_geral ?? '—'}/5</div>
-      </div>
-      <span class="badge">${escHtml(a.classificacao || '—')}</span>
-    </div>
-  `
-      )
-      .join('') || '<p class="empty">Nenhuma avaliação concluída ainda.</p>';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
