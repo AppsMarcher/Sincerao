@@ -137,7 +137,6 @@ function linhasAvaliacaoHtml(lista, papelVisao) {
         ${
           papelVisao === 'rh'
             ? `
-        <button class="btn-icon" title="Editar avaliação" onclick="event.stopPropagation(); abrirEditarAvaliacao('${a.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="btn-icon btn-icon--perigo" title="Excluir avaliação" onclick="event.stopPropagation(); excluirAvaliacao('${a.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>`
             : ''
         }
@@ -146,61 +145,6 @@ function linhasAvaliacaoHtml(lista, papelVisao) {
   `;
     })
     .join('');
-}
-
-async function abrirEditarAvaliacao(id) {
-  const av = G.avaliacoes.find((a) => a.id === id);
-  if (!av) return;
-  if (!G.colaboradores.length) await carregarColaboradores();
-  if (!G.ciclos.length) await carregarCiclos();
-  const modal = document.getElementById('modal-editar-avaliacao');
-  modal.dataset.avaliacaoId = id;
-  document.getElementById('editar-av-colaborador').innerHTML = G.colaboradores
-    .map((c) => `<option value="${c.id}" ${c.id === av.colaborador_id ? 'selected' : ''}>${escHtml(c.nome)}</option>`)
-    .join('');
-  document.getElementById('editar-av-gestor').innerHTML = G.colaboradores
-    .map((c) => `<option value="${c.id}" ${c.id === av.gestor_id ? 'selected' : ''}>${escHtml(c.nome)}</option>`)
-    .join('');
-  document.getElementById('editar-av-ciclo').innerHTML = G.ciclos
-    .map((c) => `<option value="${c.id}" ${c.id === av.ciclo_id ? 'selected' : ''}>${escHtml(c.nome)}</option>`)
-    .join('');
-  const statusOpcoes = ['rascunho', 'aguardando_autoavaliacao', 'aguardando_alinhamento', 'concluida'];
-  document.getElementById('editar-av-status').innerHTML = statusOpcoes
-    .map((s) => `<option value="${s}" ${s === av.status ? 'selected' : ''}>${escHtml(statusLabel(s))}</option>`)
-    .join('');
-  modal.classList.add('open');
-}
-
-function fecharModalEditarAvaliacao() {
-  document.getElementById('modal-editar-avaliacao').classList.remove('open');
-}
-
-async function salvarEdicaoAvaliacao() {
-  const modal = document.getElementById('modal-editar-avaliacao');
-  const id = modal.dataset.avaliacaoId;
-  const avaliacaoAtual = G.avaliacoes.find((a) => a.id === id);
-  const patch = {
-    colaborador_id: document.getElementById('editar-av-colaborador').value,
-    gestor_id: document.getElementById('editar-av-gestor').value,
-    ciclo_id: document.getElementById('editar-av-ciclo').value,
-    status: document.getElementById('editar-av-status').value,
-  };
-  try {
-    const salvo = await sbFetch('/avaliacoes?id=eq.' + id + '&versao=eq.' + (Number(avaliacaoAtual?.versao) || 1), {
-      method: 'PATCH',
-      body: JSON.stringify(patch),
-    });
-    if (!salvo?.length) {
-      showToast('Conflito: esta avaliação foi alterada por outra pessoa. Feche e abra a edição novamente.');
-      return;
-    }
-  } catch (e) {
-    showToast(String(e.message || '').includes('duplicate') ? 'Esse colaborador já tem avaliação nesse ciclo.' : 'Erro ao salvar avaliação.');
-    return;
-  }
-  fecharModalEditarAvaliacao();
-  await abrirDashboard();
-  showToast('Avaliação atualizada.');
 }
 
 async function excluirAvaliacao(id) {
