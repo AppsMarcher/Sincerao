@@ -4,6 +4,8 @@
   background: linear-gradient(135deg, #edf4ff 0%, #f4effc 52%, #eee7fa 100%);
 }
 
+#form-etapa { margin-top: var(--space-3); }
+
 /* As etapas da avaliação aproveitam melhor a tela em desktop, sem alterar a
    experiência compacta do celular. */
 @media (min-width: 641px) {
