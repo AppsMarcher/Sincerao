@@ -112,7 +112,7 @@ function respostaValida(texto) {
 
 function statusLabel(status) {
   return {
-    rascunho: 'Rascunho (gestor)',
+    rascunho: 'Avaliação do Gestor',
     aguardando_autoavaliacao: 'Aguardando autoavaliação',
     aguardando_alinhamento: 'Aguardando alinhamento',
     concluida: 'Concluída',
