@@ -129,7 +129,7 @@ const RELATORIO_ESTILO = `
 
   .capa{min-height:248mm;border-radius:20px;background:#5a0048;color:#fff;padding:38px 34px;display:flex;flex-direction:column}
   .capa-topo{display:flex;justify-content:space-between;align-items:center}
-  .capa-topo img{height:26px}
+  .capa-topo img{height:64px;width:auto;max-width:70%}
   .capa-topo span{font-size:9.5px;color:rgba(255,255,255,.65)}
   .capa-meio{margin:auto 0;padding:40px 0}
   .capa-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#ff8fd6;margin-bottom:14px}
@@ -243,7 +243,11 @@ document.addEventListener('click', (evento) => {
 // Chamado direto do card do dashboard (sem precisar abrir a avaliação) e da
 // capa da avaliação concluída. Usa fetch cru em vez de sbInvokeFunction
 // porque a resposta aqui é o PDF binário, não JSON.
+let downloadPdfEmAndamento = false;
 async function baixarPdfAvaliacao(avaliacaoId) {
+  if (downloadPdfEmAndamento) return;
+  downloadPdfEmAndamento = true;
+  mostrarProgressoDownloadPdf(true);
   try {
     const token = await getSupabaseAccessToken();
     const r = await fetch(SUPABASE_URL + '/functions/v1/enviar-avaliacao', {
@@ -268,6 +272,9 @@ async function baixarPdfAvaliacao(avaliacaoId) {
     URL.revokeObjectURL(url);
   } catch (err) {
     showToast(err.message || 'Não foi possível gerar o PDF.');
+  } finally {
+    downloadPdfEmAndamento = false;
+    mostrarProgressoDownloadPdf(false);
   }
 }
 

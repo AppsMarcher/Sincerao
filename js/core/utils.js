@@ -21,6 +21,11 @@ function showToast(m) {
   _toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
 }
 
+function mostrarProgressoDownloadPdf(mostrar) {
+  const popover = document.getElementById('popover-download-pdf');
+  if (popover) popover.hidden = !mostrar;
+}
+
 let _confirmacaoTrigger = null;
 function abrirConfirmacao({ titulo, texto, acao, rotuloConfirmar = 'Confirmar', perigosa = false }) {
   const modal = document.getElementById('modal-confirmar-fluxo');

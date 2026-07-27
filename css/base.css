@@ -360,3 +360,32 @@ input[type="checkbox"], input[type="radio"] {
   box-shadow: var(--shadow-lg);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.popover-download-pdf {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translate(-50%, -50%);
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  z-index: 101;
+}
+.popover-download-pdf[hidden] { display: none; }
+.popover-download-pdf-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--primary-soft);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: popover-download-pdf-spin .75s linear infinite;
+}
+@keyframes popover-download-pdf-spin { to { transform: rotate(360deg); } }

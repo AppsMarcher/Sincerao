@@ -88,7 +88,7 @@ const ESTILO = `
 
   .capa{min-height:248mm;border-radius:20px;background:#5a0048;color:#fff;padding:38px 34px;display:flex;flex-direction:column}
   .capa-topo{display:flex;justify-content:space-between;align-items:center}
-  .capa-topo img{height:26px}
+  .capa-topo img{height:64px;width:auto;max-width:70%}
   .capa-topo span{font-size:9.5px;color:rgba(255,255,255,.65)}
   .capa-meio{margin:auto 0;padding:40px 0}
   .capa-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#ff8fd6;margin-bottom:14px}

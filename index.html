@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="css/base.css?v=25">
+<link rel="stylesheet" href="css/base.css?v=26">
 <link rel="stylesheet" href="css/login.css?v=27">
 <link rel="stylesheet" href="css/dashboard.css?v=25">
 <link rel="stylesheet" href="css/perfil.css?v=20">
@@ -24,6 +24,11 @@
 <body>
 
 <div id="toast" class="toast"></div>
+
+<div id="popover-download-pdf" class="popover-download-pdf" role="status" aria-live="polite" aria-atomic="true" hidden>
+  <span class="popover-download-pdf-spinner" aria-hidden="true"></span>
+  <span>Preparando o download do PDF...</span>
+</div>
 
 <div id="modal-confirmar-fluxo" class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmar-fluxo-titulo" aria-describedby="confirmar-fluxo-texto" onclick="if (event.target === this) fecharModalConfirmarFluxo()">
   <div class="modal-box"><h3 id="confirmar-fluxo-titulo"></h3><p id="confirmar-fluxo-texto" class="muted"></p><div class="modal-actions"><button type="button" class="btn-link" onclick="fecharModalConfirmarFluxo()">Cancelar</button><button type="button" id="confirmar-fluxo-botao" class="btn-primary" onclick="executarConfirmacaoFluxo()">Confirmar</button></div></div>
@@ -491,13 +496,13 @@
 <script src="js/core/constants.js?v=22"></script>
 <script src="js/core/supabase-client.js?v=22"></script>
 <script src="js/core/state.js?v=21"></script>
-<script src="js/core/utils.js?v=23"></script>
+<script src="js/core/utils.js?v=24"></script>
 
 <script src="js/dashboard/dashboard-module.js?v=33"></script>
 <script src="js/gestao/gestao-module.js?v=13"></script>
 <script src="js/perfil/perfil-module.js?v=21"></script>
 
-  <script src="js/avaliacao/avaliacao-core.js?v=38"></script>
+  <script src="js/avaliacao/avaliacao-core.js?v=40"></script>
   <script src="js/avaliacao/etapa-texto.js?v=25"></script>
 <script src="js/avaliacao/etapa-competencias.js?v=26"></script>
 <script src="js/avaliacao/etapa-parecer.js?v=27"></script>
