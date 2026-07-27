@@ -204,7 +204,11 @@ Deno.serve(async (req) => {
     const { data: av } = await admin.from('avaliacoes').select('id,status,dados,pontuacao_geral,percentual,classificacao,ciencia_colaborador_em,ciencia_gestor_em,colaborador_id,gestor_id,colaborador:colaborador_id(nome,email),gestor:gestor_id(nome,email),ciclo:ciclo_id(nome)').eq('id', avaliacao_id).single();
     if (!av || av.status !== 'concluida') return json({ error: 'Somente avaliações concluídas podem ser enviadas.' }, 400);
     const { data: perfil } = await admin.from('perfis').select('papel').eq('id', user.id).single();
-    const autorizado = user.id === av.gestor_id || ['rh', 'admin'].includes(perfil?.papel);
+    // colaborador entra aqui porque a nova automação de fim de consenso
+    // (ver registrarCiencia() em etapa-parecer.js) dispara o envio pra quem
+    // completar a 2ª ciência, seja gestor ou colaborador -- antes só gestor/rh
+    // tinham o botão manual, então essa checagem nunca precisou do colaborador.
+    const autorizado = user.id === av.gestor_id || user.id === av.colaborador_id || ['rh', 'admin'].includes(perfil?.papel);
     if (!autorizado) return json({ error: 'Você não tem permissão para enviar esta avaliação.' }, 403);
 
     const [notasResult, planoResult] = await Promise.all([
