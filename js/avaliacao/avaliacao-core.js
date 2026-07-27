@@ -60,7 +60,12 @@ async function abrirAvaliacao(id) {
   );
   const ciclo = av.ciclo || (await sbFetch('/ciclos_avaliacao?id=eq.' + av.ciclo_id + '&select=nome'))?.[0];
   av.ciclo = ciclo;
-  G.etapaAtiva = etapaFinalDisponivel(av);
+  // rascunho (gestor começando) e aguardando_autoavaliacao (colaborador
+  // começando) são estados "em branco" -- devem abrir na primeira etapa, não
+  // na última (que só faz sentido pra retomar algo já em andamento/revisão).
+  G.etapaAtiva = ['rascunho', 'aguardando_autoavaliacao'].includes(av.status)
+    ? etapaInicialDisponivel(av)
+    : etapaFinalDisponivel(av);
   document.getElementById('avaliacao-titulo').textContent = `Avaliação de ${av.colaborador?.nome || ''} — ${av.ciclo?.nome || ''}`;
   document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
   document.getElementById('avaliacao-exportar').classList.remove('open');
