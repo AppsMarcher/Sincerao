@@ -1,9 +1,15 @@
 // avaliacao/avaliacao-core.js — abertura da avaliação, permissões por etapa, navegação do wizard e transições de status
 
 function meuPapelNaAvaliacao(av) {
-  if (ehRhOuAdmin()) return 'rh';
+  // Participação direta (gestor/colaborador DESTA avaliação) tem prioridade
+  // sobre o papel de RH/admin do perfil -- alguém de RH que é gestor ou
+  // colaborador na própria avaliação deve seguir as regras de gestor/colaborador
+  // dela, não o bypass geral de RH (senão RH acaba conseguindo editar/pular
+  // etapas na própria avaliação, ou ficar sem nenhuma etapa liberada quando é
+  // a colaboradora e a tela cai no fallback de "papel rh" sem etapas).
   if (av.gestor_id === G.perfil.id) return 'gestor';
   if (av.colaborador_id === G.perfil.id) return 'colaborador';
+  if (ehRhOuAdmin()) return 'rh';
   return null;
 }
 
