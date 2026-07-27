@@ -10,8 +10,8 @@ function renderEtapaCompetencias() {
   const escalaHtml = ESCALA_NOTAS.map((e) => `<div class="escala-item"><strong>${e.nota}</strong> — ${escHtml(e.descricao)}</div>`).join('');
 
   document.getElementById('etapa-conteudo').innerHTML = `
-    <h3>Avaliação das Competências</h3>
-    <details><summary>Escala de notas</summary>${escalaHtml}</details>
+    <h3 class="competencias-titulo">Avaliação das Competências</h3>
+    <details class="competencias-escala"><summary>Escala de notas</summary>${escalaHtml}</details>
     ${renderGrupoCompetencias('Competências comportamentais', grupos.comportamental, notasPorCompetencia, editavel)}
     ${renderGrupoCompetencias('Competências técnicas', grupos.tecnica, notasPorCompetencia, editavel)}
     ${editavel ? '<div class="etapa-acoes"><button class="btn-primary" onclick="avancarCompetencias()">Salvar e avançar</button></div>' : ''}
@@ -40,9 +40,9 @@ async function avancarCompetencias() {
 }
 
 function renderGrupoCompetencias(titulo, lista, notasPorCompetencia, editavel) {
-  if (!lista.length) return `<h4>${escHtml(titulo)}</h4><p class="muted">Nenhuma competência vinculada ao cargo deste colaborador.</p>`;
+  if (!lista.length) return `<h4 class="competencias-grupo-titulo">${escHtml(titulo)}</h4><p class="muted">Nenhuma competência vinculada ao cargo deste colaborador.</p>`;
   return `
-    <h4>${escHtml(titulo)}</h4>
+    <h4 class="competencias-grupo-titulo">${escHtml(titulo)}</h4>
     ${lista
       .map((c) => {
         const n = notasPorCompetencia[c.id] || {};

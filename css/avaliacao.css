@@ -98,6 +98,9 @@
 .avaliacao-exportar-menu button:hover { background:var(--primary-soft); color:var(--primary); }
 .avaliacao-exportar-menu .icon { width:16px; height:16px; }
 
+.competencias-titulo { margin-bottom: var(--space-3); }
+.competencias-escala { margin-bottom: var(--space-3); }
+.competencias-grupo-titulo { margin-bottom: var(--space-2); }
 .escala-item { font-size: 13px; padding: 4px 0; color: var(--text-soft); }
 
 .competencia-row {
