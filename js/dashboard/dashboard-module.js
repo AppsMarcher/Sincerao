@@ -118,14 +118,18 @@ function renderDashboard() {
 
 // Toda situação em que é a vez de quem está vendo esta lista agir --
 // colaborador: preencher a autoavaliação, ou já concluída e ainda sem dar
-// ciência. Gestor: rascunho ainda não enviado, consenso aguardando ele, ou já
-// concluída e ainda sem dar ciência. RH nunca "trava" o fluxo, então nunca pisca.
+// ciência. Gestor: rascunho ainda não enviado, autoavaliação pendente, consenso
+// aguardando ele, ou já concluída e ainda sem dar ciência. RH nunca "trava" o
+// fluxo, então nunca pisca.
 function precisaAcao(a, papelVisao) {
   if (papelVisao === 'colaborador') {
     return a.status === 'aguardando_autoavaliacao' || (a.status === 'concluida' && !a.ciencia_colaborador_em);
   }
   if (papelVisao === 'gestor') {
-    return a.status === 'rascunho' || a.status === 'aguardando_alinhamento' || (a.status === 'concluida' && !a.ciencia_gestor_em);
+    return a.status === 'rascunho'
+      || a.status === 'aguardando_autoavaliacao'
+      || a.status === 'aguardando_alinhamento'
+      || (a.status === 'concluida' && !a.ciencia_gestor_em);
   }
   return false;
 }
