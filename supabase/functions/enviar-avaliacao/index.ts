@@ -1,4 +1,22 @@
-// Gera o PDF de uma avaliação concluída e o envia ao gestor e colaborador.
+// Gera o PDF de uma avaliação concluída (Chrome de verdade, via Browserless)
+// e envia ao gestor e colaborador por e-mail (Resend). Mesmo padrão usado em
+// VectonPlan/supabase/functions/send-report-email — replicado aqui de propósito
+// (cada Edge Function é deployada e configurada isoladamente).
+//
+// Por que Browserless: garante fidelidade total ao HTML/CSS do relatório (o
+// mesmo motor por trás do "Imprimir" do navegador). Por que Resend e não SMTP:
+// Supabase Edge Functions bloqueiam as portas 25/587 — só HTTPS (443) sai.
+//
+// Pré-requisito (secrets do projeto Supabase do SINCERÃO — não herdam de
+// VectonPlan/ExiladosApp mesmo sendo a mesma conta Browserless/Resend, secret
+// é por projeto). Configurar uma vez pelo dashboard do Supabase (Project
+// Settings > Edge Functions > Secrets) ou via CLI:
+//   supabase secrets set BROWSERLESS_API_TOKEN=xxxxxxxxx
+//   supabase secrets set RESEND_API_KEY=re_xxxxxxxxx
+//   supabase secrets set RESEND_FROM="Sincerão <no-reply@marcher.com.br>"
+// BROWSERLESS_API_TOKEN vem do dashboard de conta em browserless.io (mesma
+// conta já usada pelo VectonPlan) — tem free tier limitado, verificar
+// necessidade de plano pago com o uso somado dos apps.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {

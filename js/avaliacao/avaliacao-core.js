@@ -199,14 +199,22 @@ function imprimirAvaliacao() {
   janela.addEventListener('load', () => { janela.focus(); janela.print(); });
 }
 
-async function enviarAvaliacaoPorEmail() {
+function enviarAvaliacaoPorEmail() {
   const av = G.avaliacaoAtual;
   fecharExportarAvaliacao();
   if (!av || av.status !== 'concluida' || !['gestor', 'rh'].includes(meuPapelNaAvaliacao(av))) {
     showToast('Apenas avaliações concluídas podem ser enviadas.');
     return;
   }
-  if (!confirm(`Enviar a avaliação concluída para ${av.colaborador?.nome || 'o colaborador'} e ${av.gestor?.nome || 'o gestor'}? Eles receberão o PDF por e-mail.`)) return;
+  const modal = document.getElementById('modal-confirmar-fluxo');
+  document.getElementById('confirmar-fluxo-titulo').textContent = 'Enviar avaliação por e-mail?';
+  document.getElementById('confirmar-fluxo-texto').textContent = `${av.colaborador?.nome || 'O colaborador'} e ${av.gestor?.nome || 'o gestor'} receberão o PDF da avaliação concluída por e-mail.`;
+  modal._acaoConfirmada = enviarAvaliacaoPorEmailConfirmado;
+  modal.classList.add('open');
+}
+
+async function enviarAvaliacaoPorEmailConfirmado() {
+  const av = G.avaliacaoAtual;
   try {
     await sbInvokeFunction('enviar-avaliacao', { avaliacao_id: av.id });
     showToast('Avaliação enviada por e-mail aos envolvidos.');
