@@ -67,6 +67,13 @@ function renderGrupoCompetencias(titulo, lista, notasPorCompetencia, editavel) {
 function salvarRascunhoNota(competenciaId) {
   const row = document.querySelector(`.competencia-row[data-competencia="${competenciaId}"]`);
   if (!row) return;
+  // Qualquer edição depois de "Quesito salvo" invalida esse estado -- o botão
+  // volta ao texto padrão até salvar de novo.
+  const btn = row.querySelector('.btn-link');
+  if (btn?.classList.contains('btn-link--salvo')) {
+    btn.textContent = 'Salvar sem avançar';
+    btn.classList.remove('btn-link--salvo');
+  }
   salvarRascunhoEtapa(G.avaliacaoAtual.id, 'nota_' + competenciaId, {
     nota: row.querySelector('select').value,
     comentario: row.querySelector('textarea').value,
@@ -110,7 +117,11 @@ async function salvarNotaCompetencia(competenciaId, silencioso = false) {
     }
     av.notas = av.notas.filter((n) => n.competencia_id !== competenciaId).concat(salvo || []);
     limparRascunhoEtapa(av.id, 'nota_' + competenciaId);
-    if (!silencioso) showToast('Nota salva no banco.');
+    if (!silencioso) {
+      showToast('Nota salva no banco.');
+      const btn = row.querySelector('.btn-link');
+      if (btn) { btn.textContent = 'Quesito salvo'; btn.classList.add('btn-link--salvo'); }
+    }
     return true;
   } catch (err) {
     if (String(err?.message || '').includes('duplicate')) {

@@ -100,6 +100,10 @@
   border-bottom: 1px solid var(--line);
 }
 
+/* Confirmação visual persistente de que a nota já está no banco -- some assim
+   que o campo é editado de novo (ver salvarRascunhoNota em etapa-competencias.js). */
+.competencia-row .btn-link.btn-link--salvo { color: var(--green); }
+
 .tabela-scroll { overflow-x: auto; }
 .tabela-plano { width: 100%; border-collapse: collapse; min-width: 720px; }
 .tabela-plano th, .tabela-plano td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
