@@ -25,6 +25,18 @@
 .cabecalho-notificacoes h3 { margin:0; }
 .btn-limpar-notificacoes { color:var(--text-soft); }
 .btn-limpar-notificacoes:hover { color:var(--red); background:rgba(220, 38, 38, 0.1); }
+@media (min-width: 641px) {
+  .cabecalho-notificacoes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 148px;
+  }
+  .btn-limpar-notificacoes,
+  .notificacao-badge-nova { justify-self: center; }
+  .notificacao-item--nao-lida {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 148px;
+  }
+}
 #dash-todas-wrap { border-color:var(--primary); }
 #dash-todas-wrap h3,
 #dash-todas-wrap .card-avaliacao strong,
