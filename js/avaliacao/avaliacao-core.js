@@ -408,15 +408,50 @@ function renderNavEtapas() {
   const el = document.getElementById('etapas-nav');
   const permitidas = etapasDisponiveis(G.avaliacaoAtual);
   if (!permitidas.includes(G.etapaAtiva)) G.etapaAtiva = permitidas[0];
-  el.innerHTML = ETAPAS.filter((e) => permitidas.includes(e.id)).map(
-    (e) => `<button class="etapa-btn ${G.etapaAtiva === e.id ? 'active' : ''}" onclick="irParaEtapa('${e.id}')">${e.n}. ${escHtml(e.label)}</button>`
-  ).join('');
+  const limite = maiorEtapaAlcancavel(G.avaliacaoAtual);
+  el.innerHTML = ETAPAS.filter((e) => permitidas.includes(e.id)).map((e) => {
+    const travada = permitidas.indexOf(e.id) > limite;
+    return `<button class="etapa-btn ${G.etapaAtiva === e.id ? 'active' : ''}" ${
+      travada ? 'disabled title="Grave a etapa anterior antes de avançar"' : `onclick="irParaEtapa('${e.id}')"`
+    }>${e.n}. ${escHtml(e.label)}</button>`;
+  }).join('');
 }
 
 function irParaEtapa(id) {
-  if (!etapasDisponiveis(G.avaliacaoAtual).includes(id)) return;
+  const permitidas = etapasDisponiveis(G.avaliacaoAtual);
+  const idx = permitidas.indexOf(id);
+  if (idx === -1 || idx > maiorEtapaAlcancavel(G.avaliacaoAtual)) return;
   G.etapaAtiva = id;
   renderEtapaAtiva();
+}
+
+// Não avança pra próxima etapa da fase sem a anterior estar gravada no banco.
+// Só considera etapas que são a vez de quem está vendo agora (podeEditarEtapa)
+// -- etapas só de leitura (ex: histórico de uma avaliação reaberta) nunca
+// travam nada, já que não há o que gravar nelas.
+function etapaEstaGravada(av, etapaId) {
+  if (etapaId === 'competencias') {
+    const competencias = av.competenciasCargo || [];
+    if (!competencias.length) return true;
+    return competencias.every((c) => {
+      const nota = (av.notas || []).find((n) => n.competencia_id === c.id);
+      return !!nota?.nota && respostaValida(nota.comentario);
+    });
+  }
+  if (etapaId === 'plano_desenvolvimento') {
+    const linhas = (av.plano || []).filter(linhaPlanoPreenchida);
+    return !linhas.length || linhas.every(linhaPlanoCompleta);
+  }
+  const campos = CAMPOS_ETAPA[etapaId];
+  if (!campos) return true;
+  return campos.every(([campo]) => respostaValida(av.dados?.[etapaId]?.[campo]));
+}
+function maiorEtapaAlcancavel(av) {
+  const etapas = etapasDisponiveis(av);
+  for (let i = 0; i < etapas.length; i++) {
+    if (podeEditarEtapa(av, etapas[i]) && !etapaEstaGravada(av, etapas[i])) return i;
+  }
+  return etapas.length;
 }
 
 function etapasDisponiveis(av) {

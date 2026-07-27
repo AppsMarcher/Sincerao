@@ -76,6 +76,7 @@ function renderEtapaTexto(etapaId) {
         await atualizarAvaliacao({ dados: novosDados });
         limparRascunhoEtapa(av.id, etapaId);
         showToast('Etapa salva no banco.');
+        renderNavEtapas();
       } catch (err) {
         if (!String(err?.message || '').includes('Conflito')) {
           showToast('Não foi possível salvar. Rascunho salvo neste navegador.');

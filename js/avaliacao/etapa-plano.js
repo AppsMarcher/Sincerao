@@ -119,6 +119,7 @@ async function salvarLinhaPlano(id, campo, valor) {
       }
       Object.assign(linha, salvo[0]);
       limparRascunhoEtapa(av.id, `plano_${id}_${campo}`);
+      renderNavEtapas();
     } catch {
       showToast('Não foi possível salvar esta linha. O valor permanece na tela.');
     }
@@ -143,6 +144,7 @@ async function removerLinhaPlano(id) {
       limparRascunhoEtapa(av.id, `plano_${id}_${campo}`);
     });
     renderEtapaPlano();
+    renderNavEtapas();
   } catch {
     showToast('Não foi possível remover a linha do plano.');
   }

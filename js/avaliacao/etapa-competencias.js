@@ -121,6 +121,7 @@ async function salvarNotaCompetencia(competenciaId, silencioso = false) {
       showToast('Nota salva no banco.');
       const btn = row.querySelector('.btn-link');
       if (btn) { btn.textContent = 'Quesito salvo'; btn.classList.add('btn-link--salvo'); }
+      renderNavEtapas();
     }
     return true;
   } catch (err) {
