@@ -43,7 +43,7 @@ async function abrirAvaliacao(id) {
     return;
   }
   if (av.status === 'aguardando_alinhamento' && av.colaborador_id === G.perfil.id && !ehRhOuAdmin()) {
-    showToast('Sua autoavaliação já foi enviada. Aguarde o gestor concluir o consenso.');
+    showToast('Autoavaliação já enviada. Aguarde o consenso do gestor.');
     return;
   }
   goTo('screen-avaliacao');

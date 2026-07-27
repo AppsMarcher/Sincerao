@@ -78,7 +78,7 @@ function renderEtapaTexto(etapaId) {
         showToast('Etapa salva no banco.');
       } catch (err) {
         if (!String(err?.message || '').includes('Conflito')) {
-          showToast('Não foi possível salvar. O rascunho continua guardado neste navegador.');
+          showToast('Não foi possível salvar. Rascunho salvo neste navegador.');
         }
       }
     });
@@ -99,7 +99,7 @@ function renderEtapaTexto(etapaId) {
 function validarRespostasEtapaTexto(campos, valores) {
   for (const [key, label] of campos) {
     if (!respostaValida(valores[key])) {
-      showToast(`Preencha "${label}" com uma resposta completa (mínimo ${MIN_CHARS_RESPOSTA_AVALIACAO} caracteres) antes de salvar.`);
+      showToast(`"${label}" precisa de uma resposta completa (mín. ${MIN_CHARS_RESPOSTA_AVALIACAO} caracteres).`);
       return false;
     }
   }

@@ -47,6 +47,11 @@
 
   .login-box { padding: 28px 20px; }
 
+  /* Toast sem max-width/text-align quebrava desalinhado (texto à esquerda
+     dentro do "pill" centralizado) sempre que a mensagem era longa demais
+     pra 1 linha -- inevitável em mensagens que citam a pergunta da etapa. */
+  .toast { max-width: calc(100vw - 48px); text-align: center; line-height: 1.4; }
+
   /* Dados do perfil: label em cima, valor embaixo (em vez de 2 colunas apertadas) */
   .dados-lista { grid-template-columns: 1fr; row-gap: 2px; }
   .dados-lista dt { margin-top: var(--space-2); }
