@@ -9,16 +9,17 @@ function meuPapelNaAvaliacao(av) {
 
 function podeEditarEtapa(av, etapaId) {
   const papel = meuPapelNaAvaliacao(av);
-  if (papel === 'rh') return true;
   const status = av.status;
+  // RH/admin edita nas mesmas fases que o gestor (rascunho e alinhamento) —
+  // nunca numa avaliação concluída só por ter o papel de RH/admin.
   if (['resultados', 'competencias', 'feedback_gestor'].includes(etapaId)) {
-    return papel === 'gestor' && status === 'rascunho';
+    return (papel === 'gestor' || papel === 'rh') && status === 'rascunho';
   }
   if (['autoavaliacao', 'feedback_colaborador'].includes(etapaId)) {
     return papel === 'colaborador' && status === 'aguardando_autoavaliacao';
   }
   if (etapaId === 'plano_desenvolvimento' || etapaId === 'resumo') {
-    return papel === 'gestor' && status === 'aguardando_alinhamento';
+    return (papel === 'gestor' || papel === 'rh') && status === 'aguardando_alinhamento';
   }
   return false;
 }
