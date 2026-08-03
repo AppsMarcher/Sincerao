@@ -26,6 +26,18 @@
   }
   .topbar-interna > .topbar-titulo { text-align: right; }
   .topbar-contexto-avaliacao { justify-content: flex-end; }
+  .topbar-com-sino > .btn-sino-notificacoes { right: var(--space-3); top: calc(10px + env(safe-area-inset-top)); }
+  .topbar-com-sino > .topbar-titulo { padding-right: 46px; }
+  .topbar-actions .nav-nome-usuario { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .central-notificacoes-cabecalho,
+  .gestao-secao-cabecalho,
+  .notificar-gestores-toolbar { align-items: stretch; flex-direction: column; }
+  .central-notificacoes-acoes { justify-content: flex-start; }
+  .central-notificacoes-filtros { grid-template-columns: 1fr; }
+  .central-notificacao { align-items: stretch; flex-direction: column; }
+  .central-notificacao-marcar { align-self: flex-start; margin: 0 16px 12px; }
+  .btn-notificar-gestores { width: 100%; }
   /* Tela de avaliação: Voltar + título/status + botão de transição não cabem
      numa linha só quando o botão de transição aparece (ex: "Enviar para
      alinhamento"). Deixa quebrar, com o botão de transição numa linha própria. */

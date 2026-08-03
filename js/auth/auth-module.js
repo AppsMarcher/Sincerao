@@ -7,6 +7,7 @@ async function fazerLogin(email, senha) {
 }
 
 async function fazerLogout() {
+  pararMonitorNotificacoes();
   await _sbClient.auth.signOut();
   G.usuario = null;
   G.perfil = null;
@@ -62,6 +63,8 @@ async function entrarNoApp(perfil) {
   document.querySelectorAll('.nav-nome-usuario').forEach((el) => { el.textContent = perfil.nome; });
   document.querySelectorAll('.nav-admin').forEach((el) => { el.style.display = ehRhOuAdmin() ? '' : 'none'; });
   document.querySelectorAll('.nav-gestao').forEach((el) => { el.style.display = podeVerGestao() ? '' : 'none'; });
+  garantirSinosNotificacoes();
+  iniciarMonitorNotificacoes();
   await abrirDashboard();
 }
 

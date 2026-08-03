@@ -27,7 +27,7 @@ document.addEventListener('click', (e) => {
 
 async function abrirDashboard() {
   goTo('screen-dashboard');
-  await carregarNotificacoes();
+  atualizarContadorNotificacoes();
   const [rows, emPreparacao, aguardandoConsenso] = await Promise.all([
     sbFetch('/avaliacoes_resumo?order=created_at.desc'),
     sbFetch('/minhas_avaliacoes_em_preparacao?order=data_inicio.desc'),
@@ -37,48 +37,6 @@ async function abrirDashboard() {
   G.avaliacoesEmPreparacao = emPreparacao || [];
   G.avaliacoesAguardandoConsenso = aguardandoConsenso || [];
   renderDashboard();
-}
-
-async function carregarNotificacoes() {
-  const el = document.getElementById('dash-notificacoes');
-  const botaoLimpar = document.getElementById('btn-limpar-notificacoes');
-  botaoLimpar.style.display = '';
-  try {
-    const notificacoes = await sbFetch('/notificacoes?destinatario_id=eq.' + G.perfil.id + '&order=created_at.desc&limit=10');
-    botaoLimpar.disabled = !notificacoes?.length;
-    el.innerHTML = notificacoes?.length ? notificacoes.map((n) => {
-      const data = new Date(n.created_at);
-      const dataHora = data.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-      const dataHoraSemSegundos = data.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) + ' ' + data.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
-      const mensagem = escHtml(n.mensagem).replace(/Enviada em \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}/, 'Enviada em ' + dataHoraSemSegundos);
-      return `<div class="notificacao-item${n.lida_em ? '' : ' notificacao-item--nao-lida'}"><div><strong>${escHtml(n.titulo)}</strong><div class="muted">${mensagem}</div><small>${dataHora}</small></div>${n.lida_em ? '' : '<span class="notificacao-badge-nova">Nova</span>'}</div>`;
-    }).join('') : '<p class="empty">Nenhuma notificação por enquanto.</p>';
-    const naoLidas = (notificacoes || []).filter((n) => !n.lida_em);
-    if (naoLidas.length) sbFetch('/notificacoes?id=in.(' + naoLidas.map((n) => n.id).join(',') + ')', { method: 'PATCH', body: JSON.stringify({ lida_em: new Date().toISOString() }) }).catch(() => {});
-  } catch { el.innerHTML = '<p class="empty">As notificações estarão disponíveis após aplicar a atualização do banco.</p>'; }
-}
-
-async function limparNotificacoes() {
-  abrirConfirmacao({
-    titulo: 'Limpar notificações?',
-    texto: 'Todas as suas notificações serão removidas. Essa ação não pode ser desfeita.',
-    acao: executarLimpezaNotificacoes,
-    rotuloConfirmar: 'Limpar',
-    perigosa: true,
-  });
-}
-
-async function executarLimpezaNotificacoes() {
-  const botaoLimpar = document.getElementById('btn-limpar-notificacoes');
-  botaoLimpar.disabled = true;
-  try {
-    await sbFetch('/notificacoes?destinatario_id=eq.' + G.perfil.id, { method: 'DELETE' });
-    document.getElementById('dash-notificacoes').innerHTML = '<p class="empty">Nenhuma notificação por enquanto.</p>';
-    showToast('Notificações removidas.');
-  } catch {
-    botaoLimpar.disabled = false;
-    showToast('Não foi possível limpar as notificações.');
-  }
 }
 
 function renderDashboard() {

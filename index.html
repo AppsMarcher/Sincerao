@@ -15,11 +15,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="css/base.css?v=26">
 <link rel="stylesheet" href="css/login.css?v=27">
-<link rel="stylesheet" href="css/dashboard.css?v=25">
+<link rel="stylesheet" href="css/dashboard.css?v=26">
 <link rel="stylesheet" href="css/perfil.css?v=20">
 <link rel="stylesheet" href="css/avaliacao.css?v=28">
 <link rel="stylesheet" href="css/admin.css?v=28">
-<link rel="stylesheet" href="css/responsive.css?v=26">
+<link rel="stylesheet" href="css/responsive.css?v=27">
 </head>
 <body>
 
@@ -149,13 +149,6 @@
     </div>
   </header>
   <main class="content stack">
-    <section class="card" id="dash-notificacoes-wrap">
-      <div class="cabecalho-notificacoes">
-        <h3>Notificações</h3>
-        <button id="btn-limpar-notificacoes" class="btn-link btn-limpar-notificacoes" type="button" onclick="limparNotificacoes()" style="display:none">Limpar notificações</button>
-      </div>
-      <div id="dash-notificacoes"></div>
-    </section>
     <section class="card">
       <h3><svg class="icon" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg> Minhas avaliações</h3>
       <div id="dash-minhas"></div>
@@ -167,6 +160,35 @@
     <section class="card" id="dash-todas-wrap" style="display:none">
       <h3><svg class="icon" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Todas as avaliações</h3>
       <div id="dash-todas"></div>
+    </section>
+  </main>
+</div>
+
+<!-- CENTRAL DE NOTIFICAÇÕES -->
+<div id="screen-notificacoes" class="screen">
+  <header class="topbar topbar-interna">
+    <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
+    <button type="button" class="topbar-marca" onclick="abrirDashboard()" aria-label="Ir para o início"><img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna"></button>
+    <h2 class="topbar-titulo">Notificações</h2>
+  </header>
+  <main class="content stack">
+    <section class="card central-notificacoes-card">
+      <div class="central-notificacoes-cabecalho">
+        <div>
+          <h3>Central de notificações</h3>
+          <p class="muted">Acompanhe avaliações, prazos e comunicados.</p>
+        </div>
+        <div class="central-notificacoes-acoes">
+          <button type="button" class="btn-link" onclick="marcarTodasNotificacoesLidas()">Marcar todas como lidas</button>
+          <button type="button" class="btn-link btn-link--perigo" onclick="excluirNotificacoesLidas()">Excluir lidas</button>
+        </div>
+      </div>
+      <div class="central-notificacoes-filtros">
+        <label class="campo"><span>Situação</span><select id="notificacoes-filtro-leitura" onchange="carregarCentralNotificacoes(true)"><option value="">Todas</option><option value="nao_lidas">Não lidas</option><option value="lidas">Lidas</option></select></label>
+        <label class="campo"><span>Categoria</span><select id="notificacoes-filtro-categoria" onchange="carregarCentralNotificacoes(true)"><option value="">Todas</option><option value="avaliacao">Avaliações</option><option value="prazo">Prazos</option><option value="comunicado">Comunicados</option><option value="sistema">Sistema</option></select></label>
+      </div>
+      <div id="notificacoes-lista" aria-live="polite"></div>
+      <div class="central-notificacoes-mais"><button id="btn-carregar-mais-notificacoes" type="button" class="btn-link" onclick="carregarMaisNotificacoes()" hidden>Carregar mais</button></div>
     </section>
   </main>
 </div>
@@ -490,6 +512,32 @@
   </div>
 </div>
 
+<!-- MODAL: notificar gestores sobre pendências do ciclo -->
+<div id="modal-notificar-gestores" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-notificar-gestores-titulo" onclick="if (event.target === this) fecharModalNotificarGestores()">
+  <div class="modal-box modal-notificar-gestores-box">
+    <div class="modal-cabecalho">
+      <div>
+        <h3 id="modal-notificar-gestores-titulo">Notificar gestores</h3>
+        <p id="notificar-gestores-ciclo" class="muted"></p>
+      </div>
+      <button type="button" class="btn-icon modal-fechar" aria-label="Fechar" onclick="fecharModalNotificarGestores()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="notificar-gestores-toolbar">
+      <label class="check-item"><input id="notificar-gestores-todos" type="checkbox" onchange="selecionarTodosGestoresNotificacao(this.checked)"><span>Selecionar todos com pendências</span></label>
+      <strong id="notificar-gestores-resumo">0 selecionados</strong>
+    </div>
+    <div id="notificar-gestores-lista" class="notificar-gestores-lista"></div>
+    <aside class="notificar-gestores-previa">
+      <strong>Prévia do aviso</strong>
+      <p>O gestor receberá uma notificação interna e um e-mail consolidado, sem notas ou dados confidenciais.</p>
+    </aside>
+    <div class="modal-actions">
+      <button type="button" class="btn-link" onclick="fecharModalNotificarGestores()">Cancelar</button>
+      <button id="btn-enviar-lembretes-gestores" type="button" class="btn-primary" onclick="enviarLembretesGestores()" disabled>Enviar lembrete</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js?v=21"></script>
 
@@ -498,8 +546,9 @@
 <script src="js/core/state.js?v=21"></script>
 <script src="js/core/utils.js?v=25"></script>
 
-<script src="js/dashboard/dashboard-module.js?v=34"></script>
-<script src="js/gestao/gestao-module.js?v=13"></script>
+<script src="js/dashboard/notificacoes-module.js?v=1"></script>
+<script src="js/dashboard/dashboard-module.js?v=35"></script>
+<script src="js/gestao/gestao-module.js?v=14"></script>
 <script src="js/perfil/perfil-module.js?v=21"></script>
 
   <script src="js/avaliacao/avaliacao-core.js?v=41"></script>
@@ -516,7 +565,7 @@
 <script src="js/admin/auditoria-module.js?v=22"></script>
 <script src="js/admin/admin-shell.js?v=24"></script>
 
-<script src="js/auth/auth-module.js?v=21"></script>
+<script src="js/auth/auth-module.js?v=22"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch((erro) => console.warn('PWA indisponível:', erro)));

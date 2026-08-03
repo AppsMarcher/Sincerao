@@ -14,29 +14,7 @@
 }
 .card-avaliacao:last-child { border-bottom: none; }
 .card-avaliacao:hover { background: var(--panel-alt); padding-left: 12px; padding-right: 12px; }
-.notificacao-item { display:flex; justify-content:space-between; gap:var(--space-3); padding:12px 0; border-bottom:1px solid var(--line); }
-.notificacao-item:last-child { border-bottom:none; }
-.notificacao-item small { display:block; margin-top:4px; color:var(--text-faint); }
-/* Pill com texto em vez de um pontinho de cor -- sinalização mais visível e
-   que não depende só de percepção de cor pra identificar notificação nova. */
-.notificacao-item--nao-lida { background:var(--primary-soft); border-left:3px solid var(--primary); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding-left:12px; }
 .notificacao-badge-nova { flex:0 0 auto; align-self:center; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#fff; background:var(--primary); padding:4px 10px; border-radius:100px; white-space:nowrap; }
-.cabecalho-notificacoes { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); margin-bottom:var(--space-2); }
-.cabecalho-notificacoes h3 { margin:0; }
-.btn-limpar-notificacoes { color:var(--text-soft); }
-.btn-limpar-notificacoes:hover { color:var(--red); background:rgba(220, 38, 38, 0.1); }
-@media (min-width: 641px) {
-  .cabecalho-notificacoes {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 148px;
-  }
-  .btn-limpar-notificacoes,
-  .notificacao-badge-nova { justify-self: center; }
-  .notificacao-item--nao-lida {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 148px;
-  }
-}
 #dash-todas-wrap { border-color:var(--primary); }
 #dash-todas-wrap h3,
 #dash-todas-wrap .card-avaliacao strong,
@@ -55,6 +33,92 @@
 
 .card-avaliacao-badges { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
 .badge-atencao { background: rgba(217, 119, 6, 0.12); color: var(--amber); }
+
+/* Atalho global para a Central de Notificações. */
+.btn-sino-notificacoes {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: #fff;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+}
+.btn-sino-notificacoes:hover { background: rgba(255,255,255,.15); }
+.btn-sino-notificacoes.tem-notificacoes { background: rgba(255,255,255,.12); }
+.btn-sino-notificacoes.tem-notificacoes .icon { stroke-width: 2.3; }
+.notificacoes-badge {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border: 2px solid var(--primary);
+  border-radius: 100px;
+  color: #fff !important;
+  background: var(--red);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 15px;
+  text-align: center;
+}
+.notificacoes-badge[hidden] { display: none; }
+.topbar-com-sino > .btn-sino-notificacoes { position: absolute; right: var(--space-5); }
+.topbar-com-sino > .topbar-titulo { padding-right: 52px; }
+
+/* Tela dedicada; abrir o dashboard não altera mais o estado de leitura. */
+.central-notificacoes-cabecalho,
+.central-notificacoes-acoes,
+.central-notificacao-topo,
+.gestao-secao-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.central-notificacoes-cabecalho h3 { margin-bottom: 4px; }
+.central-notificacoes-cabecalho p { margin: 0; }
+.central-notificacoes-acoes { justify-content: flex-end; flex-wrap: wrap; }
+.central-notificacoes-filtros { display: grid; grid-template-columns: repeat(2,minmax(0,220px)); gap: var(--space-3); margin: var(--space-4) 0 var(--space-3); }
+.central-notificacao { position: relative; display: flex; align-items: center; gap: var(--space-2); border-bottom: 1px solid var(--line); border-left: 3px solid transparent; }
+.central-notificacao:last-child { border-bottom: 0; }
+.central-notificacao--nao-lida { background: var(--primary-soft); border-left-color: var(--primary); }
+.central-notificacao--atencao { border-left-color: var(--amber); }
+.central-notificacao--urgente { border-left-color: var(--red); }
+.central-notificacao--sucesso { border-left-color: var(--green); }
+.central-notificacao-conteudo { display: flex; flex: 1 1 auto; min-width: 0; flex-direction: column; align-items: stretch; gap: 4px; padding: 16px; text-align: left; white-space: normal; border: 0; background: transparent; }
+.central-notificacao-conteudo:hover strong { color: var(--primary); }
+.central-notificacao-conteudo small { color: var(--text-faint); }
+.central-notificacao-topo { justify-content: flex-start; }
+.central-notificacao-categoria { color: var(--text-soft); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.central-notificacao-marcar { flex: 0 0 auto; margin-right: var(--space-3); font-size: 12px; }
+.central-notificacoes-mais { display: flex; justify-content: center; padding-top: var(--space-3); }
+
+/* Gestão: disparo consolidado por ciclo e seleção segura dos destinatários. */
+.gestao-secao-cabecalho { margin-bottom: var(--space-4); }
+.gestao-secao-cabecalho h3 { margin: 0; }
+.btn-notificar-gestores { min-height: 40px; padding: 8px 18px; }
+.btn-notificar-gestores:disabled { opacity: .5; cursor: not-allowed; }
+.modal-notificar-gestores-box { width: min(720px,92vw); max-height: 88vh; overflow-y: auto; }
+.modal-notificar-gestores-box .modal-cabecalho { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+.modal-notificar-gestores-box .modal-cabecalho p { margin: 4px 0 0; }
+.notificar-gestores-toolbar { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); margin: var(--space-4) 0 var(--space-2); }
+.notificar-gestores-toolbar .check-item { display: flex; align-items: center; gap: var(--space-2); }
+.notificar-gestores-lista { border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.notificar-gestor-item { display: flex; align-items: flex-start; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.notificar-gestor-item:last-child { border-bottom: 0; }
+.notificar-gestor-item:hover { background: var(--panel-alt); }
+.notificar-gestor-item input { margin-top: 4px; }
+.notificar-gestor-item span { display: flex; min-width: 0; flex-direction: column; }
+.notificar-gestor-item small { color: var(--text-soft); white-space: normal; }
+.notificar-gestores-previa { margin-top: var(--space-3); padding: 14px 16px; border-left: 3px solid var(--primary); border-radius: var(--radius-sm); background: var(--primary-soft); }
+.notificar-gestores-previa p { margin: 4px 0 0; color: var(--text-soft); font-size: 13px; }
 
 /* Chama atenção pro status que exige ação de quem está vendo agora (ex: a
    própria autoavaliação aguardando ser feita). */
