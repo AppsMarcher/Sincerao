@@ -64,6 +64,7 @@ async function entrarNoApp(perfil) {
   document.querySelectorAll('.nav-admin').forEach((el) => { el.style.display = ehRhOuAdmin() ? '' : 'none'; });
   document.querySelectorAll('.nav-gestao').forEach((el) => { el.style.display = podeVerGestao() ? '' : 'none'; });
   garantirSinosNotificacoes();
+  await carregarAvatarUsuario();
   iniciarMonitorNotificacoes();
   await abrirDashboard();
 }

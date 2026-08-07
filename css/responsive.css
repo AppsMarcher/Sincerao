@@ -68,6 +68,9 @@
   .dados-lista { grid-template-columns: 1fr; row-gap: 2px; }
   .dados-lista dt { margin-top: var(--space-2); }
   .dados-lista dt:first-child { margin-top: 0; }
+  .perfil-dados-layout { grid-template-columns: 1fr; gap: var(--space-4); }
+  .perfil-foto-area { padding: 0 0 var(--space-4); border-right: 0; border-bottom: 1px solid var(--line); }
+  .perfil-foto-area h4 { text-align: center; }
 
   /* Linha de competência: empilha nota/comentário em vez de 4 colunas apertadas */
   .competencia-row { grid-template-columns: 1fr; gap: var(--space-2); }

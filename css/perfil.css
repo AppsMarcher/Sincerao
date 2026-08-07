@@ -5,10 +5,69 @@
   grid-template-columns: 140px 1fr;
   row-gap: 8px;
   column-gap: 12px;
-  margin: 0 0 24px;
+  align-content: start;
+  margin: 0;
 }
 .dados-lista dt { color: var(--text-soft); font-size: 13px; }
 .dados-lista dd { margin: 0; font-weight: 500; }
+
+.perfil-dados-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.perfil-foto-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding-right: var(--space-5);
+  border-right: 1px solid var(--line);
+  text-align: center;
+}
+.perfil-foto-area h4 { width: 100%; color: var(--text-soft); text-align: left; }
+.perfil-foto-preview {
+  display: flex;
+  width: 132px;
+  height: 132px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(145deg, var(--primary), #8a176f);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+}
+.perfil-foto-preview img { width: 100%; height: 100%; object-fit: cover; }
+.perfil-foto-acoes { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+.perfil-foto-escolher { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 18px; cursor: pointer; }
+.perfil-foto-area > .muted { margin: -4px 0 0; line-height: 1.35; }
+.perfil-foto-area.carregando { opacity: .6; pointer-events: none; }
+
+/* Avatar compacto ao lado do nome nos cabeçalhos autenticados. */
+.nav-avatar-usuario {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  border: 2px solid rgba(255,255,255,.8);
+  border-radius: 50%;
+  color: var(--primary);
+  background: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+.nav-avatar-usuario:hover { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.12); }
+.nav-avatar-usuario img { width: 100%; height: 100%; object-fit: cover; }
 
 #form-trocar-senha { margin-bottom: 24px; }
 

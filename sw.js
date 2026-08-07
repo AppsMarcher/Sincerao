@@ -1,4 +1,4 @@
-const CACHE = 'sincerao-pwa-v30';
+const CACHE = 'sincerao-pwa-v31';
 const APP_SHELL = [
   '/', '/index.html', '/manifest.webmanifest', '/supabase-config.js',
   '/css/base.css', '/css/login.css', '/css/dashboard.css', '/css/perfil.css', '/css/avaliacao.css', '/css/admin.css', '/css/responsive.css',
