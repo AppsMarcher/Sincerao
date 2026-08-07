@@ -135,7 +135,7 @@ a { color: var(--primary); }
 .topbar-contexto-avaliacao .topbar-titulo { max-width: 100%; }
 .topbar-contexto-avaliacao h2 { overflow-wrap: anywhere; }
 
-.topbar-actions { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; position: relative; }
+.topbar-actions { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; position: relative; }
 .topbar-actions .btn-link { min-height: 44px; padding: 8px 12px; }
 .topbar-actions-interna { justify-self: end; }
 
