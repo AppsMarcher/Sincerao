@@ -536,9 +536,13 @@ function etapasDisponiveis(av) {
   if (av.status === 'aguardando_autoavaliacao') return meuPapelNaAvaliacao(av) === 'colaborador' ? ['autoavaliacao'] : [];
   if (av.status === 'aguardando_alinhamento') {
     if (!['gestor', 'rh'].includes(meuPapelNaAvaliacao(av))) return [];
-    // Avaliação reaberta (já foi concluída uma vez): continua mostrando as 6
-    // etapas pra revisão, mesmo com só Plano de Desenvolvimento/Parecer editáveis.
-    return av.dados?.reabertura ? ETAPAS.map((e) => e.id) : ['resumo', 'parecer_final'];
+    // Mostra as 6 etapas (não só Plano de Desenvolvimento/Parecer) pra que o
+    // gestor navegue e consulte Resultados/Competências/Feedback do Gestor/
+    // Autoavaliação como referência durante a conversa de consenso -- só
+    // Plano de Desenvolvimento e Parecer continuam editáveis (podeEditarEtapa
+    // trava o resto em somente-leitura). Mesmo comportamento que já existia
+    // só pra avaliação reaberta, agora vale pra fase 3 sempre.
+    return ETAPAS.map((e) => e.id);
   }
   return ['resumo', 'parecer_final'];
 }
