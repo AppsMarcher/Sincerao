@@ -230,7 +230,8 @@ body.modal-criar-avaliacoes-open { overflow: hidden; }
 }
 #modal-criar-avaliacoes .modal-box {
   display: flex;
-  width: min(560px, 100%);
+  width: calc(100vw - (2 * var(--space-5)));
+  max-width: calc(100vw - 32px);
   max-height: calc(100dvh - 32px);
   flex-direction: column;
   overflow: hidden;
@@ -268,19 +269,79 @@ body.modal-criar-avaliacoes-open { overflow: hidden; }
   font-size: 13px;
 }
 .modal-busca-vazio {
-  flex: 1 1 auto;
   margin: var(--space-5) 0;
   text-align: center;
 }
-#modal-lista-colaboradores {
+.modal-colaboradores-tabela {
+  flex: 1 1 auto;
   min-height: 0;
   margin: var(--space-3) 0 0;
-  padding-right: 8px;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
-#modal-lista-colaboradores .check-row[hidden] { display: none; }
+.modal-colaboradores-cabecalho,
+.modal-colaborador-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.15fr) minmax(280px, 1fr) minmax(130px, .35fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+.modal-colaboradores-cabecalho {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  min-height: 42px;
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.modal-colaboradores-th > button {
+  width: 100%;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-align: left;
+  text-transform: uppercase;
+}
+#modal-lista-colaboradores {
+  margin: 0;
+}
+#modal-lista-colaboradores .modal-colaborador-row {
+  padding: 11px var(--space-2);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  font-size: 13px;
+}
+#modal-lista-colaboradores .modal-colaborador-row:last-child { border-bottom: 0; }
+#modal-lista-colaboradores .modal-colaborador-row.is-incluido { cursor: default; }
+.modal-colaborador-celula { min-width: 0; }
+.modal-colaborador-nome {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.modal-colaborador-nome input { flex: 0 0 auto; }
+.modal-colaborador-cargo .tag {
+  max-width: 100%;
+  line-height: 1.35;
+  white-space: normal;
+}
+.ciclo-inclusao {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ciclo-inclusao .icon { width: 15px; height: 15px; stroke-width: 2.5; }
+.ciclo-inclusao--sim { color: var(--green); }
+.ciclo-inclusao--nao { color: var(--text-faint); }
 #modal-criar-avaliacoes .modal-actions {
   flex: 0 0 auto;
   margin-top: 0;

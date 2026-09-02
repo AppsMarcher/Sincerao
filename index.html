@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="css/dashboard.css?v=26">
 <link rel="stylesheet" href="css/perfil.css?v=22">
 <link rel="stylesheet" href="css/avaliacao.css?v=28">
-<link rel="stylesheet" href="css/admin.css?v=28">
+<link rel="stylesheet" href="css/admin.css?v=29">
 <link rel="stylesheet" href="css/responsive.css?v=28">
 </head>
 <body>
@@ -503,11 +503,24 @@
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
       <input type="search" id="modal-busca-colaborador" aria-label="Pesquisar colaborador" placeholder="Pesquisar por nome ou cargo" autocomplete="off" oninput="filtrarColaboradoresCriacao(this.value)">
     </label>
-    <p id="modal-busca-colaborador-vazio" class="modal-busca-vazio muted" hidden>Nenhuma pessoa encontrada.</p>
-    <div id="modal-lista-colaboradores" class="check-list"></div>
+    <div class="modal-colaboradores-tabela" role="table" aria-label="Colaboradores disponíveis para o ciclo">
+      <div class="modal-colaboradores-cabecalho" role="row">
+        <div id="sort-header-criacao-nome" class="modal-colaboradores-th" role="columnheader" aria-sort="ascending">
+          <button type="button" class="th-sort" onclick="ordenarColaboradoresCriacao('nome')">Nome<span class="sort-ind" id="sort-ind-criacao-nome"> ▲</span></button>
+        </div>
+        <div id="sort-header-criacao-cargo" class="modal-colaboradores-th" role="columnheader" aria-sort="none">
+          <button type="button" class="th-sort" onclick="ordenarColaboradoresCriacao('cargo')">Cargo<span class="sort-ind" id="sort-ind-criacao-cargo"></span></button>
+        </div>
+        <div id="sort-header-criacao-inclusao" class="modal-colaboradores-th" role="columnheader" aria-sort="none">
+          <button type="button" class="th-sort" onclick="ordenarColaboradoresCriacao('inclusao')">No ciclo<span class="sort-ind" id="sort-ind-criacao-inclusao"></span></button>
+        </div>
+      </div>
+      <p id="modal-busca-colaborador-vazio" class="modal-busca-vazio muted" hidden>Nenhuma pessoa encontrada.</p>
+      <div id="modal-lista-colaboradores" class="check-list" role="rowgroup"></div>
+    </div>
     <div class="modal-actions">
       <button class="btn-link" onclick="fecharModalCriarAvaliacoes()">Cancelar</button>
-      <button class="btn-primary" onclick="confirmarCriacaoAvaliacoes()">Criar</button>
+      <button id="btn-confirmar-criacao-avaliacoes" class="btn-primary" onclick="confirmarCriacaoAvaliacoes()">Criar</button>
     </div>
   </div>
 </div>
@@ -563,7 +576,7 @@
 <script src="js/admin/ciclos-module.js?v=22"></script>
 <script src="js/admin/colaboradores-module.js?v=22"></script>
 <script src="js/admin/auditoria-module.js?v=22"></script>
-<script src="js/admin/admin-shell.js?v=24"></script>
+<script src="js/admin/admin-shell.js?v=25"></script>
 
 <script src="js/auth/auth-module.js?v=23"></script>
 <script>
