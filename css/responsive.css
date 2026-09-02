@@ -38,11 +38,7 @@
   .central-notificacao { align-items: stretch; flex-direction: column; }
   .central-notificacao-marcar { align-self: flex-start; margin: 0 16px 12px; }
   .btn-notificar-gestores { width: 100%; }
-  /* Tela de avaliação: Voltar + título/status + botão de transição não cabem
-     numa linha só quando o botão de transição aparece (ex: "Enviar para
-     alinhamento"). Deixa quebrar, com o botão de transição numa linha própria. */
-  #screen-avaliacao .topbar #avaliacao-transicao:not(:empty) { flex-basis: 100%; }
-  #screen-avaliacao .topbar #avaliacao-transicao .btn-primary { width: 100%; }
+  .avaliacao-transicao-area { padding: var(--space-2) var(--space-3) 0; }
 
   /* Cards de avaliação (dashboard "Minhas avaliações" e histórico do Perfil):
      empilha texto e badge em vez de espremer os dois numa linha só. */
@@ -128,8 +124,7 @@
   }
   #screen-avaliacao.avaliacao-mobile-prioritaria #avaliacao-transicao:not(:empty) {
     display: flex;
-    grid-column: 1 / -1;
-    grid-row: 2;
+    justify-content: flex-end;
     width: 100%;
   }
   #screen-avaliacao.avaliacao-mobile-prioritaria .etapas-nav {
