@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="css/login.css?v=27">
 <link rel="stylesheet" href="css/dashboard.css?v=26">
 <link rel="stylesheet" href="css/perfil.css?v=22">
-<link rel="stylesheet" href="css/avaliacao.css?v=28">
+<link rel="stylesheet" href="css/avaliacao.css?v=29">
 <link rel="stylesheet" href="css/admin.css?v=29">
 <link rel="stylesheet" href="css/responsive.css?v=28">
 </head>
@@ -408,6 +408,7 @@
         <select id="auditoria-tabela">
           <option value="">Todas as entidades</option>
           <option value="avaliacoes">Avaliações</option>
+          <option value="avaliacao_retornos">Retornos de avaliação</option>
           <option value="avaliacao_notas">Notas</option>
           <option value="avaliacao_plano_desenvolvimento">Plano de desenvolvimento</option>
           <option value="perfis">Colaboradores</option>
@@ -477,15 +478,30 @@
   </div>
 </div>
 
-<!-- MODAL: reabrir avaliação (RH/admin) -->
-<div id="modal-reabrir-avaliacao" class="modal" role="dialog" aria-modal="true">
-  <div class="modal-box">
-    <h3>Reabrir avaliação?</h3>
-    <p class="muted">Plano de Desenvolvimento, Resumo e Parecer voltam a ficar editáveis para o gestor. As ciências já registradas serão reiniciadas — colaborador e gestor precisarão confirmar ciência novamente depois que o consenso for salvo.</p>
-    <label class="campo"><span>Motivo da reabertura</span><textarea id="reabrir-motivo" placeholder="Descreva o que precisa ser corrigido"></textarea></label>
+<!-- MODAL: retroceder avaliação (RH/admin) -->
+<div id="modal-retroceder-avaliacao" class="modal" role="dialog" aria-modal="true" aria-labelledby="retroceder-avaliacao-titulo" onclick="if (event.target === this) fecharModalRetrocederAvaliacao()">
+  <div class="modal-box modal-retroceder-avaliacao-box">
+    <div class="retrocesso-modal-cabecalho">
+      <h3 id="retroceder-avaliacao-titulo">Retroceder avaliação</h3>
+      <button type="button" class="btn-icon" aria-label="Fechar" onclick="fecharModalRetrocederAvaliacao()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <p class="muted">As respostas já registradas serão preservadas. A pessoa responsável pela fase escolhida receberá uma notificação com a orientação abaixo.</p>
+    <div class="retrocesso-contexto">
+      <div class="retrocesso-atual"><span>Situação atual</span><strong id="retroceder-avaliacao-atual"></strong></div>
+      <label class="campo">
+        <span>Retornar para</span>
+        <select id="retroceder-avaliacao-destino" onchange="atualizarImpactoRetrocesso()"></select>
+      </label>
+    </div>
+    <aside id="retroceder-avaliacao-impacto" class="retrocesso-impacto" aria-live="polite"></aside>
+    <label class="campo retrocesso-motivo">
+      <span>Orientação para correção</span>
+      <textarea id="retroceder-avaliacao-motivo" maxlength="2000" placeholder="Explique o que deve ser revisado antes que a avaliação avance novamente"></textarea>
+      <small class="muted">Mínimo de 10 caracteres. A orientação ficará registrada no histórico e visível ao responsável.</small>
+    </label>
     <div class="modal-actions">
-      <button class="btn-link" onclick="fecharModalReabrirAvaliacao()">Cancelar</button>
-      <button class="btn-primary" onclick="confirmarReabrirAvaliacao()">Reabrir avaliação</button>
+      <button type="button" class="btn-link" onclick="fecharModalRetrocederAvaliacao()">Cancelar</button>
+      <button type="button" id="btn-confirmar-retrocesso" class="btn-primary" onclick="confirmarRetrocessoAvaliacao()">Retroceder avaliação</button>
     </div>
   </div>
 </div>
@@ -564,10 +580,10 @@
 <script src="js/gestao/gestao-module.js?v=14"></script>
 <script src="js/perfil/perfil-module.js?v=22"></script>
 
-  <script src="js/avaliacao/avaliacao-core.js?v=42"></script>
-  <script src="js/avaliacao/etapa-texto.js?v=25"></script>
-<script src="js/avaliacao/etapa-competencias.js?v=26"></script>
-<script src="js/avaliacao/etapa-parecer.js?v=28"></script>
+  <script src="js/avaliacao/avaliacao-core.js?v=43"></script>
+  <script src="js/avaliacao/etapa-texto.js?v=26"></script>
+<script src="js/avaliacao/etapa-competencias.js?v=27"></script>
+<script src="js/avaliacao/etapa-parecer.js?v=29"></script>
 
 <script src="js/admin/cargos-module.js?v=22"></script>
 <script src="js/admin/setores-module.js?v=22"></script>
@@ -575,7 +591,7 @@
 <script src="js/admin/vinculo-module.js?v=22"></script>
 <script src="js/admin/ciclos-module.js?v=22"></script>
 <script src="js/admin/colaboradores-module.js?v=22"></script>
-<script src="js/admin/auditoria-module.js?v=22"></script>
+<script src="js/admin/auditoria-module.js?v=23"></script>
 <script src="js/admin/admin-shell.js?v=25"></script>
 
 <script src="js/auth/auth-module.js?v=23"></script>

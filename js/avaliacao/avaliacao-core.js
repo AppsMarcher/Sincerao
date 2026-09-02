@@ -278,10 +278,135 @@ async function baixarPdfAvaliacao(avaliacaoId) {
   }
 }
 
+const FASES_RETROCESSO = [
+  { status: 'rascunho', ordem: 1, etapa: 1, etapaId: 'resultados', label: 'Avaliação do gestor' },
+  { status: 'aguardando_autoavaliacao', ordem: 2, etapa: 4, etapaId: 'autoavaliacao', label: 'Autoavaliação' },
+  { status: 'aguardando_alinhamento', ordem: 3, etapa: 5, etapaId: 'resumo', label: 'Alinhamento e consenso' },
+];
+
+const ORDEM_STATUS_AVALIACAO = {
+  rascunho: 1,
+  aguardando_autoavaliacao: 2,
+  aguardando_alinhamento: 3,
+  aguardando_ciencia: 4,
+  concluida: 5,
+};
+
+let _retrocessoAvaliacaoTrigger = null;
+
+function destinosRetrocessoAvaliacao(av) {
+  const ordemAtual = ORDEM_STATUS_AVALIACAO[av?.status] || 0;
+  return FASES_RETROCESSO.filter((fase) => fase.ordem < ordemAtual).sort((a, b) => b.ordem - a.ordem);
+}
+
 function renderBotoesTransicao() {
   const el = document.getElementById('avaliacao-transicao');
-  el.innerHTML = '';
+  const destinos = destinosRetrocessoAvaliacao(G.avaliacaoAtual);
+  el.innerHTML = ehRhOuAdmin() && destinos.length
+    ? `<button type="button" class="btn-link btn-retroceder-avaliacao" onclick="abrirModalRetrocederAvaliacao()"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M4 9h10a6 6 0 0 1 6 6v2"/></svg>Retroceder etapa</button>`
+    : '';
 }
+
+function detalheImpactoRetrocesso(status) {
+  return {
+    rascunho: 'O gestor poderá revisar as etapas 1 a 3. Ciências, conclusão, pontuação e classificação serão invalidadas; as respostas existentes serão preservadas.',
+    aguardando_autoavaliacao: 'O colaborador poderá revisar a Autoavaliação. Ciências e conclusão serão invalidadas; as respostas existentes serão preservadas.',
+    aguardando_alinhamento: 'O gestor e o RH poderão revisar o Plano de Desenvolvimento e o Parecer Final. Ciências e conclusão serão invalidadas; as respostas existentes serão preservadas.',
+  }[status] || '';
+}
+
+function abrirModalRetrocederAvaliacao() {
+  const av = G.avaliacaoAtual;
+  const destinos = destinosRetrocessoAvaliacao(av);
+  if (!ehRhOuAdmin() || !destinos.length) return;
+  _retrocessoAvaliacaoTrigger = document.activeElement;
+  const modal = document.getElementById('modal-retroceder-avaliacao');
+  const select = document.getElementById('retroceder-avaliacao-destino');
+  document.getElementById('retroceder-avaliacao-atual').textContent = statusLabel(av.status);
+  select.innerHTML = destinos.map((fase) => `<option value="${fase.status}">${escHtml(fase.label)}</option>`).join('');
+  document.getElementById('retroceder-avaliacao-motivo').value = '';
+  document.getElementById('btn-confirmar-retrocesso').disabled = false;
+  atualizarImpactoRetrocesso();
+  modal.classList.add('open');
+  select.focus();
+}
+
+function atualizarImpactoRetrocesso() {
+  const status = document.getElementById('retroceder-avaliacao-destino').value;
+  const destino = FASES_RETROCESSO.find((fase) => fase.status === status);
+  document.getElementById('retroceder-avaliacao-impacto').textContent = detalheImpactoRetrocesso(status);
+  document.getElementById('btn-confirmar-retrocesso').textContent = destino ? `Retornar para ${destino.label}` : 'Retroceder avaliação';
+}
+
+function fecharModalRetrocederAvaliacao() {
+  document.getElementById('modal-retroceder-avaliacao').classList.remove('open');
+  if (_retrocessoAvaliacaoTrigger?.isConnected) _retrocessoAvaliacaoTrigger.focus();
+  _retrocessoAvaliacaoTrigger = null;
+}
+
+async function confirmarRetrocessoAvaliacao() {
+  const av = G.avaliacaoAtual;
+  const statusDestino = document.getElementById('retroceder-avaliacao-destino').value;
+  const motivo = document.getElementById('retroceder-avaliacao-motivo').value.trim();
+  const destino = destinosRetrocessoAvaliacao(av).find((fase) => fase.status === statusDestino);
+  if (!destino) {
+    showToast('A fase escolhida não está disponível para esta avaliação.');
+    return;
+  }
+  if (!respostaValida(motivo)) {
+    showToast(`Descreva a orientação para correção (mínimo ${MIN_CHARS_RESPOSTA_AVALIACAO} caracteres).`);
+    return;
+  }
+
+  const botao = document.getElementById('btn-confirmar-retrocesso');
+  botao.disabled = true;
+  botao.textContent = 'Retrocedendo...';
+  try {
+    const salvo = await sbRpc('retroceder_avaliacao', {
+      p_avaliacao_id: av.id,
+      p_versao: Number(av.versao) || 1,
+      p_status_destino: statusDestino,
+      p_motivo: motivo,
+    });
+    if (!salvo) throw new Error('O banco não retornou a avaliação atualizada.');
+    Object.assign(av, salvo);
+    G.etapaAtiva = destino.etapaId;
+    document.getElementById('screen-avaliacao').classList.toggle(
+      'avaliacao-mobile-prioritaria',
+      ['aguardando_autoavaliacao', 'aguardando_alinhamento', 'aguardando_ciencia'].includes(av.status)
+    );
+    document.getElementById('avaliacao-status').textContent = statusLabel(av.status);
+    fecharModalRetrocederAvaliacao();
+    renderBotoesTransicao();
+    renderEtapaAtiva();
+    showToast(`Avaliação retornada para ${destino.label}.`);
+  } catch (err) {
+    showToast(mensagemErroAvaliacao(err, 'Não foi possível retroceder a avaliação.'));
+  } finally {
+    if (document.getElementById('modal-retroceder-avaliacao').classList.contains('open')) {
+      botao.disabled = false;
+      atualizarImpactoRetrocesso();
+    }
+  }
+}
+
+function renderAvisoRetrocesso(av) {
+  const retorno = av.dados?.retrocesso;
+  const legado = av.dados?.reabertura;
+  if (!retorno && !legado) return '';
+  const registro = retorno || legado;
+  const autor = registro.retrocedido_por_nome || registro.reaberto_por_nome;
+  const momento = registro.retrocedido_em || registro.reaberto_em;
+  const destino = FASES_RETROCESSO.find((fase) => fase.status === registro.status_destino)?.label || 'Alinhamento e consenso';
+  const quando = momento ? new Date(momento).toLocaleString('pt-BR') : '';
+  return `<div class="aviso-retrocesso"><strong>Retorno administrativo para ${escHtml(destino)}</strong><span>${autor ? 'Por ' + escHtml(autor) : 'Por RH/Admin'}${quando ? ' em ' + escHtml(quando) : ''}.</span><br><b>Orientação:</b> ${escHtml(registro.motivo || '')}</div>`;
+}
+
+document.addEventListener('keydown', (evento) => {
+  if (evento.key === 'Escape' && document.getElementById('modal-retroceder-avaliacao')?.classList.contains('open')) {
+    fecharModalRetrocederAvaliacao();
+  }
+});
 
 function valoresIguais(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);

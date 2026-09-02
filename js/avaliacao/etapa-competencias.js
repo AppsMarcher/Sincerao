@@ -11,6 +11,7 @@ function renderEtapaCompetencias() {
 
   document.getElementById('etapa-conteudo').innerHTML = `
     <h3 class="competencias-titulo">Avaliação das Competências</h3>
+    ${renderAvisoRetrocesso(av)}
     <details class="competencias-escala"><summary>Escala de notas</summary>${escalaHtml}</details>
     ${renderGrupoCompetencias('Competências comportamentais', grupos.comportamental, notasPorCompetencia, editavel)}
     ${renderGrupoCompetencias('Competências técnicas', grupos.tecnica, notasPorCompetencia, editavel)}

@@ -46,6 +46,7 @@ function renderEtapaTexto(etapaId) {
   const container = document.getElementById('etapa-conteudo');
   container.innerHTML = `
     <h3>${escHtml(etapa.label)}</h3>
+    ${renderAvisoRetrocesso(av)}
     ${rascunho ? '<p class="muted">Rascunho local recuperado deste navegador. Salve a etapa para confirmar no banco.</p>' : ''}
     <form id="form-etapa">
       ${campos

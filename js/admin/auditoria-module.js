@@ -7,6 +7,7 @@ let _auditoriaCarregando = false;
 
 const AUDITORIA_ENTIDADES = {
   avaliacoes: 'Avaliação',
+  avaliacao_retornos: 'Retorno de avaliação',
   avaliacao_notas: 'Nota',
   avaliacao_plano_desenvolvimento: 'Plano de desenvolvimento',
   perfis: 'Colaborador',
@@ -94,7 +95,7 @@ function camposAuditadosLabel(campos) {
 
 function resumoRegistroAuditoria(log) {
   const dados = log.dados_novos || log.dados_anteriores || {};
-  return dados.nome || dados.email || dados.competencia || dados.acao || log.registro_id || '—';
+  return dados.nome || dados.email || dados.competencia || dados.acao || dados.motivo || log.registro_id || '—';
 }
 
 function jsonAuditoriaHtml(valor) {
