@@ -47,6 +47,6 @@ const CAMPOS_ETAPA = {
     ['fortalezas', 'Principais fortalezas'],
     ['oportunidades', 'Principais oportunidades'],
     ['prioridade_desenvolvimento', 'Prioridade de desenvolvimento'],
-    ['treinamentos_recomendados', 'Treinamentos recomendados'],
+    ['treinamentos_recomendados', 'Ações Recomendadas'],
   ],
 };

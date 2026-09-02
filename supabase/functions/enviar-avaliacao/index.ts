@@ -84,7 +84,7 @@ const CAMPOS_ETAPA: Record<string, [string, string][]> = {
     ['fortalezas', 'Principais fortalezas'],
     ['oportunidades', 'Principais oportunidades'],
     ['prioridade_desenvolvimento', 'Prioridade de desenvolvimento'],
-    ['treinamentos_recomendados', 'Treinamentos recomendados'],
+    ['treinamentos_recomendados', 'Ações Recomendadas'],
   ],
 };
 
