@@ -101,9 +101,13 @@
 .central-notificacoes-mais { display: flex; justify-content: center; padding-top: var(--space-3); }
 
 /* Indicadores de Gestão: mais colunas (fases por gestor) do que o padrão de
-   .content (880px) comporta sem quebrar nome/rótulo em várias linhas. */
+   .content (880px) comporta sem quebrar nome em várias linhas. Cabeçalho pode
+   quebrar em 2 linhas — os rótulos de fase são bem mais largos que o número
+   de 1 dígito que eles rotulam, então deixar o th quebrar mantém as colunas
+   estreitas em vez de esticar a tabela pelo tamanho do texto do rótulo. */
 #screen-gestao .content { max-width: 1400px; }
-#gestao-conteudo .tabela th, #gestao-conteudo .tabela td { white-space: nowrap; }
+#gestao-conteudo .tabela td { white-space: nowrap; }
+#gestao-conteudo .tabela th { white-space: normal; max-width: 110px; }
 
 /* Gestão: disparo consolidado por ciclo e seleção segura dos destinatários. */
 .gestao-secao-cabecalho { margin-bottom: var(--space-4); }
