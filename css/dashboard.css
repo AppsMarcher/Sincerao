@@ -107,7 +107,10 @@
    estreitas em vez de esticar a tabela pelo tamanho do texto do rótulo. */
 #screen-gestao .content { max-width: 1400px; }
 #gestao-conteudo .tabela td { white-space: nowrap; }
-#gestao-conteudo .tabela th { white-space: normal; max-width: 110px; }
+#gestao-conteudo .tabela th { white-space: normal; max-width: 110px; text-align: center; }
+/* Primeira coluna (nome do gestor/setor/fase/etc.) continua à esquerda; o
+   resto são números/datas, ficam centralizados sob o rótulo. */
+#gestao-conteudo .tabela td:not(:first-child) { text-align: center; }
 
 /* Gestão: disparo consolidado por ciclo e seleção segura dos destinatários. */
 .gestao-secao-cabecalho { margin-bottom: var(--space-4); }
