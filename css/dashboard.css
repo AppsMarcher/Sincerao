@@ -100,6 +100,11 @@
 .central-notificacao-marcar { flex: 0 0 auto; margin-right: var(--space-3); font-size: 12px; }
 .central-notificacoes-mais { display: flex; justify-content: center; padding-top: var(--space-3); }
 
+/* Indicadores de Gestão: mais colunas (fases por gestor) do que o padrão de
+   .content (880px) comporta sem quebrar nome/rótulo em várias linhas. */
+#screen-gestao .content { max-width: 1400px; }
+#gestao-conteudo .tabela th, #gestao-conteudo .tabela td { white-space: nowrap; }
+
 /* Gestão: disparo consolidado por ciclo e seleção segura dos destinatários. */
 .gestao-secao-cabecalho { margin-bottom: var(--space-4); }
 .gestao-secao-cabecalho h3 { margin: 0; }
