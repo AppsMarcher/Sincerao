@@ -107,25 +107,37 @@
 <div id="screen-definir-senha" class="screen tela-auth">
   <div class="login-box">
     <img src="assets/logo.png" alt="Sincerão" class="logo-login">
-    <h2>Defina sua senha</h2>
-    <p class="muted">Complete seu cadastro criando uma senha de acesso.</p>
-    <form id="form-definir-senha">
-      <label class="campo">
-        <span>Nova senha</span>
-        <div class="campo-senha-wrap">
-          <input type="password" id="definir-senha-nova" minlength="6" required autocomplete="new-password">
-          <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
-        </div>
-      </label>
-      <label class="campo">
-        <span>Confirmar senha</span>
-        <div class="campo-senha-wrap">
-          <input type="password" id="definir-senha-confirmar" minlength="6" required autocomplete="new-password">
-          <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
-        </div>
-      </label>
-      <button type="submit" class="btn-primary">Salvar e entrar</button>
-    </form>
+    <!-- Gate de confirmação: mostrado ANTES do formulário, com o token_hash
+         do link de e-mail só sendo trocado por sessão no CLIQUE deste botão
+         (ver js/auth/auth-module.js, mostrarGateDefinirSenha) -- scanners de
+         segurança de e-mail (Microsoft Defender Safe Links, tenant
+         @marcher.com.br) carregam a página, mas não clicam nela. -->
+    <div id="gate-definir-senha" hidden>
+      <h2 id="gate-definir-senha-titulo">Continuar</h2>
+      <p class="muted" id="gate-definir-senha-texto">Clique abaixo para continuar.</p>
+      <button type="button" class="btn-primary" id="gate-definir-senha-btn">Continuar</button>
+    </div>
+    <div id="form-definir-senha-wrap" hidden>
+      <h2>Defina sua senha</h2>
+      <p class="muted">Complete seu cadastro criando uma senha de acesso.</p>
+      <form id="form-definir-senha">
+        <label class="campo">
+          <span>Nova senha</span>
+          <div class="campo-senha-wrap">
+            <input type="password" id="definir-senha-nova" minlength="6" required autocomplete="new-password">
+            <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </label>
+        <label class="campo">
+          <span>Confirmar senha</span>
+          <div class="campo-senha-wrap">
+            <input type="password" id="definir-senha-confirmar" minlength="6" required autocomplete="new-password">
+            <button type="button" class="btn-olho" onclick="togglePasswordVisibility(this)" aria-label="Mostrar senha" tabindex="-1"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </label>
+        <button type="submit" class="btn-primary">Salvar e entrar</button>
+      </form>
+    </div>
   </div>
 </div>
 

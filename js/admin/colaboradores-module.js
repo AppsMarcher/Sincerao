@@ -173,8 +173,12 @@ async function redefinirSenhaColaborador(id) {
   if (!colaborador) return;
   try {
     const redirectTo = window.location.origin + window.location.pathname;
-    const { error } = await _sbClient.auth.resetPasswordForEmail(colaborador.email, { redirectTo });
-    if (error) throw error;
+    // Via Edge Function forgot-password (NÃO mais _sbClient.auth.resetPasswordForEmail
+    // direto) -- esse endpoint público do GoTrue manda o e-mail com o action_link bruto,
+    // que o Defender Safe Links do tenant @marcher.com.br consome antes do colaborador
+    // clicar, causando o mesmo loop de volta pro login. Ver nota grande em
+    // supabase/functions/forgot-password/index.ts.
+    await sbInvokeFunction('forgot-password', { email: colaborador.email, redirect_to: redirectTo });
     showToast('E-mail de redefinição enviado para ' + colaborador.email + '.');
   } catch (err) {
     showToast('Erro ao enviar redefinição: ' + (err.message || err));
