@@ -6,6 +6,12 @@ supabase/functions/*
 !supabase/functions/notificar-gestores/
 !supabase/functions/notificar-gestores/index.ts
 !supabase/functions/notificar-gestores/README.md
+!supabase/functions/invite-colaborador/
+!supabase/functions/invite-colaborador/index.ts
+!supabase/functions/admin-colaborador/
+!supabase/functions/admin-colaborador/index.ts
+!supabase/functions/forgot-password/
+!supabase/functions/forgot-password/index.ts
 Sincerão_Logo.png
 Sincerão_LogoB.png
 *.docx
