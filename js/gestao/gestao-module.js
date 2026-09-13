@@ -136,10 +136,14 @@ async function abrirPopoverGestorStatus(evento) {
 }
 
 // Ancora o popover perto do botão clicado, com clamp nas bordas da
-// viewport (inclusive virando pra cima quando não cabe embaixo).
+// viewport (inclusive virando pra cima quando não cabe embaixo). Chamada
+// de novo a cada scroll (o popover é position:fixed, não acompanha o
+// scroll sozinho) -- por isso não mexe em visibility aqui: hidden=false +
+// left/top são setados na mesma tarefa síncrona, então não há frame
+// intermediário pra "piscar" a posição errada, nem no primeiro open nem
+// nas chamadas repetidas durante um scroll contínuo.
 function posicionarPopover(popover, ancora) {
   const margem = 8;
-  popover.style.visibility = 'hidden';
   popover.hidden = false;
   const r = ancora.getBoundingClientRect();
   const largura = popover.offsetWidth;
@@ -150,7 +154,6 @@ function posicionarPopover(popover, ancora) {
   if (topo + altura > window.innerHeight - margem) topo = Math.max(margem, r.top - altura - margem);
   popover.style.left = esquerda + 'px';
   popover.style.top = topo + 'px';
-  popover.style.visibility = '';
 }
 
 function fecharPopoverGestorStatus() {
@@ -164,9 +167,19 @@ function fecharPopoverGestorStatus() {
 document.addEventListener('click', (evento) => {
   if (!evento.target.closest('.link-numero') && !evento.target.closest('#popover-gestor-status')) fecharPopoverGestorStatus();
 });
-// capture:true porque scroll não borbulha -- só assim um listener no
-// window pega o scroll de dentro do .tabela-scroll também.
-window.addEventListener('scroll', () => fecharPopoverGestorStatus(), true);
+// Reposiciona em vez de fechar: o popover é position:fixed (não acompanha
+// o scroll sozinho), então sem isso ele "desaparecia" (ficava ancorado no
+// lugar antigo, atrás do resto da página) assim que a pessoa rolava a
+// tela pra ler a lista inteira. capture:true porque scroll não borbulha --
+// só assim um listener no window pega o scroll de dentro do .tabela-scroll
+// também. Se o botão que abriu o popover já saiu do DOM (re-render da
+// tabela), fecha em vez de reposicionar contra uma âncora morta.
+window.addEventListener('scroll', () => {
+  const popover = document.getElementById('popover-gestor-status');
+  if (!popover || popover.hidden) return;
+  if (_popoverGestorTrigger?.isConnected) posicionarPopover(popover, _popoverGestorTrigger);
+  else fecharPopoverGestorStatus();
+}, true);
 
 function selecionarTodosGestoresNotificacao(marcado) {
   document.querySelectorAll('#notificar-gestores-lista input[type="checkbox"]').forEach((input) => { input.checked = marcado; });
