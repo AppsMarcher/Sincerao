@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="css/base.css?v=27">
+<link rel="stylesheet" href="css/base.css?v=28">
 <link rel="stylesheet" href="css/login.css?v=27">
 <link rel="stylesheet" href="css/dashboard.css?v=26">
 <link rel="stylesheet" href="css/perfil.css?v=22">
@@ -207,7 +207,18 @@
 
 <div id="screen-gestao" class="screen">
   <header class="topbar topbar-interna"><button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button><button type="button" class="topbar-marca" onclick="abrirDashboard()"><img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna"></button><h2 class="topbar-titulo">Dashboard</h2></header>
-  <main class="content stack"><section class="card"><label class="campo"><span>Ciclo de avaliação</span><select id="gestao-ciclo" onchange="carregarIndicadoresGestao()"></select></label><p class="muted">Dados consolidados. Esta área não exibe avaliações individuais.</p></section><div id="gestao-conteudo"></div></main>
+  <main class="content stack"><section class="card"><label class="campo"><span>Ciclo de avaliação</span><select id="gestao-ciclo" onchange="carregarIndicadoresGestao()"></select></label><p class="muted">Dados consolidados por gestor, setor e ciclo. Clique num número da tabela "Resultados por gestor" pra ver os colaboradores incluídos.</p></section><div id="gestao-conteudo"></div></main>
+</div>
+
+<div id="popover-gestor-status" class="popover-status" hidden role="dialog" aria-modal="false" aria-labelledby="popover-gestor-status-titulo">
+  <div class="popover-status-cabecalho">
+    <div>
+      <strong id="popover-gestor-status-titulo"></strong>
+      <p id="popover-gestor-status-subtitulo" class="muted"></p>
+    </div>
+    <button type="button" class="btn-icon" aria-label="Fechar" onclick="fecharPopoverGestorStatus()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div id="popover-gestor-status-corpo" class="popover-status-corpo"></div>
 </div>
 
 <!-- PERFIL -->
@@ -591,7 +602,7 @@
 
 <script src="js/dashboard/notificacoes-module.js?v=1"></script>
 <script src="js/dashboard/dashboard-module.js?v=35"></script>
-<script src="js/gestao/gestao-module.js?v=14"></script>
+<script src="js/gestao/gestao-module.js?v=15"></script>
 <script src="js/perfil/perfil-module.js?v=22"></script>
 
   <script src="js/avaliacao/avaliacao-core.js?v=44"></script>
