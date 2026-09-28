@@ -300,10 +300,12 @@ function destinosRetrocessoAvaliacao(av) {
 }
 
 function renderBotoesTransicao() {
+  const av = G.avaliacaoAtual;
+  const nomeEl = document.getElementById('avaliacao-transicao-nome');
+  if (nomeEl) nomeEl.textContent = av?.colaborador?.nome ? `Avaliação de ${av.colaborador.nome}` : '';
   const el = document.getElementById('avaliacao-transicao');
-  const destinos = destinosRetrocessoAvaliacao(G.avaliacaoAtual);
+  const destinos = destinosRetrocessoAvaliacao(av);
   const exibir = ehRhOuAdmin() && destinos.length > 0;
-  el.parentElement.hidden = !exibir;
   el.innerHTML = exibir
     ? `<button type="button" class="btn-link btn-retroceder-avaliacao" onclick="abrirModalRetrocederAvaliacao()"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M4 9h10a6 6 0 0 1 6 6v2"/></svg>Retroceder etapa</button>`
     : '';
