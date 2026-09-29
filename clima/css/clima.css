@@ -179,4 +179,7 @@
 @media (max-width: 420px) {
   .clima-app .card { padding: 22px 16px; border-radius: 14px; }
   .clima-likert-btn { max-width: 36px; }
+  /* 0-10 em duas linhas de tamanho igual (6 + 5), em vez de quebrar desigual */
+  .clima-nps-row { display: grid; grid-template-columns: repeat(6, 1fr); }
+  .clima-nps-btn { min-width: 0; }
 }
