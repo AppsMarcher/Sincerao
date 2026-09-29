@@ -143,10 +143,12 @@ async function entrarNoApp(perfil) {
   document.querySelectorAll('.nav-nome-usuario').forEach((el) => { el.textContent = perfil.nome; });
   document.querySelectorAll('.nav-admin').forEach((el) => { el.style.display = ehRhOuAdmin() ? '' : 'none'; });
   document.querySelectorAll('.nav-gestao').forEach((el) => { el.style.display = podeVerGestao() ? '' : 'none'; });
+  document.querySelectorAll('.nav-hub').forEach((el) => { el.style.display = ehRhOuAdmin() ? '' : 'none'; });
   garantirSinosNotificacoes();
   await carregarAvatarUsuario();
   iniciarMonitorNotificacoes();
-  await abrirDashboard();
+  if (ehRhOuAdmin()) await abrirHub();
+  else await abrirDashboard();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

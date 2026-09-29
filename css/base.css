@@ -160,7 +160,65 @@ a { color: var(--primary); }
 
 .icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.8; fill: none; vertical-align: -3px; }
 
-.content { padding: var(--space-5); max-width: 880px; margin: 0 auto; }
+/* Topbar de tela de módulo (Hub, dashboard de Avaliação, Administração,
+   Indicadores de Gestão, Clima) — mesmo <header class="topbar topbar-modulo">,
+   só troca o layout de flex (space-between) pra grid de 3 colunas, pra
+   caber logo | título centralizado | ações. Aditiva: não mexe em
+   .topbar/.topbar-interna sozinhos, que continuam servindo as telas de
+   tarefa focada (wizard de avaliação, perfil, notificações) -- e como
+   segue sendo .topbar, garantirSinosNotificacoes()/atualizarAvataresCabecalho()
+   continuam encontrando essas telas sem precisar de nenhuma mudança lá. */
+.topbar-modulo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+.topbar-modulo .topbar-marca { justify-self: start; }
+.topbar-titulo-central {
+  grid-column: 2;
+  justify-self: center;
+  margin: 0;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+}
+.topbar-modulo .topbar-actions { grid-column: 3; justify-self: end; }
+
+/* Barra de abas de módulo — navegação entre as telas de um mesmo módulo
+   (ex: Painel / Administração / Dashboard da Avaliação; Ciclos & códigos /
+   Resultados do Clima). Cada botão continua navegando com goTo() pra uma
+   .screen própria — isto é só a casca visual, não um painel em página. */
+.modulo-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 var(--space-5);
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  overflow-x: auto;
+}
+.modulo-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 14px 4px;
+  margin-right: 24px;
+  color: var(--text-soft);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.modulo-tab-btn:hover { color: var(--text); }
+.modulo-tab-btn.active { color: var(--primary); font-weight: 700; border-bottom-color: var(--primary); }
+
+.content { padding: var(--space-5); max-width: 1400px; margin: 0 auto; }
 .stack { display: flex; flex-direction: column; gap: var(--space-5); }
 
 .card {

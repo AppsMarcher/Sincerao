@@ -2,17 +2,21 @@ const LIMITE_NOTIFICACOES = 20;
 let _notificacoesCentral = [];
 let _notificacoesOffset = 0;
 let _notificacoesTemMais = false;
+let _notificacoesModuloAtual = 'avaliacao';
 let _monitorNotificacoes = null;
 let _canalNotificacoes = null;
 
 function garantirSinosNotificacoes() {
   document.querySelectorAll('.topbar').forEach((topbar) => {
+    if (topbar.closest('#screen-hub')) return; // Hub é seletor de módulo, não tem central de notificações
+    const modulo = topbar.dataset.modulo || 'avaliacao';
     if (topbar.querySelector('.btn-sino-notificacoes')) return;
     const botao = document.createElement('button');
     botao.type = 'button';
     botao.className = 'btn-sino-notificacoes';
+    botao.dataset.modulo = modulo;
     botao.setAttribute('aria-label', 'Abrir notificações. Nenhuma não lida.');
-    botao.onclick = abrirNotificacoes;
+    botao.onclick = () => abrirNotificacoes(modulo);
     botao.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span class="notificacoes-badge" hidden>0</span>';
     const acoes = topbar.querySelector('.topbar-actions');
     if (acoes) acoes.insertBefore(botao, acoes.firstChild);
@@ -31,20 +35,29 @@ function formatarDataHoraNotificacao(valor) {
   });
 }
 
+function aplicarContadorSino(modulo, quantidade) {
+  document.querySelectorAll(`.btn-sino-notificacoes[data-modulo="${modulo}"]`).forEach((botao) => {
+    const badge = botao.querySelector('.notificacoes-badge');
+    if (badge) {
+      badge.textContent = quantidade > 99 ? '99+' : String(quantidade);
+      badge.hidden = quantidade === 0;
+    }
+    botao.classList.toggle('tem-notificacoes', quantidade > 0);
+    botao.setAttribute('aria-label', quantidade
+      ? `Abrir notificações. ${quantidade} ${quantidade === 1 ? 'não lida' : 'não lidas'}.`
+      : 'Abrir notificações. Nenhuma não lida.');
+  });
+}
+
 async function atualizarContadorNotificacoes() {
   if (!G.perfil?.id) return;
   try {
-    const quantidade = Number(await sbRpc('contar_notificacoes_nao_lidas')) || 0;
-    document.querySelectorAll('.notificacoes-badge').forEach((badge) => {
-      badge.textContent = quantidade > 99 ? '99+' : String(quantidade);
-      badge.hidden = quantidade === 0;
-    });
-    document.querySelectorAll('.btn-sino-notificacoes').forEach((botao) => {
-      botao.classList.toggle('tem-notificacoes', quantidade > 0);
-      botao.setAttribute('aria-label', quantidade
-        ? `Abrir notificações. ${quantidade} ${quantidade === 1 ? 'não lida' : 'não lidas'}.`
-        : 'Abrir notificações. Nenhuma não lida.');
-    });
+    const [avaliacao, clima] = await Promise.all([
+      sbRpc('contar_notificacoes_nao_lidas').catch(() => 0),
+      sbFetch('/clima_notificacoes?lida_em=is.null&select=id').catch(() => []),
+    ]);
+    aplicarContadorSino('avaliacao', Number(avaliacao) || 0);
+    aplicarContadorSino('clima', (clima || []).length);
   } catch (erro) {
     console.warn('Não foi possível atualizar o contador de notificações.', erro);
   }
@@ -62,23 +75,44 @@ function iniciarMonitorNotificacoes() {
   atualizarContadorNotificacoes();
   _monitorNotificacoes = setInterval(atualizarContadorNotificacoes, 60000);
   if (!G.perfil?.id || typeof _sbClient.channel !== 'function') return;
+
+  const aoMudar = (modulo, recarregar) => () => {
+    atualizarContadorNotificacoes();
+    if (_notificacoesModuloAtual === modulo && document.getElementById('screen-notificacoes')?.classList.contains('active')) {
+      recarregar(true);
+    }
+  };
+
   _canalNotificacoes = _sbClient
     .channel(`notificacoes-${G.perfil.id}`)
     .on('postgres_changes', {
       event: '*', schema: 'public', table: 'notificacoes', filter: `destinatario_id=eq.${G.perfil.id}`,
-    }, () => {
-      atualizarContadorNotificacoes();
-      if (document.getElementById('screen-notificacoes')?.classList.contains('active')) {
-        carregarCentralNotificacoes(true);
-      }
-    })
+    }, aoMudar('avaliacao', carregarCentralNotificacoes))
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'clima_notificacoes',
+    }, aoMudar('clima', carregarClimaNotificacoes))
     .subscribe();
 }
 
-async function abrirNotificacoes() {
+async function abrirNotificacoes(modulo = 'avaliacao') {
   document.querySelectorAll('.nav-menu.open').forEach((menu) => menu.classList.remove('open'));
+  _notificacoesModuloAtual = modulo;
   goTo('screen-notificacoes');
-  await carregarCentralNotificacoes(true);
+
+  const ehClima = modulo === 'clima';
+  document.getElementById('notificacoes-titulo-modulo').textContent = ehClima ? 'Notificações · Clima' : 'Notificações · Avaliação';
+  document.getElementById('notificacoes-subtitulo').textContent = ehClima
+    ? 'Ciclos e eventos da pesquisa de clima.'
+    : 'Acompanhe avaliações, prazos e comunicados.';
+  document.getElementById('notificacoes-filtros').hidden = ehClima;
+
+  if (ehClima) await carregarClimaNotificacoes(true);
+  else await carregarCentralNotificacoes(true);
+}
+
+function voltarDeNotificacoes() {
+  if (_notificacoesModuloAtual === 'clima') abrirClimaAdmin();
+  else abrirDashboard();
 }
 
 function categoriaNotificacaoLabel(categoria) {
@@ -104,14 +138,65 @@ function renderNotificacaoItem(n) {
   </article>`;
 }
 
+function renderClimaNotificacaoItem(n) {
+  return `<article class="central-notificacao${n.lida_em ? '' : ' central-notificacao--nao-lida'}">
+    <button type="button" class="central-notificacao-conteudo" onclick="marcarClimaNotificacaoLida('${n.id}')">
+      <span class="central-notificacao-topo">
+        <span class="central-notificacao-categoria">Clima</span>
+        ${n.lida_em ? '' : '<span class="notificacao-badge-nova">Nova</span>'}
+      </span>
+      <strong>${escHtml(n.titulo)}</strong>
+      <span class="muted">${escHtml(n.mensagem)}</span>
+      <small>${escHtml(formatarDataHoraNotificacao(n.created_at))}</small>
+    </button>
+    ${n.lida_em ? '' : `<button type="button" class="btn-link central-notificacao-marcar" onclick="marcarClimaNotificacaoLida('${n.id}')">Marcar como lida</button>`}
+  </article>`;
+}
+
 function renderCentralNotificacoes() {
   const lista = document.getElementById('notificacoes-lista');
   if (!lista) return;
+  const renderItem = _notificacoesModuloAtual === 'clima' ? renderClimaNotificacaoItem : renderNotificacaoItem;
   lista.innerHTML = _notificacoesCentral.length
-    ? _notificacoesCentral.map(renderNotificacaoItem).join('')
+    ? _notificacoesCentral.map(renderItem).join('')
     : '<p class="empty">Nenhuma notificação encontrada para este filtro.</p>';
   const carregarMais = document.getElementById('btn-carregar-mais-notificacoes');
   if (carregarMais) carregarMais.hidden = !_notificacoesTemMais;
+}
+
+async function carregarClimaNotificacoes(reiniciar = false) {
+  const lista = document.getElementById('notificacoes-lista');
+  if (!lista) return;
+  if (reiniciar) {
+    _notificacoesOffset = 0;
+    _notificacoesCentral = [];
+    lista.innerHTML = '<p class="muted">Carregando notificações…</p>';
+  }
+  const path = `/clima_notificacoes?order=created_at.desc&limit=${LIMITE_NOTIFICACOES + 1}&offset=${_notificacoesOffset}`;
+  try {
+    const dados = (await sbFetch(path)) || [];
+    _notificacoesTemMais = dados.length > LIMITE_NOTIFICACOES;
+    const pagina = dados.slice(0, LIMITE_NOTIFICACOES);
+    _notificacoesCentral = reiniciar ? pagina : _notificacoesCentral.concat(pagina);
+    _notificacoesOffset = _notificacoesCentral.length;
+    renderCentralNotificacoes();
+  } catch {
+    lista.innerHTML = '<p class="empty">Não foi possível carregar as notificações.</p>';
+  }
+}
+
+async function marcarClimaNotificacaoLida(id) {
+  const notificacao = _notificacoesCentral.find((item) => item.id === id);
+  if (!notificacao || notificacao.lida_em) return;
+  const agora = new Date().toISOString();
+  try {
+    await sbFetch(`/clima_notificacoes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ lida_em: agora }) });
+    notificacao.lida_em = agora;
+    renderCentralNotificacoes();
+    await atualizarContadorNotificacoes();
+  } catch {
+    showToast('Não foi possível marcar a notificação como lida.');
+  }
 }
 
 async function carregarCentralNotificacoes(reiniciar = false) {
@@ -141,7 +226,8 @@ async function carregarCentralNotificacoes(reiniciar = false) {
 }
 
 function carregarMaisNotificacoes() {
-  carregarCentralNotificacoes(false);
+  if (_notificacoesModuloAtual === 'clima') carregarClimaNotificacoes(false);
+  else carregarCentralNotificacoes(false);
 }
 
 async function marcarNotificacaoLida(id) {
@@ -161,9 +247,18 @@ async function marcarNotificacaoLida(id) {
 }
 
 async function marcarTodasNotificacoesLidas() {
+  const ehClima = _notificacoesModuloAtual === 'clima';
   try {
-    const quantidade = Number(await sbRpc('marcar_todas_notificacoes_lidas')) || 0;
-    await Promise.all([carregarCentralNotificacoes(true), atualizarContadorNotificacoes()]);
+    let quantidade;
+    if (ehClima) {
+      const antes = (await sbFetch('/clima_notificacoes?lida_em=is.null&select=id')) || [];
+      await sbFetch('/clima_notificacoes?lida_em=is.null', { method: 'PATCH', body: JSON.stringify({ lida_em: new Date().toISOString() }) });
+      quantidade = antes.length;
+      await Promise.all([carregarClimaNotificacoes(true), atualizarContadorNotificacoes()]);
+    } else {
+      quantidade = Number(await sbRpc('marcar_todas_notificacoes_lidas')) || 0;
+      await Promise.all([carregarCentralNotificacoes(true), atualizarContadorNotificacoes()]);
+    }
     showToast(quantidade ? `${quantidade} ${quantidade === 1 ? 'notificação marcada' : 'notificações marcadas'} como lida${quantidade === 1 ? '' : 's'}.` : 'Não há notificações novas.');
   } catch {
     showToast('Não foi possível atualizar as notificações.');
@@ -182,12 +277,15 @@ async function abrirDestinoNotificacao(id) {
 }
 
 function excluirNotificacoesLidas() {
+  const ehClima = _notificacoesModuloAtual === 'clima';
   abrirConfirmacao({
     titulo: 'Excluir notificações lidas?',
-    texto: 'As notificações já lidas serão removidas da sua central. O histórico administrativo de disparos será preservado.',
+    texto: ehClima
+      ? 'As notificações já lidas do Clima serão removidas para todo mundo que usa este módulo.'
+      : 'As notificações já lidas serão removidas da sua central. O histórico administrativo de disparos será preservado.',
     rotuloConfirmar: 'Excluir lidas',
     perigosa: true,
-    acao: executarExclusaoNotificacoesLidas,
+    acao: ehClima ? executarExclusaoClimaNotificacoesLidas : executarExclusaoNotificacoesLidas,
   });
 }
 
@@ -195,6 +293,16 @@ async function executarExclusaoNotificacoesLidas() {
   try {
     await sbFetch(`/notificacoes?destinatario_id=eq.${G.perfil.id}&lida_em=not.is.null`, { method: 'DELETE' });
     await carregarCentralNotificacoes(true);
+    showToast('Notificações lidas removidas.');
+  } catch {
+    showToast('Não foi possível excluir as notificações lidas.');
+  }
+}
+
+async function executarExclusaoClimaNotificacoesLidas() {
+  try {
+    await sbFetch('/clima_notificacoes?lida_em=not.is.null', { method: 'DELETE' });
+    await carregarClimaNotificacoes(true);
     showToast('Notificações lidas removidas.');
   } catch {
     showToast('Não foi possível excluir as notificações lidas.');

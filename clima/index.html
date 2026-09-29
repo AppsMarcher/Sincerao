@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#09031d">
+<title>Clima Organizacional — Sincerão</title>
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="css/clima.css">
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<!-- HERO -->
+<div id="tela-hero" class="clima-hero">
+  <div class="clima-hero-inner">
+    <img class="clima-hero-logo" src="../assets/logo-b.png" alt="Sincerão">
+    <span class="clima-proto-pill">sincerao.marcher.com.br/clima</span>
+    <h1>Como está o <span>clima</span> por aqui?</h1>
+    <p class="clima-hero-sub">Sua opinião ajuda a melhorar o dia a dia da fábrica. Leva menos de 5 minutos, sem identificação.</p>
+
+    <div class="clima-glass-card">
+      <h2>Antes de começar</h2>
+      <ul class="clima-anon-list">
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Não pedimos nome, e-mail, cargo ou qualquer identificação.</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Seu código de acesso não fica gravado junto com a resposta.</span></li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Resultados só aparecem em relatórios agregados da empresa toda.</span></li>
+      </ul>
+      <div class="clima-meta-row">
+        <div class="clima-meta-item"><span class="n">~5 min</span><span class="l">Duração</span></div>
+        <div class="clima-meta-item"><span class="n">21</span><span class="l">Perguntas</span></div>
+        <div class="clima-meta-item"><span class="n">100%</span><span class="l">Anônima</span></div>
+      </div>
+      <button class="clima-cta" id="btn-comecar">
+        Começar pesquisa
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"></path></svg>
+      </button>
+    </div>
+    <p class="clima-hero-footnote">Este código de acesso é de uso único e não pode ser reaberto após o envio.</p>
+  </div>
+</div>
+
+<!-- APP FLOW (código, perguntas, agradecimento) -->
+<div id="tela-app" class="clima-app" hidden>
+  <header class="topbar">
+    <img class="logo-topbar" src="../assets/logo-b.png" alt="Sincerão">
+    <span class="badge">Pesquisa de clima</span>
+  </header>
+  <div class="clima-progress-wrap" id="progress-wrap" hidden>
+    <div class="clima-progress-row">
+      <div class="clima-progress-track"><div class="clima-progress-fill" id="progress-fill"></div></div>
+      <span class="clima-progress-count" id="progress-count"></span>
+    </div>
+  </div>
+  <div class="content"><div class="card" id="card"></div></div>
+</div>
+
+<p class="clima-footer-note">Esta pesquisa não coleta nome, e-mail, cargo ou IP. As respostas seguem para um banco separado do seu código de acesso.</p>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../supabase-config.js"></script>
+<script src="js/clima-app.js"></script>
+</body>
+</html>

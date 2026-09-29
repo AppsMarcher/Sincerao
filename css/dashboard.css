@@ -100,12 +100,12 @@
 .central-notificacao-marcar { flex: 0 0 auto; margin-right: var(--space-3); font-size: 12px; }
 .central-notificacoes-mais { display: flex; justify-content: center; padding-top: var(--space-3); }
 
-/* Indicadores de Gestão: mais colunas (fases por gestor) do que o padrão de
-   .content (880px) comporta sem quebrar nome em várias linhas. Cabeçalho pode
-   quebrar em 2 linhas — os rótulos de fase são bem mais largos que o número
-   de 1 dígito que eles rotulam, então deixar o th quebrar mantém as colunas
-   estreitas em vez de esticar a tabela pelo tamanho do texto do rótulo. */
-#screen-gestao .content { max-width: 1400px; }
+/* Indicadores de Gestão: mais colunas (fases por gestor) do que cabe sem
+   quebrar nome em várias linhas. Cabeçalho pode quebrar em 2 linhas — os
+   rótulos de fase são bem mais largos que o número de 1 dígito que eles
+   rotulam, então deixar o th quebrar mantém as colunas estreitas em vez de
+   esticar a tabela pelo tamanho do texto do rótulo. (.content já é 1400px
+   em toda tela do app — sem exceção própria aqui.) */
 #gestao-conteudo .tabela td { white-space: nowrap; }
 #gestao-conteudo .tabela th { white-space: normal; max-width: 110px; text-align: center; }
 /* Primeira coluna (nome do gestor/setor/fase/etc.) continua à esquerda; o

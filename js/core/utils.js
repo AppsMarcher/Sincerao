@@ -4,6 +4,7 @@ function goTo(id) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
   const screen = document.getElementById(id);
   if (screen) screen.classList.add('active');
+  document.querySelectorAll('.modulo-tab-btn').forEach((b) => b.classList.toggle('active', b.dataset.screen === id));
   window.scrollTo(0, 0);
 }
 

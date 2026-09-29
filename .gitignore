@@ -12,6 +12,8 @@ supabase/functions/*
 !supabase/functions/admin-colaborador/index.ts
 !supabase/functions/forgot-password/
 !supabase/functions/forgot-password/index.ts
+!supabase/functions/gerar-tokens-clima/
+!supabase/functions/gerar-tokens-clima/index.ts
 Sincerão_Logo.png
 Sincerão_LogoB.png
 *.docx

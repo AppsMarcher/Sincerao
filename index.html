@@ -13,12 +13,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="css/base.css?v=28">
+<link rel="stylesheet" href="css/base.css?v=30">
 <link rel="stylesheet" href="css/login.css?v=27">
-<link rel="stylesheet" href="css/dashboard.css?v=26">
+<link rel="stylesheet" href="css/dashboard.css?v=27">
 <link rel="stylesheet" href="css/perfil.css?v=22">
 <link rel="stylesheet" href="css/avaliacao.css?v=30">
-<link rel="stylesheet" href="css/admin.css?v=29">
+<link rel="stylesheet" href="css/admin.css?v=30">
+<link rel="stylesheet" href="css/hub.css?v=2">
+<link rel="stylesheet" href="css/clima-admin.css?v=4">
 <link rel="stylesheet" href="css/responsive.css?v=29">
 </head>
 <body>
@@ -141,10 +143,10 @@
   </div>
 </div>
 
-<!-- DASHBOARD -->
-<div id="screen-dashboard" class="screen">
-  <header class="topbar">
-    <button type="button" class="topbar-marca topbar-atualizar" onclick="recarregarAplicacao()" aria-label="Atualizar a aplicação">
+<!-- HUB DE MÓDULOS (só RH/Admin) -->
+<div id="screen-hub" class="screen">
+  <header class="topbar topbar-modulo">
+    <button type="button" class="topbar-marca" aria-label="Sincerão">
       <img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar">
     </button>
     <div class="topbar-actions">
@@ -154,12 +156,58 @@
       </button>
       <div class="nav-menu">
         <button class="btn-link" onclick="abrirPerfil()"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg> Perfil</button>
-        <button class="nav-admin btn-link" onclick="abrirAdmin()"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15 1.65 1.65 0 0 0 3.17 14H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Administração</button>
-        <button class="nav-gestao btn-link" onclick="abrirGestao()" style="display:none"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="13" width="3" height="7" rx="1"/><rect x="10.5" y="9" width="3" height="11" rx="1"/><rect x="17" y="4" width="3" height="16" rx="1"/></svg> Dashboard</button>
         <button class="btn-link" onclick="fazerLogout()"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair</button>
       </div>
     </div>
   </header>
+  <main class="content">
+    <div class="hub-head">
+      <div class="hub-saudacao" id="hub-saudacao">Olá</div>
+      <h1>O que você quer acessar?</h1>
+    </div>
+    <div class="modulos">
+      <button type="button" class="modulo-card" onclick="abrirDashboard()">
+        <span class="modulo-card-icone"><svg class="icon" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg></span>
+        <h2>Avaliação de Desempenho</h2>
+        <p>Ciclos 180°, feedbacks, alinhamentos e trilhas de desenvolvimento da equipe.</p>
+        <span class="modulo-card-stat">Cadastros, ciclos e indicadores</span>
+        <span class="modulo-card-ir">Entrar <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </button>
+      <button type="button" class="modulo-card" onclick="abrirClimaAdmin()">
+        <span class="modulo-card-icone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.65-9.5 9-9.5 9z"/></svg></span>
+        <h2>Pesquisa de Clima</h2>
+        <p>Gerencie ciclos, códigos de acesso e acompanhe os resultados da pesquisa anônima.</p>
+        <span class="modulo-card-stat" id="hub-clima-stat">Ver ciclos e resultados</span>
+        <span class="modulo-card-ir">Entrar <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </button>
+    </div>
+  </main>
+</div>
+
+<!-- DASHBOARD -->
+<div id="screen-dashboard" class="screen">
+  <header class="topbar topbar-modulo" data-modulo="avaliacao">
+    <button type="button" class="topbar-marca" onclick="ehRhOuAdmin() ? abrirHub() : abrirDashboard()" aria-label="Ir para o início">
+      <img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar">
+    </button>
+    <h2 class="topbar-titulo-central">Avaliação de Desempenho</h2>
+    <div class="topbar-actions">
+      <span class="nav-nome-usuario"></span>
+      <button class="btn-link nav-hamburguer" onclick="toggleNavMenu(this)" aria-label="Abrir menu">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="nav-menu">
+        <button class="btn-link" onclick="abrirPerfil()"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg> Perfil</button>
+        <button class="nav-hub btn-link" onclick="abrirHub()" style="display:none"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Trocar de módulo</button>
+        <button class="btn-link" onclick="fazerLogout()"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair</button>
+      </div>
+    </div>
+  </header>
+  <nav class="modulo-tabs">
+    <button type="button" class="modulo-tab-btn" data-screen="screen-dashboard" onclick="abrirDashboard()">Painel</button>
+    <button type="button" class="modulo-tab-btn nav-admin" data-screen="screen-admin" onclick="abrirAdmin()">Administração</button>
+    <button type="button" class="modulo-tab-btn nav-gestao" data-screen="screen-gestao" onclick="abrirGestao()" style="display:none">Dashboard</button>
+  </nav>
   <main class="content stack">
     <section class="card">
       <h3><svg class="icon" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg> Minhas avaliações</h3>
@@ -179,23 +227,23 @@
 <!-- CENTRAL DE NOTIFICAÇÕES -->
 <div id="screen-notificacoes" class="screen">
   <header class="topbar topbar-interna">
-    <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
-    <button type="button" class="topbar-marca" onclick="abrirDashboard()" aria-label="Ir para o início"><img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna"></button>
-    <h2 class="topbar-titulo">Notificações</h2>
+    <button class="btn-link" onclick="voltarDeNotificacoes()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
+    <button type="button" class="topbar-marca" onclick="voltarDeNotificacoes()" aria-label="Ir para o início"><img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna"></button>
+    <h2 class="topbar-titulo" id="notificacoes-titulo-modulo">Notificações</h2>
   </header>
   <main class="content stack">
     <section class="card central-notificacoes-card">
       <div class="central-notificacoes-cabecalho">
         <div>
           <h3>Central de notificações</h3>
-          <p class="muted">Acompanhe avaliações, prazos e comunicados.</p>
+          <p class="muted" id="notificacoes-subtitulo">Acompanhe avaliações, prazos e comunicados.</p>
         </div>
         <div class="central-notificacoes-acoes">
           <button type="button" class="btn-link" onclick="marcarTodasNotificacoesLidas()">Marcar todas como lidas</button>
           <button type="button" class="btn-link btn-link--perigo" onclick="excluirNotificacoesLidas()">Excluir lidas</button>
         </div>
       </div>
-      <div class="central-notificacoes-filtros">
+      <div class="central-notificacoes-filtros" id="notificacoes-filtros">
         <label class="campo"><span>Situação</span><select id="notificacoes-filtro-leitura" onchange="carregarCentralNotificacoes(true)"><option value="">Todas</option><option value="nao_lidas">Não lidas</option><option value="lidas">Lidas</option></select></label>
         <label class="campo"><span>Categoria</span><select id="notificacoes-filtro-categoria" onchange="carregarCentralNotificacoes(true)"><option value="">Todas</option><option value="avaliacao">Avaliações</option><option value="prazo">Prazos</option><option value="comunicado">Comunicados</option><option value="sistema">Sistema</option></select></label>
       </div>
@@ -206,8 +254,112 @@
 </div>
 
 <div id="screen-gestao" class="screen">
-  <header class="topbar topbar-interna"><button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button><button type="button" class="topbar-marca" onclick="abrirDashboard()"><img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna"></button><h2 class="topbar-titulo">Dashboard</h2></header>
+  <header class="topbar topbar-modulo" data-modulo="avaliacao">
+    <button type="button" class="topbar-marca" onclick="ehRhOuAdmin() ? abrirHub() : abrirDashboard()"><img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar"></button>
+    <h2 class="topbar-titulo-central">Avaliação de Desempenho</h2>
+    <div class="topbar-actions">
+      <span class="nav-nome-usuario"></span>
+      <button class="btn-link nav-hamburguer" onclick="toggleNavMenu(this)" aria-label="Abrir menu">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="nav-menu">
+        <button class="btn-link" onclick="abrirPerfil()"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg> Perfil</button>
+        <button class="nav-hub btn-link" onclick="abrirHub()" style="display:none"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Trocar de módulo</button>
+        <button class="btn-link" onclick="fazerLogout()"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair</button>
+      </div>
+    </div>
+  </header>
+  <nav class="modulo-tabs">
+    <button type="button" class="modulo-tab-btn" data-screen="screen-dashboard" onclick="abrirDashboard()">Painel</button>
+    <button type="button" class="modulo-tab-btn nav-admin" data-screen="screen-admin" onclick="abrirAdmin()">Administração</button>
+    <button type="button" class="modulo-tab-btn nav-gestao active" data-screen="screen-gestao" onclick="abrirGestao()">Dashboard</button>
+  </nav>
   <main class="content stack"><section class="card"><label class="campo"><span>Ciclo de avaliação</span><select id="gestao-ciclo" onchange="carregarIndicadoresGestao()"></select></label><p class="muted">Dados consolidados por gestor, setor e ciclo. Clique num número da tabela "Resultados por gestor" pra ver os colaboradores incluídos.</p></section><div id="gestao-conteudo"></div></main>
+</div>
+
+<!-- PESQUISA DE CLIMA (RH/Admin) -->
+<div id="screen-clima-admin" class="screen">
+  <header class="topbar topbar-modulo" data-modulo="clima">
+    <button type="button" class="topbar-marca" onclick="abrirHub()"><img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar"></button>
+    <h2 class="topbar-titulo-central">Clima Organizacional</h2>
+    <div class="topbar-actions">
+      <span class="nav-nome-usuario"></span>
+      <button class="btn-link nav-hamburguer" onclick="toggleNavMenu(this)" aria-label="Abrir menu">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="nav-menu">
+        <button class="btn-link" onclick="abrirPerfil()"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg> Perfil</button>
+        <button class="btn-link" onclick="abrirHub()"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Trocar de módulo</button>
+        <button class="btn-link" onclick="fazerLogout()"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair</button>
+      </div>
+    </div>
+  </header>
+  <nav class="modulo-tabs">
+    <button type="button" id="clima-btn-ciclos" class="modulo-tab-btn" onclick="climaTab('ciclos')">Ciclos &amp; códigos</button>
+    <button type="button" id="clima-btn-administracao" class="modulo-tab-btn" onclick="climaTab('administracao')">Administração</button>
+    <button type="button" id="clima-btn-resultados" class="modulo-tab-btn" onclick="climaTab('resultados')">Resultados</button>
+  </nav>
+  <main class="content">
+    <div id="clima-panel-ciclos" class="adm-tab-panel">
+      <div class="clima-cabecalho">
+        <div>
+          <h1>Ciclos da pesquisa</h1>
+          <p class="muted">Cada ciclo gera um novo lote de códigos de acesso de uso único.</p>
+        </div>
+        <button class="btn-primary" onclick="abrirModalNovoCicloClima()"><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Novo ciclo</button>
+      </div>
+      <div class="card">
+        <table class="tabela">
+          <thead><tr><th>Ciclo</th><th>Status</th><th>Códigos</th><th>Usados</th><th>Adesão</th></tr></thead>
+          <tbody id="clima-lista-ciclos"></tbody>
+        </table>
+      </div>
+      <div id="clima-detalhe-ciclo"></div>
+    </div>
+    <div id="clima-panel-administracao" class="adm-tab-panel">
+      <div class="clima-cabecalho">
+        <div>
+          <h1>Administração</h1>
+          <p class="muted">Perguntas do questionário. Editar o texto vale para os próximos respondentes; para tirar uma pergunta do ar sem perder o histórico, desative-a.</p>
+        </div>
+      </div>
+      <div class="card">
+        <form class="clima-pergunta-form" onsubmit="event.preventDefault(); criarPerguntaClima(this); ">
+          <input name="secao" placeholder="Bloco (ex: Liderança)" list="clima-secoes-lista" required>
+          <datalist id="clima-secoes-lista"></datalist>
+          <input name="texto" placeholder="Texto da pergunta" required class="clima-pergunta-texto">
+          <select name="tipo">
+            <option value="likert">Escala 1 a 5</option>
+            <option value="nps">Nota 0 a 10</option>
+          </select>
+          <button type="submit" class="btn-primary">Adicionar pergunta</button>
+        </form>
+        <table class="tabela">
+          <thead><tr><th>Nº</th><th>Bloco</th><th>Pergunta</th><th>Tipo</th><th>Ações</th></tr></thead>
+          <tbody id="clima-lista-perguntas"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="clima-panel-resultados" class="adm-tab-panel">
+      <h1>Resultados</h1>
+      <label class="campo" style="max-width:320px;"><span>Ciclo</span><select id="clima-resultados-ciclo" onchange="carregarResultadosClima()"></select></label>
+      <p class="muted">Sempre a média da empresa toda — sem recorte por área.</p>
+      <div id="clima-resultados-conteudo"></div>
+    </div>
+  </main>
+</div>
+
+<div id="modal-novo-ciclo-clima" class="modal" role="dialog" aria-modal="true" aria-labelledby="clima-novo-ciclo-titulo" onclick="if (event.target === this) fecharModalNovoCicloClima()">
+  <div class="modal-box">
+    <h3 id="clima-novo-ciclo-titulo">Novo ciclo</h3>
+    <p class="muted">Gera um lote novo de códigos de uso único.</p>
+    <label class="campo"><span>Nome do ciclo</span><input type="text" id="clima-novo-nome" placeholder="Ex: 2º semestre 2026"></label>
+    <label class="campo"><span>Quantidade de códigos</span><input type="number" id="clima-novo-quantidade" min="1" max="2000"></label>
+    <div class="modal-actions">
+      <button class="btn-link" onclick="fecharModalNovoCicloClima()">Cancelar</button>
+      <button class="btn-primary" id="clima-novo-confirmar" onclick="confirmarNovoCicloClima()">Gerar códigos</button>
+    </div>
+  </div>
 </div>
 
 <div id="popover-gestor-status" class="popover-status" hidden role="dialog" aria-modal="false" aria-labelledby="popover-gestor-status-titulo">
@@ -225,7 +377,7 @@
 <div id="screen-perfil" class="screen">
   <header class="topbar topbar-interna">
     <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
-    <button type="button" class="topbar-marca" onclick="abrirDashboard()" aria-label="Ir para o início">
+    <button type="button" class="topbar-marca" onclick="ehRhOuAdmin() ? abrirHub() : abrirDashboard()" aria-label="Ir para o início">
       <img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna">
     </button>
     <h2 class="topbar-titulo">Perfil</h2>
@@ -262,7 +414,7 @@
 <div id="screen-avaliacao" class="screen">
   <header class="topbar topbar-interna topbar-interna-avaliacao">
     <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
-    <button type="button" class="topbar-marca" onclick="abrirDashboard()" aria-label="Ir para o início">
+    <button type="button" class="topbar-marca" onclick="ehRhOuAdmin() ? abrirHub() : abrirDashboard()" aria-label="Ir para o início">
       <img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna">
     </button>
     <div class="topbar-contexto-avaliacao">
@@ -275,8 +427,7 @@
         <button class="btn-link nav-hamburguer" onclick="toggleNavMenu(this)" aria-label="Abrir menu"><svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
         <div class="nav-menu">
           <button class="btn-link" onclick="abrirPerfil()">Perfil</button>
-          <button class="nav-admin btn-link" onclick="abrirAdmin()">Administração</button>
-          <button class="nav-gestao btn-link" onclick="abrirGestao()" style="display:none">Dashboard</button>
+          <button class="nav-hub btn-link" onclick="abrirHub()" style="display:none">Trocar de módulo</button>
           <button class="btn-link" onclick="fazerLogout()">Sair</button>
         </div>
       </div>
@@ -304,13 +455,28 @@
 
 <!-- ADMIN / CADASTROS -->
 <div id="screen-admin" class="screen">
-  <header class="topbar topbar-interna">
-    <button class="btn-link" onclick="abrirDashboard()"><svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Voltar</button>
-    <button type="button" class="topbar-marca" onclick="abrirDashboard()" aria-label="Ir para o início">
-      <img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar-interna">
+  <header class="topbar topbar-modulo" data-modulo="avaliacao">
+    <button type="button" class="topbar-marca" onclick="ehRhOuAdmin() ? abrirHub() : abrirDashboard()" aria-label="Ir para o início">
+      <img src="assets/logo-b.png" alt="Sincerão" class="logo-topbar">
     </button>
-    <h2 class="topbar-titulo">Administração</h2>
+    <h2 class="topbar-titulo-central">Avaliação de Desempenho</h2>
+    <div class="topbar-actions">
+      <span class="nav-nome-usuario"></span>
+      <button class="btn-link nav-hamburguer" onclick="toggleNavMenu(this)" aria-label="Abrir menu">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="nav-menu">
+        <button class="btn-link" onclick="abrirPerfil()"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg> Perfil</button>
+        <button class="nav-hub btn-link" onclick="abrirHub()" style="display:none"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Trocar de módulo</button>
+        <button class="btn-link" onclick="fazerLogout()"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair</button>
+      </div>
+    </div>
   </header>
+  <nav class="modulo-tabs">
+    <button type="button" class="modulo-tab-btn" data-screen="screen-dashboard" onclick="abrirDashboard()">Painel</button>
+    <button type="button" class="modulo-tab-btn nav-admin active" data-screen="screen-admin" onclick="abrirAdmin()">Administração</button>
+    <button type="button" class="modulo-tab-btn nav-gestao" data-screen="screen-gestao" onclick="abrirGestao()" style="display:none">Dashboard</button>
+  </nav>
   <div class="adm-tabs">
     <button id="adm-btn-colaboradores" class="adm-tab-btn" onclick="admTab('colaboradores')"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Colaboradores</button>
     <button id="adm-btn-setores" class="adm-tab-btn" onclick="admTab('setores')"><svg class="icon" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/></svg> Setores</button>
@@ -599,12 +765,14 @@
 <script src="js/core/constants.js?v=22"></script>
 <script src="js/core/supabase-client.js?v=22"></script>
 <script src="js/core/state.js?v=21"></script>
-<script src="js/core/utils.js?v=25"></script>
+<script src="js/core/utils.js?v=26"></script>
 
-<script src="js/dashboard/notificacoes-module.js?v=1"></script>
-<script src="js/dashboard/dashboard-module.js?v=35"></script>
-<script src="js/gestao/gestao-module.js?v=16"></script>
+<script src="js/dashboard/notificacoes-module.js?v=3"></script>
+<script src="js/dashboard/dashboard-module.js?v=36"></script>
+<script src="js/gestao/gestao-module.js?v=17"></script>
 <script src="js/perfil/perfil-module.js?v=22"></script>
+<script src="js/hub/hub-module.js?v=1"></script>
+<script src="js/clima-admin/clima-admin-module.js?v=3"></script>
 
   <script src="js/avaliacao/avaliacao-core.js?v=44"></script>
   <script src="js/avaliacao/etapa-texto.js?v=26"></script>
@@ -618,9 +786,9 @@
 <script src="js/admin/ciclos-module.js?v=22"></script>
 <script src="js/admin/colaboradores-module.js?v=22"></script>
 <script src="js/admin/auditoria-module.js?v=23"></script>
-<script src="js/admin/admin-shell.js?v=25"></script>
+<script src="js/admin/admin-shell.js?v=26"></script>
 
-<script src="js/auth/auth-module.js?v=23"></script>
+<script src="js/auth/auth-module.js?v=24"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch((erro) => console.warn('PWA indisponível:', erro)));

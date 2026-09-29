@@ -1,0 +1,67 @@
+/* clima-admin.css — telas de gestão da Pesquisa de Clima (RH/Admin):
+   Ciclos & códigos e Resultados. Reaproveita .card/.tabela/.badge/.btn-primary
+   de base.css e .badge-ciclo-* e .adm-tab-panel de admin.css; aqui só o que é
+   específico dessas duas telas. */
+
+.clima-cabecalho { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-4); }
+.clima-cabecalho h1 { font-size: 20px; }
+.clima-cabecalho > div:first-child { flex: 1 1 320px; min-width: 0; }
+.clima-cabecalho > .btn-primary { flex: 0 0 auto; }
+
+#clima-lista-ciclos tr { cursor: pointer; }
+#clima-lista-ciclos tr.is-selected { background: var(--primary-soft); }
+
+#clima-detalhe-ciclo { margin-top: var(--space-4); }
+.clima-detalhe-cabecalho { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.clima-detalhe-cabecalho h3 { font-size: 17px; text-transform: none; letter-spacing: 0; color: var(--text); }
+
+.clima-geracao-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 14px 16px; border-radius: var(--radius-sm); background: var(--panel-alt); flex-wrap: wrap; }
+.clima-geracao-n { font-family: "Space Grotesk", sans-serif; font-size: 22px; font-weight: 700; color: var(--primary); }
+.clima-geracao-l { display: block; font-size: 12px; color: var(--text-soft); }
+.clima-geracao-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.clima-progress-block { margin-top: var(--space-4); }
+.clima-progress-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.clima-progress-top strong { font-family: "Space Grotesk", sans-serif; font-size: 15px; }
+.clima-progress-track { height: 10px; border-radius: 999px; background: var(--panel-alt); overflow: hidden; }
+.clima-progress-fill { height: 100%; border-radius: 999px; background: var(--primary); }
+
+.clima-cartao-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: var(--space-4); }
+.clima-cartao { border: 1.5px dashed var(--line); border-radius: var(--radius-sm); padding: 12px 10px; text-align: center; background: var(--panel); }
+.clima-cartao small { display: block; color: var(--text-faint); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+.clima-cartao strong { font-family: "Space Grotesk", sans-serif; font-size: 16px; letter-spacing: 0.12em; color: var(--primary); }
+.clima-cartao--usado { opacity: 0.4; }
+.clima-cartao--usado strong { color: var(--text-faint); }
+
+.clima-acoes-ciclo { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--line); flex-wrap: wrap; }
+
+.clima-kpis-mini { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 14px; margin-bottom: var(--space-4); }
+.clima-kpi-mini { background: var(--panel-alt); border-radius: var(--radius-sm); padding: 14px 16px; }
+.clima-kpi-mini span { display: block; color: var(--text-soft); font-size: 11.5px; font-weight: 600; }
+.clima-kpi-mini strong { display: block; margin-top: 4px; font-size: 20px; font-family: "Space Grotesk", sans-serif; color: var(--primary); }
+
+.clima-eyebrow-card { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); margin-bottom: var(--space-3); }
+.clima-score-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.clima-score-row:last-child { border-bottom: none; }
+.clima-score-label { flex: 0 0 130px; font-size: 13px; font-weight: 600; }
+.clima-score-track { flex: 1; height: 9px; border-radius: 999px; background: var(--panel-alt); overflow: hidden; }
+.clima-score-fill { height: 100%; border-radius: 999px; background: var(--primary); }
+.clima-score-value { flex: 0 0 40px; text-align: right; font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 13.5px; }
+
+.footnote { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; border-radius: var(--radius-sm); background: var(--primary-soft); border-left: 3px solid var(--primary); font-size: 12.5px; color: var(--text); line-height: 1.55; margin-top: var(--space-4); }
+.footnote .icon { flex: none; margin-top: 1px; color: var(--primary); }
+.footnote strong { display: block; margin-bottom: 2px; color: var(--primary); }
+
+@media (max-width: 760px) {
+  .clima-kpis-mini { grid-template-columns: repeat(2, 1fr); }
+  .clima-geracao-row, .clima-acoes-ciclo, .clima-detalhe-cabecalho { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---------- Administração (perguntas) ---------- */
+.clima-pergunta-form { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-4); }
+.clima-pergunta-form input, .clima-pergunta-form select { flex: 0 1 200px; }
+.clima-pergunta-form .clima-pergunta-texto { flex: 1 1 320px; }
+.clima-pergunta-inativa td { opacity: 0.5; }
+.clima-perg-edit { display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center; }
+.clima-perg-edit input[type="text"] { flex: 1 1 160px; }
+.clima-tag-enps { font-size: 11px; font-weight: 700; color: var(--brand, #5b0048); margin-left: 6px; }
