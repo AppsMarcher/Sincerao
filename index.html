@@ -310,7 +310,7 @@
       </div>
       <div class="card">
         <table class="tabela">
-          <thead><tr><th>Ciclo</th><th>Status</th><th>Códigos</th><th>Usados</th><th>Adesão</th></tr></thead>
+          <thead><tr><th>Ciclo</th><th>Status</th><th>Códigos</th><th>Usados</th><th>Adesão</th><th>Ações</th></tr></thead>
           <tbody id="clima-lista-ciclos"></tbody>
         </table>
       </div>
@@ -347,6 +347,19 @@
       <div id="clima-resultados-conteudo"></div>
     </div>
   </main>
+</div>
+
+<div id="modal-editar-ciclo-clima" class="modal" role="dialog" aria-modal="true" aria-labelledby="clima-editar-ciclo-titulo" onclick="if (event.target === this) fecharModalEditarCicloClima()">
+  <div class="modal-box">
+    <h3 id="clima-editar-ciclo-titulo">Editar ciclo</h3>
+    <p class="muted" id="clima-editar-info"></p>
+    <label class="campo"><span>Nome do ciclo</span><input type="text" id="clima-editar-nome"></label>
+    <label class="campo"><span>Quantidade de códigos</span><input type="number" id="clima-editar-quantidade" min="1" max="2000"></label>
+    <div class="modal-actions">
+      <button class="btn-link" onclick="fecharModalEditarCicloClima()">Cancelar</button>
+      <button class="btn-primary" id="clima-editar-confirmar" onclick="confirmarEditarCicloClima()">Salvar</button>
+    </div>
+  </div>
 </div>
 
 <div id="modal-novo-ciclo-clima" class="modal" role="dialog" aria-modal="true" aria-labelledby="clima-novo-ciclo-titulo" onclick="if (event.target === this) fecharModalNovoCicloClima()">
@@ -772,7 +785,7 @@
 <script src="js/gestao/gestao-module.js?v=17"></script>
 <script src="js/perfil/perfil-module.js?v=22"></script>
 <script src="js/hub/hub-module.js?v=1"></script>
-<script src="js/clima-admin/clima-admin-module.js?v=3"></script>
+<script src="js/clima-admin/clima-admin-module.js?v=4"></script>
 
   <script src="js/avaliacao/avaliacao-core.js?v=44"></script>
   <script src="js/avaliacao/etapa-texto.js?v=26"></script>

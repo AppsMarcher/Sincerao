@@ -45,8 +45,12 @@ function renderClimaCiclosTabela() {
       <td>${c.total_codigos}</td>
       <td>${c.total_respondidos}</td>
       <td>${c.total_codigos ? Math.round((c.total_respondidos / c.total_codigos) * 100) : 0}%</td>
+      <td onclick="event.stopPropagation()"><div class="tabela-acoes">
+        <button class="btn-icon" title="Editar" aria-label="Editar o ciclo ${escHtml(c.nome)}" onclick="abrirModalEditarCicloClima('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="btn-icon btn-icon--perigo" title="Excluir" aria-label="Excluir o ciclo ${escHtml(c.nome)}" onclick="confirmarExcluirCicloClima('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
+      </div></td>
     </tr>
-  `).join('') || '<tr><td colspan="5">Nenhum ciclo criado ainda.</td></tr>';
+  `).join('') || '<tr><td colspan="6">Nenhum ciclo criado ainda.</td></tr>';
 }
 
 function selecionarCicloClima(id) {
@@ -179,6 +183,89 @@ async function executarEncerrarCicloClima(id) {
   }
   await carregarClimaCiclos();
   showToast('Ciclo encerrado.');
+}
+
+// ---------- Editar / excluir ciclo ----------
+
+let _cicloEmEdicaoClimaId = null;
+
+function abrirModalEditarCicloClima(id) {
+  const c = _climaCiclos.find((x) => x.id === id);
+  if (!c) return;
+  _cicloEmEdicaoClimaId = id;
+  const usados = c.total_respondidos;
+  const aberto = c.status === 'aberto';
+  document.getElementById('clima-editar-nome').value = c.nome;
+  const qtd = document.getElementById('clima-editar-quantidade');
+  qtd.value = c.total_codigos;
+  qtd.min = Math.max(1, usados);
+  qtd.disabled = !aberto;
+  document.getElementById('clima-editar-info').textContent = aberto
+    ? `${usados} de ${c.total_codigos} códigos já usados. Aumentar gera códigos novos; diminuir remove só códigos ainda não usados (no mínimo ${Math.max(1, usados)}).`
+    : 'Ciclo encerrado: só o nome pode ser alterado.';
+  document.getElementById('modal-editar-ciclo-clima').classList.add('open');
+}
+function fecharModalEditarCicloClima() {
+  document.getElementById('modal-editar-ciclo-clima').classList.remove('open');
+}
+
+async function confirmarEditarCicloClima() {
+  const c = _climaCiclos.find((x) => x.id === _cicloEmEdicaoClimaId);
+  if (!c) return;
+  const nome = document.getElementById('clima-editar-nome').value.trim();
+  const novoTotal = Number(document.getElementById('clima-editar-quantidade').value);
+  if (!nome) { showToast('Informe o nome do ciclo.'); return; }
+  const aberto = c.status === 'aberto';
+  const minimo = Math.max(1, c.total_respondidos);
+  if (aberto && (!Number.isInteger(novoTotal) || novoTotal < minimo || novoTotal > 2000)) {
+    showToast(`A quantidade deve estar entre ${minimo} (já usados) e 2000.`);
+    return;
+  }
+  const botao = document.getElementById('clima-editar-confirmar');
+  botao.disabled = true;
+  botao.textContent = 'Salvando…';
+  let erro = null;
+  try {
+    if (nome !== c.nome) {
+      await sbFetch('/clima_ciclos?id=eq.' + c.id, { method: 'PATCH', body: JSON.stringify({ nome }) });
+    }
+    if (aberto && novoTotal > c.total_codigos) {
+      await sbInvokeFunction('gerar-tokens-clima', { ciclo_id: c.id, quantidade: novoTotal - c.total_codigos });
+    } else if (aberto && novoTotal < c.total_codigos) {
+      await sbRpc('clima_reduzir_codigos', { p_ciclo_id: c.id, p_quantidade: c.total_codigos - novoTotal });
+    }
+  } catch (e) {
+    erro = e;
+  }
+  botao.disabled = false;
+  botao.textContent = 'Salvar';
+  await carregarClimaCiclos();
+  if (erro) { showToast('Erro ao salvar o ciclo: ' + (erro.message || 'tente novamente.')); return; }
+  fecharModalEditarCicloClima();
+  showToast('Ciclo atualizado.');
+}
+
+function confirmarExcluirCicloClima(id) {
+  const c = _climaCiclos.find((x) => x.id === id);
+  abrirConfirmacao({
+    titulo: 'Excluir este ciclo?',
+    texto: `O ciclo "${c?.nome || ''}" será excluído junto com todos os seus códigos e as ${c?.total_respondidos ?? 0} respostas já recebidas. Essa ação não pode ser desfeita.`,
+    acao: () => executarExcluirCicloClima(id),
+    rotuloConfirmar: 'Excluir ciclo',
+    perigosa: true,
+  });
+}
+
+async function executarExcluirCicloClima(id) {
+  try {
+    await sbFetch('/clima_ciclos?id=eq.' + id, { method: 'DELETE' });
+  } catch (e) {
+    showToast('Erro ao excluir o ciclo.');
+    return;
+  }
+  if (_cicloSelecionadoClimaId === id) _cicloSelecionadoClimaId = null;
+  await carregarClimaCiclos();
+  showToast('Ciclo excluído.');
 }
 
 // ---------- Novo ciclo ----------

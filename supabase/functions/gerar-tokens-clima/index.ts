@@ -54,17 +54,32 @@ Deno.serve(async (req) => {
       return json({ error: 'Acesso restrito ao RH.' }, 403);
     }
 
-    const { nome, quantidade } = await req.json();
-    if (!nome || !Number.isInteger(quantidade) || quantidade < 1 || quantidade > 2000) {
+    const { nome, quantidade, ciclo_id } = await req.json();
+    const adicionando = Boolean(ciclo_id);
+    if ((!adicionando && !nome) || !Number.isInteger(quantidade) || quantidade < 1 || quantidade > 2000) {
       return json({ error: 'Informe um nome de ciclo e uma quantidade entre 1 e 2000.' }, 400);
     }
 
-    const { data: ciclo, error: cicloError } = await adminClient
-      .from('clima_ciclos')
-      .insert({ nome, criado_por: userData.user.id })
-      .select('id')
-      .single();
-    if (cicloError || !ciclo) return json({ error: cicloError?.message || 'Falha ao criar o ciclo.' }, 400);
+    // Com ciclo_id: acrescenta códigos a um ciclo aberto já existente.
+    let ciclo: { id: string; total_codigos?: number } | null = null;
+    if (adicionando) {
+      const { data: existente } = await adminClient
+        .from('clima_ciclos')
+        .select('id, status, total_codigos')
+        .eq('id', ciclo_id)
+        .single();
+      if (!existente) return json({ error: 'Ciclo não encontrado.' }, 404);
+      if (existente.status !== 'aberto') return json({ error: 'Ciclo encerrado não aceita novos códigos.' }, 400);
+      ciclo = existente;
+    } else {
+      const { data: novo, error: cicloError } = await adminClient
+        .from('clima_ciclos')
+        .insert({ nome, criado_por: userData.user.id })
+        .select('id')
+        .single();
+      if (cicloError || !novo) return json({ error: cicloError?.message || 'Falha ao criar o ciclo.' }, 400);
+      ciclo = novo;
+    }
 
     // Tenta algumas vezes: colisão de código com o que já existe no banco é
     // rara (espaço de 1 milhão de códigos), mas não impossível.
@@ -74,7 +89,7 @@ Deno.serve(async (req) => {
       const candidatos = gerarLoteDeCodigos(quantidade);
       const { error: tokensError } = await adminClient
         .from('clima_tokens')
-        .insert(candidatos.map((codigo) => ({ ciclo_id: ciclo.id, codigo })));
+        .insert(candidatos.map((codigo) => ({ ciclo_id: ciclo!.id, codigo })));
       if (!tokensError) {
         codigos = candidatos;
       } else {
@@ -83,13 +98,16 @@ Deno.serve(async (req) => {
     }
 
     if (codigos.length === 0) {
-      await adminClient.from('clima_ciclos').delete().eq('id', ciclo.id);
+      if (!adicionando) await adminClient.from('clima_ciclos').delete().eq('id', ciclo!.id);
       return json({ error: `Falha ao gerar os códigos: ${ultimoErro}` }, 500);
     }
 
-    await adminClient.from('clima_ciclos').update({ total_codigos: codigos.length }).eq('id', ciclo.id);
+    await adminClient
+      .from('clima_ciclos')
+      .update({ total_codigos: (ciclo!.total_codigos ?? 0) + codigos.length })
+      .eq('id', ciclo!.id);
 
-    return json({ ok: true, ciclo_id: ciclo.id, codigos });
+    return json({ ok: true, ciclo_id: ciclo!.id, codigos });
   } catch (e) {
     return json({ error: String(e) }, 500);
   }
