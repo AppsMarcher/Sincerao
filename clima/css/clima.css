@@ -35,18 +35,7 @@
 }
 .clima-hero-inner { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .clima-hero-logo { height: 38px; width: auto; display: block; }
-.clima-proto-pill {
-  margin-top: 22px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.68);
-  border: 1px solid rgba(255,255,255,.22);
-  border-radius: var(--radius-pill);
-  padding: 5px 14px;
-}
-.clima-hero h1 { margin-top: 22px; font-size: clamp(32px,6.5vw,44px); color: #fff; font-family: "Space Grotesk", sans-serif; font-weight: 700; line-height: 1.15; }
+.clima-hero h1 { margin-top: 32px; font-size: clamp(32px,6.5vw,44px); color: #fff; font-family: "Space Grotesk", sans-serif; font-weight: 700; line-height: 1.15; }
 .clima-hero h1 span { color: #ff2683; text-shadow: 0 0 26px rgba(255,38,131,.28); }
 .clima-hero-sub { margin: 16px 0 0; color: rgba(255,255,255,.72); font-size: 16px; line-height: 1.55; max-width: 400px; }
 
@@ -100,13 +89,14 @@
 
 /* ---------- APP FLOW (perguntas) ---------- */
 .clima-app .topbar { justify-content: space-between; }
-.clima-progress-wrap { max-width: 600px; margin: 18px auto 0; padding: 0 20px; }
+/* Mesma largura/margens do .content do app (base.css), pra página seguir o padrão das demais telas. */
+.clima-progress-wrap { max-width: 1400px; margin: 18px auto 0; padding: 0 var(--space-5); }
 .clima-progress-row { display: flex; align-items: center; gap: 10px; }
 .clima-progress-track { flex: 1; height: 6px; border-radius: 999px; background: var(--panel-alt); overflow: hidden; }
 .clima-progress-fill { height: 100%; background: var(--primary); border-radius: 999px; transition: width .35s ease; }
 .clima-progress-count { font-family: "Space Grotesk", sans-serif; font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
 
-.clima-app .content { max-width: 600px; padding: 18px 20px 48px; }
+.clima-app .content { padding-top: var(--space-4); padding-bottom: 48px; }
 
 .clima-eyebrow { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--primary); font-weight: 700; }
 .clima-section-title { font-size: 20px; margin: 4px 0 0; }
@@ -174,7 +164,11 @@
   margin-bottom: 16px;
 }
 
-.clima-footer-note { max-width: 600px; margin: 0 auto; padding: 16px 20px 28px; font-size: 11.5px; color: var(--text-faint); text-align: center; line-height: 1.5; }
+.clima-footer-note { max-width: 1400px; margin: 0 auto; padding: 16px var(--space-5) 28px; font-size: 11.5px; color: var(--text-faint); text-align: center; line-height: 1.5; }
+
+@media (max-width: 720px) {
+  .clima-progress-wrap, .clima-footer-note { padding-left: var(--space-3); padding-right: var(--space-3); }
+}
 
 @media (max-width: 420px) {
   .clima-app .card { padding: 22px 16px; border-radius: 14px; }

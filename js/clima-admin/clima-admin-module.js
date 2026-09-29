@@ -313,6 +313,131 @@ function renderClimaSeletorResultados() {
   carregarResultadosClima();
 }
 
+// ---------- Resultados: visual ----------
+
+const CLIMA_COR_BOM = '#16a34a';
+const CLIMA_COR_MEDIO = '#f59e0b';
+const CLIMA_COR_RUIM = '#dc2626';
+
+// Cor pela proporção da escala (1-5 ou 0-10): abaixo de 60% vermelho, até 80% âmbar, acima verde.
+function corNotaClima(valor, max) {
+  const r = valor / max;
+  return r >= 0.8 ? CLIMA_COR_BOM : r >= 0.6 ? CLIMA_COR_MEDIO : CLIMA_COR_RUIM;
+}
+
+// Anel de progresso em SVG (pct de 0 a 100).
+function anelClimaHtml(pct, cor, centro) {
+  const C = 2 * Math.PI * 42;
+  const p = Math.max(0, Math.min(100, pct));
+  return `
+    <div class="clima-anel">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#ece7ee" stroke-width="11"/>
+        <circle cx="50" cy="50" r="42" fill="none" stroke="${cor}" stroke-width="11" stroke-linecap="round"
+          stroke-dasharray="${(p / 100) * C} ${C}" transform="rotate(-90 50 50)"/>
+      </svg>
+      <strong style="color:${cor};">${centro}</strong>
+    </div>`;
+}
+
+// Zonas de referência do eNPS (faixas usadas de forma corrente no mercado).
+const CLIMA_ZONAS_ENPS = [
+  { de: -100, ate: 0, nome: 'Zona crítica', cor: '#dc2626', txt: 'Mais detratores que promotores: sinal de alerta.' },
+  { de: 0, ate: 30, nome: 'Zona de aperfeiçoamento', cor: '#f59e0b', txt: 'Positivo, mas com muito espaço para melhorar.' },
+  { de: 30, ate: 70, nome: 'Zona de qualidade', cor: '#65a30d', txt: 'A maioria recomenda a empresa.' },
+  { de: 70, ate: 100, nome: 'Zona de excelência', cor: '#15803d', txt: 'Referência: equipe fã da empresa.' },
+];
+
+function zonaEnpsClima(v) {
+  return CLIMA_ZONAS_ENPS.find((z) => v < z.ate) || CLIMA_ZONAS_ENPS[CLIMA_ZONAS_ENPS.length - 1];
+}
+
+function enpsClimaHtml(nps) {
+  const total = nps.promotores + nps.neutros + nps.detratores;
+  if (!total) {
+    return '<div class="card clima-enps"><h3 class="clima-eyebrow-card">eNPS</h3><p class="muted">Nenhuma pergunta está marcada como base do eNPS (veja a aba Administração) ou ainda não há respostas para ela.</p></div>';
+  }
+  const pct = (n) => Math.round((n / total) * 100);
+  const pp = pct(nps.promotores), pn = pct(nps.neutros), pd = pct(nps.detratores);
+  const valor = Math.round(((nps.promotores - nps.detratores) / total) * 100);
+  const zona = zonaEnpsClima(valor);
+  const pos = ((valor + 100) / 200) * 100;
+
+  const segmentos = CLIMA_ZONAS_ENPS.map((z) => `<div class="clima-zona" style="flex:${z.ate - z.de}; background:${z.cor};"></div>`).join('');
+  const rotulos = CLIMA_ZONAS_ENPS.map((z) => `<div style="flex:${z.ate - z.de};"><strong style="color:${z.cor};">${z.nome}</strong><span>${z.de} a ${z.ate}</span></div>`).join('');
+
+  return `
+    <div class="card clima-enps">
+      <h3 class="clima-eyebrow-card">eNPS — recomendação da empresa</h3>
+      <div class="clima-enps-topo">
+        <div class="clima-enps-valor" style="color:${zona.cor};">
+          <strong>${valor > 0 ? '+' : ''}${valor}</strong>
+          <span style="background:${zona.cor};">${zona.nome}</span>
+        </div>
+        <div class="clima-enps-comp">
+          <div class="clima-comp-barra" role="img" aria-label="${pp}% promotores, ${pn}% neutros, ${pd}% detratores">
+            <div style="flex:${nps.promotores || 0}; background:${CLIMA_COR_BOM};"></div>
+            <div style="flex:${nps.neutros || 0}; background:${CLIMA_COR_MEDIO};"></div>
+            <div style="flex:${nps.detratores || 0}; background:${CLIMA_COR_RUIM};"></div>
+          </div>
+          <div class="clima-comp-legenda">
+            <div><i style="background:${CLIMA_COR_BOM};"></i><b>${pp}%</b> Promotores <small>notas 9–10 · ${nps.promotores} resp.</small></div>
+            <div><i style="background:${CLIMA_COR_MEDIO};"></i><b>${pn}%</b> Neutros <small>notas 7–8 · ${nps.neutros} resp.</small></div>
+            <div><i style="background:${CLIMA_COR_RUIM};"></i><b>${pd}%</b> Detratores <small>notas 0–6 · ${nps.detratores} resp.</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="clima-enps-escala">
+        <div class="clima-escala-titulo">Escala de referência (−100 a +100)</div>
+        <div class="clima-escala-barra">
+          ${segmentos}
+          <div class="clima-escala-marca" style="left:${pos}%; border-color:${zona.cor};"><span style="background:${zona.cor};">${valor > 0 ? '+' : ''}${valor}</span></div>
+        </div>
+        <div class="clima-escala-ticks"><span>−100</span><span>0</span><span>+100</span></div>
+        <div class="clima-escala-rotulos">${rotulos}</div>
+      </div>
+
+      <p class="clima-enps-ajuda"><strong>Como se calcula:</strong> eNPS = % de promotores − % de detratores. Os neutros não entram na conta. Aqui: ${pp}% − ${pd}% = <strong>${valor > 0 ? '+' : ''}${valor}</strong>. ${zona.txt}</p>
+    </div>`;
+}
+
+function perguntasResultadoClimaHtml(medias) {
+  const chaves = Object.keys(medias);
+  const conhecidas = _climaPerguntas.filter((p) => medias['q' + p.id] !== undefined);
+  const orfas = chaves.filter((k) => !_climaPerguntas.some((p) => 'q' + p.id === k))
+    .sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)));
+
+  const grupos = [];
+  conhecidas.forEach((p) => {
+    let g = grupos[grupos.length - 1];
+    if (!g || g.titulo !== p.secao) { g = { titulo: p.secao, itens: [] }; grupos.push(g); }
+    g.itens.push({ num: _climaPerguntas.indexOf(p) + 1, texto: p.texto, valor: Number(medias['q' + p.id]), max: p.tipo === 'nps' ? 10 : 5, min: p.tipo === 'nps' ? 0 : 1 });
+  });
+  if (orfas.length) {
+    grupos.push({ titulo: 'Perguntas removidas do questionário', itens: orfas.map((k) => ({ num: '—', texto: 'Pergunta removida (' + k + ')', valor: Number(medias[k]), max: 5, min: 1 })) });
+  }
+
+  return grupos.map((g) => {
+    const mediaBloco = g.itens.reduce((a, i) => a + i.valor / i.max, 0) / g.itens.length;
+    return `
+      <div class="clima-bloco">
+        <div class="clima-bloco-titulo"><span>${escHtml(g.titulo)}</span><small>${g.itens.length} pergunta${g.itens.length > 1 ? 's' : ''} · aproveitamento ${Math.round(mediaBloco * 100)}%</small></div>
+        ${g.itens.map((i) => {
+          const cor = corNotaClima(i.valor, i.max);
+          return `
+            <div class="clima-pergunta-res">
+              <div class="clima-pergunta-texto"><span class="clima-pergunta-num">${i.num}</span>${escHtml(i.texto)}</div>
+              <div class="clima-pergunta-grafico">
+                <div class="clima-score-track"><div class="clima-score-fill" style="width:${Math.min(100, (i.valor / i.max) * 100)}%; background:${cor};"></div></div>
+                <span class="clima-score-value" style="color:${cor};">${i.valor.toFixed(1)}<small>/${i.max}</small></span>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>`;
+  }).join('');
+}
+
 async function carregarResultadosClima() {
   const select = document.getElementById('clima-resultados-ciclo');
   const cicloId = select.value;
@@ -322,6 +447,7 @@ async function carregarResultadosClima() {
   wrap.innerHTML = '<p class="muted">Carregando…</p>';
   let r;
   try {
+    if (!_climaPerguntas.length) await carregarPerguntasClima();
     r = await sbRpc('clima_resultados_agregados', { p_ciclo_id: cicloId });
   } catch (e) {
     wrap.innerHTML = '<p class="muted">Não foi possível carregar os resultados agora.</p>';
@@ -335,29 +461,40 @@ async function carregarResultadosClima() {
 
   const adesao = r.total_codigos ? Math.round((r.total_respondidos / r.total_codigos) * 100) : 0;
   const medias = r.medias_por_pergunta || {};
-  const mediaGeral = Object.keys(medias).length
-    ? (Object.values(medias).reduce((a, b) => a + Number(b), 0) / Object.keys(medias).length).toFixed(1)
-    : '—';
+  // Média geral só das perguntas de escala 1-5 (as de 0-10 têm outra régua).
+  const escala5 = Object.keys(medias).filter((k) => escalaMaxPerguntaClima(k) === 5).map((k) => Number(medias[k]));
+  const mediaGeral = escala5.length ? escala5.reduce((a, b) => a + b, 0) / escala5.length : null;
   const nps = r.nps || { promotores: 0, neutros: 0, detratores: 0 };
-  const totalNps = nps.promotores + nps.neutros + nps.detratores;
-  const enps = totalNps ? Math.round(((nps.promotores - nps.detratores) / totalNps) * 100) : 0;
 
   wrap.innerHTML = `
-    <div class="clima-kpis-mini">
-      <div class="clima-kpi-mini"><span>Adesão</span><strong>${adesao}%</strong></div>
-      <div class="clima-kpi-mini"><span>Média geral</span><strong>${mediaGeral}</strong></div>
-      <div class="clima-kpi-mini"><span>eNPS</span><strong>${enps >= 0 ? '+' : ''}${enps}</strong></div>
-      <div class="clima-kpi-mini"><span>Respostas</span><strong>${r.total_respondidos}</strong></div>
+    <div class="clima-kpis">
+      <div class="clima-kpi">
+        <span class="clima-kpi-rotulo">Adesão</span>
+        ${anelClimaHtml(adesao, '#7b1fa2', adesao + '%')}
+        <small>${r.total_respondidos} de ${r.total_codigos} códigos usados</small>
+      </div>
+      <div class="clima-kpi">
+        <span class="clima-kpi-rotulo">Média geral</span>
+        ${mediaGeral === null ? '<strong class="clima-kpi-num">—</strong>' : anelClimaHtml((mediaGeral / 5) * 100, corNotaClima(mediaGeral, 5), mediaGeral.toFixed(1))}
+        <small>perguntas de escala, de 1 a 5</small>
+      </div>
+      <div class="clima-kpi clima-kpi--resp">
+        <span class="clima-kpi-rotulo">Respostas</span>
+        <strong class="clima-kpi-num">${r.total_respondidos}</strong>
+        <small>questionários enviados</small>
+      </div>
     </div>
+
+    ${enpsClimaHtml(nps)}
+
     <div class="card">
       <h3 class="clima-eyebrow-card">Média por pergunta</h3>
-      ${Object.keys(medias).sort((a, b) => Number(a.slice(1)) - Number(b.slice(1))).map((chave) => `
-        <div class="clima-score-row">
-          <span class="clima-score-label" title="${escHtml(textoPerguntaClima(chave))}">Pergunta ${chave.slice(1)}</span>
-          <div class="clima-score-track"><div class="clima-score-fill" style="width:${Math.min(100, (Number(medias[chave]) / escalaMaxPerguntaClima(chave)) * 100)}%;"></div></div>
-          <span class="clima-score-value">${Number(medias[chave]).toFixed(1)}</span>
-        </div>
-      `).join('')}
+      <div class="clima-legenda-cores">
+        <span><i style="background:${CLIMA_COR_BOM};"></i>Ponto forte</span>
+        <span><i style="background:${CLIMA_COR_MEDIO};"></i>Atenção</span>
+        <span><i style="background:${CLIMA_COR_RUIM};"></i>Crítico</span>
+      </div>
+      ${perguntasResultadoClimaHtml(medias)}
     </div>
     <p class="muted">Resultado sempre da empresa toda — sem recorte por área, turno ou cargo.</p>
   `;
