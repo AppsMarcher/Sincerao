@@ -139,3 +139,6 @@
 @media (prefers-reduced-motion: reduce) {
   .badge-piscando { animation: none; }
 }
+
+.linha-consolidado td { background:var(--bg-soft, #f6f1f5); border-bottom:2px solid var(--line); }
+.legenda-ponto { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; }
