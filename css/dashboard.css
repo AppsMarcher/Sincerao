@@ -31,6 +31,10 @@
 .gestao-kpis span { display:block; color:var(--text-soft); font-size:13px; }
 .gestao-kpis strong { font-size:26px; color:var(--primary); }
 
+.card-cabecalho { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4); }
+.card-cabecalho h3 { margin: 0; }
+.card-cabecalho-acoes { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); }
+.card-cabecalho-acoes[hidden] { display: none; }
 .card-avaliacao-badges { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
 .badge-atencao { background: rgba(217, 119, 6, 0.12); color: var(--amber); }
 

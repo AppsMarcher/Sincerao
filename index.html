@@ -214,7 +214,13 @@
       <div id="dash-minhas"></div>
     </section>
     <section class="card" id="dash-equipe-wrap">
-      <h3><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Avaliações da minha equipe</h3>
+      <div class="card-cabecalho">
+        <h3><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Avaliações da minha equipe</h3>
+        <div class="card-cabecalho-acoes" id="dash-equipe-acoes" hidden>
+          <button class="btn-link" title="Baixar um PDF com todas as avaliações concluídas da equipe" onclick="baixarCompiladoEquipe('download_equipe')"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> <span>Todas as avaliações</span></button>
+          <button class="btn-link" title="Baixar um PDF com os planos de desenvolvimento de toda a equipe" onclick="baixarCompiladoEquipe('download_pdi_equipe')"><svg class="icon" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> <span>Todos os planos</span></button>
+        </div>
+      </div>
       <div id="dash-equipe"></div>
     </section>
     <section class="card" id="dash-todas-wrap" style="display:none">

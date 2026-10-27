@@ -155,7 +155,7 @@ const ESTILO = `
   .rodape-pagina{margin-top:24px;padding-top:10px;border-top:1px solid #ede8ee;font-size:8.5px;color:#a49da8;text-align:center}
 `;
 
-function relatorioHtml(av: any, notas: any[], somentePdi = false) {
+function paginasRelatorio(av: any, notas: any[], somentePdi = false) {
   const dados = av.dados || {};
   const perguntas = (grupo: string) => {
     const respostas = dados[grupo] || {};
@@ -189,11 +189,51 @@ function relatorioHtml(av: any, notas: any[], somentePdi = false) {
     pagina(5, 'Plano de desenvolvimento', perguntas('resumo')),
     pagina(6, 'Parecer final', `<div class="pergunta"><h3>Parecer do gestor e colaborador</h3><p>${esc(parecer || 'Não informado.').replace(/\n/g, '<br>')}</p></div><h2>Resultado final</h2><div class="stats-final"><div class="stat"><div class="label">Pontuação geral</div><div class="value">${esc(av.pontuacao_geral ?? '—')}/5</div></div><div class="stat"><div class="label">Percentual</div><div class="value">${esc(av.percentual ?? '—')}%</div></div><div class="stat"><div class="label">Classificação</div><div class="value" style="color:${corClassificacao(av.classificacao)}">${esc(av.classificacao || '—')}</div></div></div>${cienciaHtml}`),
   ];
+  return paginas;
+}
+
+function documentoHtml(paginas: string[]) {
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
     <style>${ESTILO}</style></head><body>${paginas.join('')}</body></html>`;
 }
+
+// Compilado do gestor: capa com índice + o relatório (ou só o plano) de cada
+// colaborador, em um único PDF.
+function compiladoEquipeHtml(avs: any[], notasPorAvaliacao: Map<string, any[]>, somentePdi: boolean) {
+  const geradoEm = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  const titulo = somentePdi ? 'Planos de desenvolvimento da equipe' : 'Avaliações de desempenho da equipe';
+  const itens = avs.map((av) => `<tr><td>${esc(av.colaborador?.nome || '—')}</td><td>${esc(av.ciclo?.nome || '—')}</td></tr>`).join('');
+  const capa = `<article class="pagina"><div class="capa"><div class="capa-topo"><img src="${LOGO_URL}" alt="Sincerão"><span>Gerado em ${esc(geradoEm)}</span></div><div class="capa-meio"><div class="capa-eyebrow">Compilado do gestor</div><h1 style="font-size:30px">${esc(titulo)}</h1><div class="capa-sub">Gestor: ${esc(avs[0]?.gestor?.nome || '—')} &nbsp;·&nbsp; ${avs.length} ${avs.length === 1 ? 'colaborador' : 'colaboradores'}</div></div></div></article>`;
+  const indice = `<article class="pagina"><h2 style="margin-top:0">Colaboradores incluídos</h2><table><thead><tr><th>Colaborador</th><th>Ciclo</th></tr></thead><tbody>${itens}</tbody></table></article>`;
+  const corpo = avs.flatMap((av) => {
+    const paginas = paginasRelatorio(av, notasPorAvaliacao.get(av.id) || [], somentePdi);
+    return somentePdi ? paginas : paginas.slice(1);
+  });
+  return documentoHtml([capa, indice, ...corpo]);
+}
+
+async function gerarPdf(html: string, token: string) {
+  const resposta = await fetch(`https://production-sfo.browserless.io/pdf?token=${token}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      html,
+      options: {
+        printBackground: true,
+        format: 'A4',
+        margin: { top: '14mm', right: '14mm', bottom: '20mm', left: '14mm' },
+        displayHeaderFooter: true,
+        headerTemplate: '<div></div>',
+        footerTemplate: '<div style="width:100%;font-family:Arial,sans-serif;font-size:8px;color:#a49da8;text-align:center;padding:0 14mm;">Sincerão · Avaliação de Desempenho · Página <span class="pageNumber"></span> de <span class="totalPages"></span></div>',
+      },
+    }),
+  });
+  return resposta.ok ? new Uint8Array(await resposta.arrayBuffer()) : null;
+}
+
+const SELECT_AVALIACAO = 'id,status,dados,pontuacao_geral,percentual,classificacao,ciencia_colaborador_em,ciencia_gestor_em,colaborador_id,gestor_id,colaborador:colaborador_id(nome,email),gestor:gestor_id(nome,email),ciclo:ciclo_id(nome)';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -205,11 +245,34 @@ Deno.serve(async (req) => {
     const caller = createClient(url, anon, { global: { headers: { Authorization: req.headers.get('Authorization') || '' } } });
     const { data: { user } } = await caller.auth.getUser();
     if (!user) return json({ error: 'Não autenticado.' }, 401);
-    const { avaliacao_id, modo } = await req.json();
-    if (!avaliacao_id) return json({ error: 'Avaliação não informada.' }, 400);
-
+    const { avaliacao_id, avaliacao_ids, modo } = await req.json();
     const admin = createClient(url, service);
-    const { data: av } = await admin.from('avaliacoes').select('id,status,dados,pontuacao_geral,percentual,classificacao,ciencia_colaborador_em,ciencia_gestor_em,colaborador_id,gestor_id,colaborador:colaborador_id(nome,email),gestor:gestor_id(nome,email),ciclo:ciclo_id(nome)').eq('id', avaliacao_id).single();
+
+    // Compilado do gestor (um PDF com várias avaliações concluídas).
+    if (modo === 'download_equipe' || modo === 'download_pdi_equipe') {
+      if (!Array.isArray(avaliacao_ids) || !avaliacao_ids.length) return json({ error: 'Nenhuma avaliação informada.' }, 400);
+      const { data: avs } = await admin.from('avaliacoes').select(SELECT_AVALIACAO).in('id', avaliacao_ids).eq('status', 'concluida');
+      if (!avs?.length) return json({ error: 'Não há avaliações concluídas para compilar.' }, 400);
+      const { data: perfilEquipe } = await admin.from('perfis').select('papel').eq('id', user.id).single();
+      const ehRh = ['rh', 'admin'].includes(perfilEquipe?.papel);
+      if (!ehRh && avs.some((a) => a.gestor_id !== user.id)) return json({ error: 'Você não tem permissão para baixar estas avaliações.' }, 403);
+      const ordenadas = [...avs].sort((a, b) => String(a.colaborador?.nome || '').localeCompare(String(b.colaborador?.nome || ''), 'pt-BR'));
+      const somentePdi = modo === 'download_pdi_equipe';
+      const notasPorAvaliacao = new Map<string, any[]>();
+      if (!somentePdi) {
+        const { data: notas } = await admin.from('avaliacao_notas').select('avaliacao_id,nota,comentario,competencia:competencia_id(nome)').in('avaliacao_id', ordenadas.map((a) => a.id));
+        for (const nota of notas || []) notasPorAvaliacao.set(nota.avaliacao_id, [...(notasPorAvaliacao.get(nota.avaliacao_id) || []), nota]);
+      }
+      const tokenEquipe = Deno.env.get('BROWSERLESS_API_TOKEN');
+      if (!tokenEquipe) return json({ error: 'Geração de PDF não configurada (BROWSERLESS_API_TOKEN ausente).' }, 500);
+      const bytes = await gerarPdf(compiladoEquipeHtml(ordenadas, notasPorAvaliacao, somentePdi), tokenEquipe);
+      if (!bytes) return json({ error: 'Não foi possível gerar o PDF.' }, 502);
+      const arquivoEquipe = somentePdi ? 'planos-desenvolvimento-equipe.pdf' : 'avaliacoes-equipe.pdf';
+      return new Response(bytes, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${arquivoEquipe}"` } });
+    }
+
+    if (!avaliacao_id) return json({ error: 'Avaliação não informada.' }, 400);
+    const { data: av } = await admin.from('avaliacoes').select(SELECT_AVALIACAO).eq('id', avaliacao_id).single();
     if (!av || av.status !== 'concluida') return json({ error: 'Somente avaliações concluídas podem ser enviadas.' }, 400);
     const { data: perfil } = await admin.from('perfis').select('papel').eq('id', user.id).single();
     // colaborador entra aqui porque a nova automação de fim de consenso
@@ -222,24 +285,9 @@ Deno.serve(async (req) => {
     const notasResult = await admin.from('avaliacao_notas').select('nota,comentario,competencia:competencia_id(nome)').eq('avaliacao_id', av.id);
     const token = Deno.env.get('BROWSERLESS_API_TOKEN');
     if (!token) return json({ error: 'Geração de PDF não configurada (BROWSERLESS_API_TOKEN ausente).' }, 500);
-    const pdf = await fetch(`https://production-sfo.browserless.io/pdf?token=${token}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        html: relatorioHtml(av, notasResult.data || [], modo === 'download_pdi'),
-        options: {
-          printBackground: true,
-          format: 'A4',
-          margin: { top: '14mm', right: '14mm', bottom: '20mm', left: '14mm' },
-          displayHeaderFooter: true,
-          headerTemplate: '<div></div>',
-          footerTemplate: '<div style="width:100%;font-family:Arial,sans-serif;font-size:8px;color:#a49da8;text-align:center;padding:0 14mm;">Sincerão · Avaliação de Desempenho · Página <span class="pageNumber"></span> de <span class="totalPages"></span></div>',
-        },
-      }),
-    });
-    if (!pdf.ok) return json({ error: 'Não foi possível gerar o PDF da avaliação.' }, 502);
+    const pdfBytes = await gerarPdf(documentoHtml(paginasRelatorio(av, notasResult.data || [], modo === 'download_pdi')), token);
+    if (!pdfBytes) return json({ error: 'Não foi possível gerar o PDF da avaliação.' }, 502);
     const nomeArquivo = `avaliacao-${String(av.colaborador?.nome || 'colaborador').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.pdf`;
-    const pdfBytes = new Uint8Array(await pdf.arrayBuffer());
 
     // Modo "baixar" -- só gera e devolve o arquivo pro navegador, sem mandar
     // e-mail nenhum (usado pelo botão de download no dashboard e na capa da

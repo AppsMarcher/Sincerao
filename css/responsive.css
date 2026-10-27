@@ -44,6 +44,8 @@
      empilha texto e badge em vez de espremer os dois numa linha só. */
   .card-avaliacao { flex-wrap: wrap; row-gap: var(--space-2); }
   .card-avaliacao-badges { flex-shrink: 1; }
+  /* Botões do compilado da equipe viram só ícones (a dica fica no title). */
+  .card-cabecalho-acoes .btn-link span { display: none; }
 
   /* Edição inline do nome no Perfil: o input precisa poder encolher além do
      seu tamanho padrão pra sobrar espaço pro botão "Salvar" ao lado. */

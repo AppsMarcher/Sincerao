@@ -59,6 +59,7 @@ function renderDashboard() {
     const avisoGestor = aguardandoColaborador.length
       ? `<div class="aviso-avaliacao-gestor"><strong>${aguardandoColaborador.length === 1 ? 'Autoavaliação pendente' : 'Autoavaliações pendentes'}</strong><div>${aguardandoColaborador.length === 1 ? escHtml(aguardandoColaborador[0].colaborador?.nome || 'Um colaborador') + ' ainda não concluiu a autoavaliação.' : `${aguardandoColaborador.length} colaboradores ainda não concluíram a autoavaliação.`} Você será avisado quando ela for devolvida para a etapa de consenso.</div></div>`
       : '';
+    document.getElementById('dash-equipe-acoes').hidden = !comoGestor.some((a) => a.status === 'concluida');
     document.getElementById('dash-equipe').innerHTML = avisoGestor + linhasAvaliacaoHtml(comoGestor, 'gestor');
   } else {
     secaoGestor.style.display = 'none';

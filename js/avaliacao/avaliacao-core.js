@@ -245,7 +245,19 @@ document.addEventListener('click', (evento) => {
 // porque a resposta aqui é o PDF binário, não JSON.
 let downloadPdfEmAndamento = false;
 // `modo` 'download_pdi' gera só o Plano de desenvolvimento (botão do gestor).
-async function baixarPdfAvaliacao(avaliacaoId, modo = 'download') {
+function baixarPdfAvaliacao(avaliacaoId, modo = 'download') {
+  return baixarPdfDaFuncao({ avaliacao_id: avaliacaoId, modo });
+}
+
+// Compilado do gestor: um PDF único com todas as avaliações concluídas da
+// equipe (`modo` 'download_equipe') ou só os planos ('download_pdi_equipe').
+function baixarCompiladoEquipe(modo) {
+  const ids = G.avaliacoes.filter((a) => a.gestor_id === G.perfil.id && a.status === 'concluida').map((a) => a.id);
+  if (!ids.length) return showToast('Não há avaliações concluídas para baixar.');
+  return baixarPdfDaFuncao({ avaliacao_ids: ids, modo });
+}
+
+async function baixarPdfDaFuncao(corpo) {
   if (downloadPdfEmAndamento) return;
   downloadPdfEmAndamento = true;
   mostrarProgressoDownloadPdf(true);
@@ -254,7 +266,7 @@ async function baixarPdfAvaliacao(avaliacaoId, modo = 'download') {
     const r = await fetch(SUPABASE_URL + '/functions/v1/enviar-avaliacao', {
       method: 'POST',
       headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ avaliacao_id: avaliacaoId, modo }),
+      body: JSON.stringify(corpo),
     });
     if (!r.ok) {
       let mensagem = 'Não foi possível gerar o PDF.';
