@@ -119,6 +119,11 @@ function linhasAvaliacaoHtml(lista, papelVisao) {
       <div class="card-avaliacao-badges">
         <span class="badge${piscar ? ' badge-piscando' : ''}">${escHtml(labelStatusCard(a, papelVisao))}</span>
         ${
+          a.status === 'concluida' && papelVisao === 'gestor'
+            ? `<button class="btn-icon" title="Baixar somente o plano de desenvolvimento" onclick="event.stopPropagation(); baixarPdfAvaliacao('${a.id}', 'download_pdi')"><svg class="icon" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></button>`
+            : ''
+        }
+        ${
           a.status === 'concluida'
             ? `<button class="btn-icon" title="Baixar PDF da avaliação" onclick="event.stopPropagation(); baixarPdfAvaliacao('${a.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>`
             : ''

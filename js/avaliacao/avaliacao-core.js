@@ -244,7 +244,8 @@ document.addEventListener('click', (evento) => {
 // capa da avaliação concluída. Usa fetch cru em vez de sbInvokeFunction
 // porque a resposta aqui é o PDF binário, não JSON.
 let downloadPdfEmAndamento = false;
-async function baixarPdfAvaliacao(avaliacaoId) {
+// `modo` 'download_pdi' gera só o Plano de desenvolvimento (botão do gestor).
+async function baixarPdfAvaliacao(avaliacaoId, modo = 'download') {
   if (downloadPdfEmAndamento) return;
   downloadPdfEmAndamento = true;
   mostrarProgressoDownloadPdf(true);
@@ -253,7 +254,7 @@ async function baixarPdfAvaliacao(avaliacaoId) {
     const r = await fetch(SUPABASE_URL + '/functions/v1/enviar-avaliacao', {
       method: 'POST',
       headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ avaliacao_id: avaliacaoId, modo: 'download' }),
+      body: JSON.stringify({ avaliacao_id: avaliacaoId, modo }),
     });
     if (!r.ok) {
       let mensagem = 'Não foi possível gerar o PDF.';

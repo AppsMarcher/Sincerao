@@ -155,7 +155,7 @@ const ESTILO = `
   .rodape-pagina{margin-top:24px;padding-top:10px;border-top:1px solid #ede8ee;font-size:8.5px;color:#a49da8;text-align:center}
 `;
 
-function relatorioHtml(av: any, notas: any[]) {
+function relatorioHtml(av: any, notas: any[], somentePdi = false) {
   const dados = av.dados || {};
   const perguntas = (grupo: string) => {
     const respostas = dados[grupo] || {};
@@ -180,7 +180,7 @@ function relatorioHtml(av: any, notas: any[]) {
   const geradoEm = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   const capa = `<article class="pagina"><div class="capa"><div class="capa-topo"><img src="${LOGO_URL}" alt="Sincerão"><span>Gerado em ${esc(geradoEm)}</span></div><div class="capa-meio"><div class="capa-eyebrow">Relatório de Avaliação de Desempenho</div><h1>${esc(av.colaborador?.nome || '—')}</h1><div class="capa-sub">Gestor: ${esc(av.gestor?.nome || '—')} &nbsp;·&nbsp; Ciclo: ${esc(av.ciclo?.nome || '—')}</div></div><div class="capa-stats"><div class="stat"><div class="label">Pontuação geral</div><div class="value">${esc(av.pontuacao_geral ?? '—')}/5</div></div><div class="stat"><div class="label">Percentual</div><div class="value">${esc(av.percentual ?? '—')}%</div></div><div class="stat"><div class="label">Classificação</div><div class="value">${esc(av.classificacao || '—')}</div></div></div></div></article>`;
 
-  const paginas = [
+  const paginas = somentePdi ? [pagina(5, 'Plano de desenvolvimento', perguntas('resumo'))] : [
     capa,
     pagina(1, 'Resultados do período', perguntas('resultados')),
     pagina(2, 'Avaliação das competências', notasHtml),
@@ -226,7 +226,7 @@ Deno.serve(async (req) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        html: relatorioHtml(av, notasResult.data || []),
+        html: relatorioHtml(av, notasResult.data || [], modo === 'download_pdi'),
         options: {
           printBackground: true,
           format: 'A4',
@@ -244,10 +244,11 @@ Deno.serve(async (req) => {
     // Modo "baixar" -- só gera e devolve o arquivo pro navegador, sem mandar
     // e-mail nenhum (usado pelo botão de download no dashboard e na capa da
     // avaliação concluída). Não exige destinatário nem RESEND_API_KEY.
-    if (modo === 'download') {
+    if (modo === 'download' || modo === 'download_pdi') {
+      const arquivo = modo === 'download_pdi' ? nomeArquivo.replace(/^avaliacao-/, 'plano-desenvolvimento-') : nomeArquivo;
       return new Response(pdfBytes, {
         status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${nomeArquivo}"` },
+        headers: { ...corsHeaders, 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${arquivo}"` },
       });
     }
 
