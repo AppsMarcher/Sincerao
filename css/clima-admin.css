@@ -123,3 +123,17 @@
   .clima-escala-rotulos > div { font-size: 10.5px; }
   .clima-pergunta-grafico { padding-left: 0; }
 }
+
+/* Exportação em PDF dos Resultados (window.print) */
+.clima-print-titulo { display: none; }
+@media print {
+  @page { size: A4; margin: 12mm; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .topbar, .modulo-tabs, .clima-exportar-pdf, .toast,
+  #clima-panel-ciclos, #clima-panel-administracao,
+  #clima-panel-resultados .campo { display: none !important; }
+  body { background: #fff; }
+  .content { padding: 0; max-width: none; }
+  .clima-print-titulo { display: block; margin: 0 0 12px; font-weight: 600; }
+  #clima-panel-resultados .card, .clima-kpi { break-inside: avoid; box-shadow: none; }
+}

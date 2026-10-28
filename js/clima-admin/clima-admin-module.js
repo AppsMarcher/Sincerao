@@ -438,6 +438,22 @@ function perguntasResultadoClimaHtml(medias) {
   }).join('');
 }
 
+// PDF via impressão do navegador ("Salvar como PDF"): o @media print em
+// clima-admin.css deixa só o relatório na página. O título do documento vira
+// o nome sugerido do arquivo.
+function exportarResultadosClimaPdf() {
+  const select = document.getElementById('clima-resultados-ciclo');
+  const ciclo = select.selectedOptions[0]?.textContent.trim() || '';
+  if (!select.value || !document.querySelector('#clima-resultados-conteudo .clima-kpis')) {
+    return showToast('Não há resultados para exportar neste ciclo.');
+  }
+  const tituloOriginal = document.title;
+  document.getElementById('clima-print-titulo').textContent = `${ciclo} — gerado em ${new Date().toLocaleDateString('pt-BR')}`;
+  document.title = `Resultados - ${ciclo}`;
+  window.addEventListener('afterprint', () => { document.title = tituloOriginal; }, { once: true });
+  window.print();
+}
+
 async function carregarResultadosClima() {
   const select = document.getElementById('clima-resultados-ciclo');
   const cicloId = select.value;
